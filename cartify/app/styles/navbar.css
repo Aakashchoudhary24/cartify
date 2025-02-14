@@ -1,0 +1,50 @@
+*{
+    font-family: "Faculty Glyphic";
+}
+
+.container{
+    height: 60px;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+}
+
+.navbar {
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 15vw;
+    align-items: center;
+    height: 60px;
+    margin-left: 140px;
+    overflow: hidden;
+}
+
+.pages{
+    display: flex;
+    list-style-type: none;
+    gap: 3vw;
+    text-decoration: none;
+    font-size: 20px;
+    padding: 0;
+    margin-top: 30px;
+}
+.pages a {
+    text-decoration: none;
+    color: black;
+}
+
+.logo {
+    font-style: italic;
+    font-size: 40px;
+}
+
+.search-bar {
+    height: 20px;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 7px;
+    text-indent: 10px;
+    width: 250px;
+    margin-top: 10px;
+}
