@@ -1,13 +1,11 @@
-import Navbar from "./Components/Navbar";
-import Footer from "./Components/Footer";
-import Landing from "./Pages/Landing";
-import Categories from "./Components/Categories";
+import Footer from "./components/footer";
+import Navbar from "./components/navbar";
+import Landing from "./landing/page";
 
 export default function Home(){
   return(
     <div className="main">
       <Navbar/>
-      <Categories/>
       <Landing/>
       <Footer/>
     </div>
