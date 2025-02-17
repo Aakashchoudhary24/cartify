@@ -1,6 +1,12 @@
+.form-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 form {
-    justify-self: center;
     border: 1px solid black;
     margin-top: 10vh;
-    padding: 20px;
+    padding: 10px;
 }
