@@ -23,3 +23,7 @@ Thumbs.db
 
 # Ignore environment variables (if using a `.env` file for secrets)
 .env
+
+
+# python virtual environment
+.venv/
