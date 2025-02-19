@@ -1,7 +1,7 @@
 "use client";
 import React from 'react'
 import { useState } from 'react';
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 import styles from "../styles/forms.module.css"
 
 export default function page() {

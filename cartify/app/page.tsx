@@ -1,5 +1,5 @@
 import Footer from "./components/footer";
-import Navbar from "./components/navbar";
+import Navbar from "./components/Navbar";
 import Landing from "./landing/page";
 
 export default function Home(){

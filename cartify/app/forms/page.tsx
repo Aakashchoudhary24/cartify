@@ -1,5 +1,5 @@
 "use client";
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 import styles from "../styles/forms.module.css";
 import Image from "next/image";
 import { useState } from "react";
