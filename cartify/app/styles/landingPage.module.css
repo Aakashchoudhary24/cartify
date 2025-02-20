@@ -1,0 +1,102 @@
+.landingContainer {
+    width: 90%;
+    max-width: 1400px;
+    margin: auto;
+    text-align: center;
+    background-color: #CFC8C5;
+    border: 0.5px hidden;
+    background-clip: padding-box;
+    padding-bottom: 0px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2),
+        0 0 2px rgba(0, 0, 0, 0.15),
+        0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.main {
+    background-color: #CFC8C5;
+}
+
+.navbar {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 15px 0;
+    background: rgb(139, 131, 124);
+    margin-bottom: 0px;
+}
+
+.navbar span {
+    cursor: pointer;
+    transition: color 0.1s;
+}
+
+.navbar span:hover {
+    color: #a87b5d;
+}
+
+.topSection {
+    display: flex;
+    align-items: flex-start;
+}
+
+.topLeft {
+    flex: 1;
+    display: flex;
+    border-radius: 10px;
+}
+
+.topRight {
+    display: flex;
+    flex: 1;
+    border-radius: 10px;
+
+    Image {
+        border-radius: 10px;
+    }
+}
+
+.topCenter {
+    flex: 2;
+    font-size: 2.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 30px 0;
+}
+
+.brandsSection {
+    margin-top: 50px;
+}
+
+.brandsSection h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.brandsContainer {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.brandCard {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.brandCard:hover {
+    transform: scale(1.05);
+}
+
+.brandCard p {
+    margin-top: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+}

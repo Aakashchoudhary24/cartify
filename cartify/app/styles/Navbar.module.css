@@ -21,7 +21,8 @@
   justify-content: space-between;
   gap: 20px;
   margin-left: 30px;
-
+  cursor: pointer;
+  transition: color 0.1s;
 }
 
 .navLinks li:hover {
@@ -44,6 +45,9 @@
   position: relative;
   margin-left: 30px;
   justify-content: center;
+  cursor: pointer;
+  transition: color 0.1s;
+  gap: 8px;
 }
 
 .cartIcon:hover {
@@ -53,21 +57,6 @@
 
 .cartIcon svg {
   font-size: 20px;
-}
-
-.cartBadge {
-  position: absolute;
-  top: -5px;
-  right: -10px;
-  background-color: red;
-  color: white;
-  font-size: 12px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .searchBox {

@@ -24,8 +24,7 @@ function Navbar() {
                 </div>
 
                 <div className={styles.cartIcon} onClick={() => router.push("/cart")}>
-                    CART<FaShoppingCart />
-                    <span className={styles.cartBadge}>2</span>
+                    <FaShoppingCart /> {' '}CART
                 </div>
             </nav>
         </>
