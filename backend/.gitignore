@@ -67,6 +67,7 @@ coverage.xml
 env/
 venv/
 ENV/
+.venv/
 
 # Next.js frontend (if in the same repo)
 # Dependencies
