@@ -36,7 +36,6 @@
     text-align: center;
 }
 
-.label {}
 
 .labelWrapper {
     align-self: stretch;
@@ -274,6 +273,7 @@
     align-items: flex-start;
     justify-content: flex-start;
     font-family: 'Courier New', Courier, 'Times New Roman', Times, serif;
+    margin-top: 10px;
     padding: 2px;
     text-align: left;
     font-size: 16px;
@@ -305,14 +305,14 @@
 .signUpNow {
     position: absolute;
     top: 50px;
-    left: 1000px;
+    left: 900px;
     border-radius: 24px;
     border: black solid 2px;
     background-color: #f7eeee;
     border: 1px solid rgba(102, 102, 102, 0.5);
     box-sizing: border-box;
-    width: 772px;
-    height: 770px;
+    width: 750px;
+    height: 720px;
     overflow: hidden;
     font-size: 16px;
     color: #333;
@@ -330,8 +330,8 @@
 .homePage {
     width: 100%;
     position: relative;
-    background-color: #1f1f1f;
-    height: 1000px;
+    background-color: #000000;
+    min-height: 800px;
     overflow: hidden;
     text-align: left;
     font-size: 48px;
@@ -339,10 +339,6 @@
     font-family: Poppins;
     /* background-image: url("../../public/images/image.png");
     background-size: inherit; */
-}
-
-body {
-    overflow: hidden;
 }
 
 .loginNow {

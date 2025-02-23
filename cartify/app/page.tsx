@@ -7,6 +7,7 @@ export default function Home() {
     <div className="main">
       <Navbar />
       <Landing />
+      <Footer/>
     </div>
   )
 }

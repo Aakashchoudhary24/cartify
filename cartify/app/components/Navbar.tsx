@@ -14,7 +14,7 @@ function Navbar() {
                     <li onClick={() => router.push("/products")}>SHOP</li>
                     <li onClick={() => router.push("/")}>HOME</li>
                     <li onClick={() => router.push("/about")}>ABOUT</li>
-                    <li onClick={() => router.push("/forms")}>LOGIN</li>
+                    <li onClick={() => router.push("/forms")}>REGISTER</li>
                 </ul>
                 <div className={styles.searchBox}>
                     <span className={styles.searchIcon}>

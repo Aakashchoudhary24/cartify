@@ -89,9 +89,9 @@ export default function Forms() {
                                     />
                                     <span className={styles.termsOfUse}>
                                         By creating an account, I agree to the {" "}
-                                        <a href="#" className={styles.termsOfUse}>Terms of Use</a>
+                                        <a href="#" className={styles.termsOfUse} style={{textDecoration: 'underline'}}>Terms of Use</a>
                                         {" "}and{" "}
-                                        <a href="#" className={styles.termsOfUse}>Privacy Policy</a>
+                                        <a href="#" className={styles.termsOfUse} style={{ textDecoration: 'underline' }}>Privacy Policy</a>
                                     </span>
                                 </div>
                                 <div className={styles.checkBox}>
@@ -107,10 +107,11 @@ export default function Forms() {
                                 </div>
                             </div>
                             <button type="submit" className={styles.button}>Sign Up</button>
+
+                            <span className={styles.haveAnAccountLogin}>
+                                Already have an account? {" "} <a href="#" className={styles.logIn} onClick={() => router.push('/login')}>Log in</a>
+                            </span>
                         </form>
-                        <span className={styles.haveAnAccountLogin}>
-                            Already have an account? {" "} <a href="#" className={styles.logIn} onClick={() => router.push('/login')}>Log in</a>
-                        </span>
                     </div>
                 </div>
             </div>
