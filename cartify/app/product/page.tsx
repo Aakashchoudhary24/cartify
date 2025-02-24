@@ -1,5 +1,6 @@
-'use client'
+'use client';
 import React, { useState } from "react";
+import styles from "../styles/ProductsPage.module.css"; 
 
 const productsData = [
   { id: 1, name: "Autumn Dress", price: 85, originalPrice: 124, colors: 2, image: "autumn-dress.jpg" },
@@ -28,41 +29,43 @@ const ProductsPage = () => {
   };
 
   return (
-    <div className="flex p-6 w-4/5 mx-auto">
+    <div className={styles.productsContainer}>
       {/* Sidebar Filters */}
-      <div className="w-1/4 p-4 border-r">
-        <h3 className="font-semibold mb-4">Category</h3>
-        <ul>
-          <li><input type="checkbox" defaultChecked className="mr-2" /> Tops (37)</li>
-          <li><input type="checkbox" className="mr-2" /> Jackets (22)</li>
-          <li><input type="checkbox" className="mr-2" /> Sweaters (31)</li>
+      <div className={styles.sidebar}>
+        <h3 className={styles.sidebarTitle}>Category</h3>
+        <ul className={styles.sidebarList}>
+          <li><input type="checkbox" defaultChecked className={styles.checkbox} /> Tops (37)</li>
+          <li><input type="checkbox" className={styles.checkbox} /> Jackets (22)</li>
+          <li><input type="checkbox" className={styles.checkbox} /> Sweaters (31)</li>
         </ul>
-        <h3 className="font-semibold mt-4">Filters</h3>
-        <ul>
-          <li><input type="checkbox" defaultChecked className="mr-2" /> $20 - $100</li>
-          <li><input type="checkbox" defaultChecked className="mr-2" /> Medium</li>
+        <h3 className={styles.sidebarTitle}>Filters</h3>
+        <ul className={styles.sidebarList}>
+          <li><input type="checkbox" defaultChecked className={styles.checkbox} /> $20 - $100</li>
+          <li><input type="checkbox" defaultChecked className={styles.checkbox} /> Medium</li>
         </ul>
       </div>
-      
+
       {/* Products Section */}
-      <div className="w-3/4 px-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">
+      <div className={styles.productsSection}>
+        <div className={styles.productsHeader}>
+          <h2 className={styles.productsTitle}>
             Showing {filteredProducts.length} results from total {productsData.length} for "tops"
           </h2>
-          <select onChange={handleSortChange} value={sortOption} className="border p-2 rounded">
+          <select onChange={handleSortChange} value={sortOption} className={styles.sortDropdown}>
             <option value="popularity">Sort by Popularity</option>
             <option value="priceLowHigh">Sort by Price: Low to High</option>
             <option value="priceHighLow">Sort by Price: High to Low</option>
           </select>
         </div>
-        <div className="grid grid-cols-3 gap-6">
+        <div className={styles.productsGrid}>
           {filteredProducts.map((product) => (
-            <div key={product.id} className="border p-4 rounded-lg shadow-lg">
-              <img src={product.image} alt={product.name} className="w-full h-40 object-cover mb-2" />
-              <h3 className="font-semibold">{product.name}</h3>
-              <p className="text-gray-500">{product.colors} Colors</p>
-              <p className="font-bold text-lg">${product.price} {product.originalPrice && <span className="text-gray-400 line-through text-sm">${product.originalPrice}</span>}</p>
+            <div key={product.id} className={styles.productCard}>
+              <img src={product.image} alt={product.name} className={styles.productImage} />
+              <h3 className={styles.productName}>{product.name}</h3>
+              <p className={styles.productColors}>{product.colors} Colors</p>
+              <p className={styles.productPrice}>
+                ${product.price} {product.originalPrice && <span className={styles.originalPrice}>${product.originalPrice}</span>}
+              </p>
             </div>
           ))}
         </div>

@@ -1,0 +1,206 @@
+.container {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+  
+  .grid {
+    display: grid;
+    gap: 2rem;
+  }
+  
+  @media (min-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+
+  .image {
+    width: 100%;
+    height: 24rem;
+    object-fit: cover;
+    border-radius: 0.5rem;
+  }
+  
+  .thumbnailContainer {
+    display: flex;
+    margin-top: 1rem;
+    gap: 0.5rem;
+  }
+  
+  .thumbnail {
+    width: 5rem;
+    height: 5rem;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    border: 1px solid #e5e7eb;
+    transition: border-color 0.2s;
+  }
+  
+  .thumbnail:hover {
+    border-color: black;
+  }
+  
+
+  .productTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .priceContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  
+  .price {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+  }
+  
+  .originalPrice {
+    text-decoration: line-through;
+    color: #6b7280;
+  }
+  
+  .discount {
+    color: #ef4444;
+  }
+  
+  .rating {
+    color: #4b5563;
+    margin-top: 0.25rem;
+  }
+  
+  .description {
+    color: #374151;
+    margin-top: 1rem;
+  }
+  
+
+  .colorSection, .sizeSection {
+    margin-top: 1.5rem;
+  }
+  
+  .sectionTitle {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .colorOptions, .sizeOptions {
+    display: flex;
+    gap: 0.75rem;
+  }
+  
+  .colorButton {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 2px solid #d1d5db;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  
+  .colorButton.selected {
+    border-color: black;
+  }
+  
+  .sizeButton {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  
+  .sizeButton.selected {
+    background-color: black;
+    color: white;
+  }
+  
+
+  .buttonContainer {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .addToCart {
+    background-color: #e5e7eb;
+    color: black;
+  }
+  
+  .addToCart:hover {
+    background-color: #d1d5db;
+  }
+  
+  .checkout {
+    background-color: black;
+    color: white;
+  }
+  
+  .checkout:hover {
+    background-color: #333;
+  }
+  
+
+  .recommendations {
+    margin-top: 3rem;
+  }
+  
+  .recommendationsTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  
+  .recommendationGrid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  
+  .recommendationCard {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: #f9fafb;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .recommendationCard:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .recommendationImage {
+    width: 100%;
+    max-height: 140px;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+  }
+  
+  .recommendationName {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #374151;
+  }
+  
+  .recommendationPrice {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f2937;
+  }
+  
