@@ -37,8 +37,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api'
+    'api',
+    'authentication',
+    'chowkidar'
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+REFRESH_TOKEN_MODEL = 'authentication.RefreshToken'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -77,9 +85,9 @@ WSGI_APPLICATION = 'api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'cartify_db',
-        'USER': 'postgres',
-        'PASSWORD': 'root',
+        'NAME': 'cartify',
+        'USER': 'cartify_admin',
+        'PASSWORD': 'cartify',
         'HOST': 'localhost', 
         'PORT': '5432',
     }

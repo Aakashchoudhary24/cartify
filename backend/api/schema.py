@@ -3,6 +3,15 @@ from typing import List, Optional
 from datetime import datetime
 from django.contrib.auth.models import User
 from .models import Category, Product, Cart, CartItem, Order, OrderItem, Payment
+from strawberry.tools import merge_types
+from authentication.schema import AuthQuery, AuthMutation
+from strawberry.tools import merge_types
+
+MergedQuery = merge_types("MergedQuery", (AuthQuery,))
+MergedMutation = merge_types("MergedMutation", (AuthMutation,))
+
+Query = merge_types("Query", (AuthQuery,))
+Mutation = merge_types("Mutation", (AuthMutation,))
 
 @strawberry.type
 class CategoryType:
@@ -103,4 +112,4 @@ class Mutation:
         order = Order.objects.create(user=user, total_price=total_price, status="Pending")
         return order
 
-schema = strawberry.Schema(query=Query, mutation=Mutation)
+schema = strawberry.Schema(query=MergedQuery, mutation=MergedMutation)
