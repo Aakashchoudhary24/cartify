@@ -70,3 +70,22 @@
   cursor: pointer;
 }
 
+.input{
+  width: 30%;
+  padding: 8px;
+  margin-bottom: 16px;
+  margin: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  position: relative;
+}
+
+.smallcontainer{
+  border: solid 2px #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+
+
+}
+
+

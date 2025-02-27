@@ -43,13 +43,53 @@ export default function AccountSettings() {
 function ProfileSection() {
   return (
     <div>
-      <h2>My Profile</h2>
-      <div>
-        <p><strong>First Name:</strong> first name</p>
-        <p><strong>Last Name:</strong> lastname</p>
-        <p><strong>Email:</strong> abc@gmail.com</p>
-        <p><strong>Phone:</strong> 9876543210</p>
+    <form className={styles.smallcontainer}>
+      <div className={styles.personalinfoContainer}>
+      <h2>Personal information</h2>
+      <button className={styles.button}>Edit</button>
       </div>
+      <div>
+      <span><label>First name</label></span>
+      <span><input className={styles.input} type="text" value="first name" disabled/></span>
+      </div>
+      <div>
+      <label>Last name</label>
+      <input className={styles.input} type="text" value="last name" disabled/>
+      </div>
+     <div>
+      <label>Email</label>
+      <input className={styles.input} type="text" value="email" disabled/></div>
+      <div>
+      <label>Phone number </label>
+      <input className={styles.input} type="number" value="Phone number" disabled/>
+      </div>
+    </form>
+    <form >
+      <div>
+      <h2>Address</h2>
+      <button className={styles.button}>Edit</button>
+      </div>
+      <div></div>
+      <label>country</label>
+      <input className={styles.input} type="text" value="country" disabled/>
+      
+      <div>
+      <label>State</label>
+      <input className={styles.input} type="text" value="first name" disabled/>
+      </div>
+      <div>
+      <label>city</label>
+      <input className={styles.input} type="text" value="first name" disabled/>
+      </div>
+      <div>
+      <label>street</label>
+      <input className={styles.input}type="text" value="first name" disabled/>
+      </div>
+      <div>
+      <label>pincode</label>
+      <input className={styles.input} type="text" value="first name" disabled/>
+      </div>
+    </form>
     </div>
   );
 }
