@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1akty^pf3q&$9af@u3@zey(riub6@!(u-5nf-=e9hy)kxc0^*v'
+SECRET_KEY = 'django-insecure-!xcj7t935on654g)(bka1_%t3qz6+j!75+7ihuxb9yo3cskgzo'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,7 +37,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'api',
+    'authentication',
+    'chowkidar'
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+REFRESH_TOKEN_MODEL = 'authentication.RefreshToken'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -76,14 +85,19 @@ WSGI_APPLICATION = 'api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+<<<<<<< HEAD
         'NAME': 'cartify_db',
         'USER': 'postgres',
         'PASSWORD': 'root',
+=======
+        'NAME': 'cartify',
+        'USER': 'cartify_admin',
+        'PASSWORD': 'cartify',
+>>>>>>> backend-freshstart
         'HOST': 'localhost', 
         'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
