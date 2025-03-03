@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from chowkidar.decorators import login_required
 from chowkidar.wrappers import issue_tokens_on_login, revoke_tokens_on_logout
 from chowkidar.authentication import authenticate 
+from chowkidar.extension import JWTAuthExtension
 
 User = get_user_model()
 
@@ -55,5 +56,6 @@ class AuthQuery:
 schema = strawberry.Schema(
     query=AuthQuery,
     mutation=AuthMutation,
-    types=[UserType, AuthPayload]  
+    types=[UserType, AuthPayload],
+    extensions=[JWTAuthExtension],
 )
