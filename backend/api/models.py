@@ -84,6 +84,13 @@ class Payment(models.Model):
     status = models.CharField(max_length=20, choices=[("Pending", "Pending"), ("Completed", "Completed")], default="Pending")
     transaction_id = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
     def __str__(self):
         return f"Payment {self.id} - Order {self.order.id}"
+ # About Page
+class About(models.Model):
+    email = models.EmailField(max_length=254)
+    phone = models.CharField(max_length=15)
+    github = models.URLField(max_length=200)
+    linkedin = models.URLField(max_length=200)
+    def __str__(self):
+        return self.email
