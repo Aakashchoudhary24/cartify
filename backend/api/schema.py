@@ -2,7 +2,7 @@ import strawberry
 from typing import List, Optional
 from datetime import datetime
 from django.contrib.auth.models import User
-from .models import Category, Product, Cart, CartItem, Order, OrderItem, Payment
+from .models import Category, Product, Cart, CartItem, Order, OrderItem, Payment, About
 from strawberry.tools import merge_types
 from authentication.schema import AuthQuery, AuthMutation
 
@@ -68,6 +68,13 @@ class PaymentType:
     created_at: datetime
 
 @strawberry.type
+class AboutType:
+    email: str
+    phone: str
+    github: str
+    linkedin: str
+
+@strawberry.type
 class Query:
     @strawberry.field
     def categories(self) -> List[CategoryType]:
@@ -85,6 +92,17 @@ class Query:
     def orders(self, user_id: int) -> List[OrderType]:
         return Order.objects.filter(user__id=user_id)
 
+    @strawberry.field
+    def about(self) -> Optional[AboutType]:
+        about_instance = About.objects.first()
+        if about_instance:
+            return AboutType(
+                email=about_instance.email,
+                phone=about_instance.phone,
+                github=about_instance.github,
+                linkedin=about_instance.linkedin,
+            )
+        return None    
 @strawberry.type
 class Mutation:
     @strawberry.mutation
