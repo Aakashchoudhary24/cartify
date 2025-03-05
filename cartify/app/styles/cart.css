@@ -1,0 +1,262 @@
+/* Main container */
+.cart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+}
+
+/* Main content layout */
+.cart-content {
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px;
+    width: 100%;
+    background: white;
+    padding: 32px;
+}
+
+@media (min-width: 768px) {
+    .cart-content {
+        flex-direction: row;
+    }
+}
+
+/* Left Section */
+.cart-left {
+    width: 100%;
+    padding: 24px;
+}
+
+@media (min-width: 768px) {
+    .cart-left {
+        width: 75%;
+    }
+}
+
+/* Delivery Address */
+.delivery-address {
+    border: 1px solid #93c5fd;
+    padding: 16px;
+    background: #dbeafe;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+.delivery-address h2 {
+    font-weight: bold;
+    color: #2563eb;
+}
+
+.delivery-address span {
+    color: #374151;
+}
+
+.delivery-address button {
+    margin-top: 8px;
+    padding: 8px 16px;
+    border: 1px solid #3b82f6;
+    color: #3b82f6;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+}
+
+/* Offers Section */
+.offers-section {
+    border: 1px solid #d1d5db;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+/* Cart Item */
+.cart-item {
+    display: flex;
+    align-items: center;
+    border: 1px solid #d1d5db;
+    padding: 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+.cart-item-img {
+    width: 160px;
+    height: 192px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 40px;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+}
+
+.seller {
+    color: #6b7280;
+}
+
+.price {
+    color: #ef4444;
+    font-weight: bold;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #6b7280;
+}
+
+.delivery {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.quantity-control{
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+    margin: 2px;
+}
+
+.quantity-control button {
+    padding: 3px 10px 3px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    cursor: pointer;
+    background: white;
+}
+
+.cart-checkbox {
+    margin-left: auto;
+}
+
+/* Vertical Divider */
+.vertical-divider {
+    width: 2px;
+    background: #d1d5db;
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .vertical-divider {
+        display: block;
+    }
+}
+
+/* Right Section */
+.cart-right {
+    width: 100%;
+    padding: 24px;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+@media (min-width: 768px) {
+    .cart-right {
+        width: 30%;
+    }
+}
+
+/* Price Summary */
+.total-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1e3a8a;
+}
+
+.place-order-btn {
+    width: 100%;
+    background: #2563eb;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.cart-right {
+    width: 100%;
+    padding: 24px;
+}
+
+@media (min-width: 768px) {
+    .cart-right {
+        width: 30%;
+    }
+}
+
+/* Boxed sections (Apply Coupons, Donation, Price Summary) */
+.apply-coupons,
+.donation-section,
+.price-summary {
+    border: 1px solid #bfdbfe;
+    /* Light blue border */
+    padding: 16px;
+    border-radius: 4px;
+    background: #eff6ff;
+    /* Light blue background */
+    margin-bottom: 16px;
+}
+
+/* Headings inside sections */
+.apply-coupons h2,
+.donation-section h2,
+.price-summary h2 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1e3a8a;
+    /* Dark blue */
+    margin-bottom: 8px;
+}
+
+/* Donation buttons */
+.donation-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.donation-buttons button {
+    padding: 6px 12px;
+    border: 1px solid #3b82f6;
+    border-radius: 8px;
+    color: #3b82f6;
+    background: white;
+    cursor: pointer;
+}
+
+/* Price Details */
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #1e3a8a;
+    padding: 4px 0;
+}
+
+.total-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1e3a8a;
+    border-top: 1px solid #d1d5db;
+    padding-top: 12px;
+    margin-top: 8px;
+}
+
+/* Place Order Button */
+.place-order-btn {
+    width: 100%;
+    background: #2563eb;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+/* Carousel Section */
+.carousel-section {
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 24px;
+}
