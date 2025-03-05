@@ -25,12 +25,12 @@ const ABOUT_QUERY = gql`
 `;
 
 function getCSRFToken() {
-  const name = 'csrftoken';
+  const name = 'csrftoken=';
   const cookies = document.cookie.split(';');
   for (let i = 0; i < cookies.length; i++) {
     const cookie = cookies[i].trim();
-    if (cookie.startsWith(name + '=')) {
-      return cookie.substring(name.length + 1);
+    if (cookie.startsWith(name)) {
+      return cookie.substring(name.length);
     }
   }
   return '';
@@ -45,13 +45,13 @@ export default function AboutPage() {
     async function fetchAbout() {
       setLoading(true);
       setError(null);
-
+      
       try {
         const endpoint = "http://127.0.0.1:8000/graphql/";
         const headers = {
-          'Authorization': 'Bearer YOUR_ACCESS_TOKEN', // Replace with your actual token
           'X-CSRFToken': getCSRFToken(),
         };
+        
         const data = await request<{ about: About }>(endpoint, ABOUT_QUERY, {}, headers);
         setAbout(data.about);
       } catch (err) {
