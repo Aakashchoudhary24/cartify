@@ -1,10 +1,11 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Carousel from "../carousel/page";
 import "../styles/cart.css";
 
-const cartItems = [
+const initialCartItems = [
     {
+        id: 1,
         img: "LandingImg5.jpeg",
         name: "HERE&NOW",
         description: "Corduroy Weave Oversized Casual Shirt",
@@ -15,6 +16,7 @@ const cartItems = [
         quantity: 1,
     },
     {
+        id: 2,
         img: "LandingImg4.jpeg",
         name: "Zara",
         description: "Slim Fit Casual Shirt",
@@ -25,6 +27,7 @@ const cartItems = [
         quantity: 2,
     },
     {
+        id: 3,
         img: "LandingImg3.jpg",
         name: "Overcoat",
         description: "Women's Overcoat",
@@ -37,8 +40,24 @@ const cartItems = [
 ];
 
 const CartPage = () => {
+    const [cartItems, setCartItems] = useState(initialCartItems);
+
+    // Function to update quantity
+    const updateQuantity = (id, change) => {
+        setCartItems((prevItems) =>
+            prevItems.map((item) =>
+                item.id === id
+                    ? { ...item, quantity: Math.max(1, item.quantity + change) } // Ensure quantity is at least 1
+                    : item
+            )
+        );
+    };
+
     return (
         <div className="cart-container">
+            {/* Main Heading */}
+            <h1 className="cart-title">CARTIFY - Your Shopping Cart</h1>
+
             <div className="cart-content">
                 {/* Left Section - Cart Items */}
                 <div className="cart-left">
@@ -58,21 +77,21 @@ const CartPage = () => {
                     </div>
 
                     {/* Cart Items */}
-                    {cartItems.map((item, index) => (
-                        <div key={index} className="cart-item">
+                    {cartItems.map((item) => (
+                        <div key={item.id} className="cart-item">
                             <img src={`/images/${item.img}`} alt={item.name} className="cart-item-img" />
                             <div className="cart-item-details">
                                 <h2>{item.name}</h2>
                                 <p>{item.description}</p>
                                 <p className="seller">Sold by: {item.seller}</p>
                                 <p className="price">
-                                    <span className="original-price">{item.price}</span> {item.discount}
+                                    <span className="original-price">{item.price}</span>
                                 </p>
                                 <p className="delivery">Delivery by {item.deliveryDate}</p>
                                 <div className="quantity-control">
-                                    <button>-</button>
+                                    <button onClick={() => updateQuantity(item.id, -1)}>-</button>
                                     <span>{item.quantity}</span>
-                                    <button>+</button>
+                                    <button onClick={() => updateQuantity(item.id, 1)}>+</button>
                                 </div>
                             </div>
                             <input type="checkbox" className="cart-checkbox" />

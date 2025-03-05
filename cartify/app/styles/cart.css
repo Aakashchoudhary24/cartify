@@ -4,6 +4,8 @@
     flex-direction: column;
     align-items: center;
     padding: 16px;
+    background: #F4EEFF;
+    /* Lightest shade for background */
 }
 
 /* Main content layout */
@@ -14,6 +16,8 @@
     width: 100%;
     background: white;
     padding: 32px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 @media (min-width: 768px) {
@@ -36,47 +40,81 @@
 
 /* Delivery Address */
 .delivery-address {
-    border: 1px solid #93c5fd;
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
     padding: 16px;
-    background: #dbeafe;
+    background: #DCD6F7;
+    /* Light shade for backgrounds */
     border-radius: 4px;
     margin-bottom: 16px;
 }
 
 .delivery-address h2 {
     font-weight: bold;
-    color: #2563eb;
+    color: #424874;
+    /* Darkest shade for text */
 }
 
 .delivery-address span {
-    color: #374151;
+    color: #424874;
+    /* Darkest shade for text */
 }
 
 .delivery-address button {
     margin-top: 8px;
     padding: 8px 16px;
-    border: 1px solid #3b82f6;
-    color: #3b82f6;
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
+    color: #424874;
+    /* Darkest shade for text */
     border-radius: 8px;
     background: white;
     cursor: pointer;
 }
 
+.delivery-address button:hover {
+    background: #A6B1E1;
+    /* Medium shade for hover */
+    color: white;
+}
+
 /* Offers Section */
 .offers-section {
-    border: 1px solid #d1d5db;
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
     padding: 16px;
     margin-bottom: 16px;
+    background: #DCD6F7;
+    /* Light shade for backgrounds */
+    border-radius: 4px;
+}
+
+.offers-section h3 {
+    color: #424874;
+    /* Darkest shade for text */
+}
+
+.offers-section p {
+    color: #424874;
+    /* Darkest shade for text */
+}
+
+.cart-title {
+    font-size: xx-large;
+    color: #424874;
+    /* Darkest shade for text */
 }
 
 /* Cart Item */
 .cart-item {
     display: flex;
     align-items: center;
-    border: 1px solid #d1d5db;
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
     padding: 16px;
     border-radius: 4px;
     margin-bottom: 16px;
+    background: white;
 }
 
 .cart-item-img {
@@ -96,13 +134,14 @@
 }
 
 .price {
-    color: #ef4444;
+    color: #424874;
+    /* Darkest shade for text */
     font-weight: bold;
 }
 
 .original-price {
-    text-decoration: line-through;
-    color: #6b7280;
+    color: #424874;
+    /* Darkest shade for text */
 }
 
 .delivery {
@@ -110,20 +149,29 @@
     font-size: 14px;
 }
 
-.quantity-control{
+.quantity-control {
     display: flex;
     flex-direction: row;
-    gap: 5px;
+    gap: 8px;
     align-items: center;
     margin: 2px;
 }
 
 .quantity-control button {
-    padding: 3px 10px 3px 10px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    padding: 0.5px 8px 0.5px 8px;
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
+    border-radius: 5px;
     cursor: pointer;
     background: white;
+    color: #424874;
+    /* Darkest shade for text */
+}
+
+.quantity-control button:hover {
+    background: #A6B1E1;
+    /* Medium shade for hover */
+    color: white;
 }
 
 .cart-checkbox {
@@ -133,7 +181,8 @@
 /* Vertical Divider */
 .vertical-divider {
     width: 2px;
-    background: #d1d5db;
+    background: #A6B1E1;
+    /* Medium shade for borders */
     display: none;
 }
 
@@ -158,43 +207,16 @@
     }
 }
 
-/* Price Summary */
-.total-price {
-    font-size: 18px;
-    font-weight: bold;
-    color: #1e3a8a;
-}
-
-.place-order-btn {
-    width: 100%;
-    background: #2563eb;
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.cart-right {
-    width: 100%;
-    padding: 24px;
-}
-
-@media (min-width: 768px) {
-    .cart-right {
-        width: 30%;
-    }
-}
-
 /* Boxed sections (Apply Coupons, Donation, Price Summary) */
 .apply-coupons,
 .donation-section,
 .price-summary {
-    border: 1px solid #bfdbfe;
-    /* Light blue border */
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
     padding: 16px;
     border-radius: 4px;
-    background: #eff6ff;
-    /* Light blue background */
+    background: #DCD6F7;
+    /* Light shade for backgrounds */
     margin-bottom: 16px;
 }
 
@@ -204,8 +226,8 @@
 .price-summary h2 {
     font-size: 16px;
     font-weight: bold;
-    color: #1e3a8a;
-    /* Dark blue */
+    color: #424874;
+    /* Darkest shade for text */
     margin-bottom: 8px;
 }
 
@@ -218,11 +240,19 @@
 
 .donation-buttons button {
     padding: 6px 12px;
-    border: 1px solid #3b82f6;
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
     border-radius: 8px;
-    color: #3b82f6;
+    color: #424874;
+    /* Darkest shade for text */
     background: white;
     cursor: pointer;
+}
+
+.donation-buttons button:hover {
+    background: #A6B1E1;
+    /* Medium shade for hover */
+    color: white;
 }
 
 /* Price Details */
@@ -230,15 +260,18 @@
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    color: #1e3a8a;
+    color: #424874;
+    /* Darkest shade for text */
     padding: 4px 0;
 }
 
 .total-price {
     font-size: 18px;
     font-weight: bold;
-    color: #1e3a8a;
-    border-top: 1px solid #d1d5db;
+    color: #424874;
+    /* Darkest shade for text */
+    border-top: 1px solid #A6B1E1;
+    /* Medium shade for borders */
     padding-top: 12px;
     margin-top: 8px;
 }
@@ -246,7 +279,8 @@
 /* Place Order Button */
 .place-order-btn {
     width: 100%;
-    background: #2563eb;
+    background: #424874;
+    /* Darkest shade for buttons */
     color: white;
     padding: 12px;
     border-radius: 8px;
@@ -254,9 +288,14 @@
     margin-top: 12px;
 }
 
+.place-order-btn:hover {
+    background: #A6B1E1;
+    /* Medium shade for hover */
+}
+
 /* Carousel Section */
 .carousel-section {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1167px;
     margin-top: 24px;
 }
