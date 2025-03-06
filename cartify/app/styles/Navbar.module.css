@@ -6,6 +6,11 @@
   background-color: #2c2f36;
   color: white;
   width: 100vw;
+  margin-bottom:"60px";
+  position: fixed; /* Make the navbar fixed */
+  top: 0; /* Position it at the top of the viewport */
+  left: 0; /* Align it to the left edge */
+  z-index: 1000;
 }
 
 .logo {

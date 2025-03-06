@@ -22,7 +22,7 @@ export default function ProductPage() {
     ],
     sizes: ["S", "M", "L", "XL"],
     images: [
-      "/jacket-black.png",
+      "/jacket-blue.png",
       "/jacket-blue.png",
       "/jacket-green.png",
       "/jacket-gray.png",
@@ -31,7 +31,7 @@ export default function ProductPage() {
       { name: "Adidas x Jolt", price: 349.0, image: "/shoes.png" },
       { name: "P.S Cap", price: 49.0, image: "/cap.png" },
       { name: "OS Beanie", price: 20.0, image: "/beanie.png" },
-      { name: "NH X Hekknox Folding Tote", price: 39.9, image: "/tote.png" },
+      { name: "NH X Hekknox Folding Tote", price: 39.9, image: "public/images/h1.png" },
     ],
   };
 
