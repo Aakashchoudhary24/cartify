@@ -116,5 +116,3 @@ docker-compose.override.yml
 *~
 tmp/
 
-#settings.py to ensure that the database is not included in the git repository
-api/settings.py
