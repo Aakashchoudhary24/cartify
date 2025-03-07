@@ -5,7 +5,6 @@
     align-items: center;
     padding: 16px;
     background: #F4EEFF;
-    /* Lightest shade for background */
 }
 
 /* Main content layout */
@@ -18,6 +17,7 @@
     padding: 32px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
 }
 
 @media (min-width: 768px) {
@@ -180,10 +180,10 @@
 
 /* Vertical Divider */
 .vertical-divider {
-    width: 2px;
-    background: #A6B1E1;
-    /* Medium shade for borders */
     display: none;
+    width: 3px;
+    background: linear-gradient(180deg, #A6B1E1, #424874);
+    border-radius: 2px;
 }
 
 @media (min-width: 768px) {
