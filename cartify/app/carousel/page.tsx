@@ -76,7 +76,7 @@ const CarouselPage = () => {
                         >
                             {products.map((item) => (
                                 <div key={item.id} className="item-card">
-                                    <img src={'backend/product_images/7MJY6oCf_4cea68b5bd2845eea44bd3649fe0be77.jpg'} className="item-image" />
+                                    <img src={`http://localhost:8000/media/${item.image}`} className="item-image" />
                                     <p className="item-name">{item.name}</p>
                                     <p className="item-price">{item.price}</p>
                                 </div>
