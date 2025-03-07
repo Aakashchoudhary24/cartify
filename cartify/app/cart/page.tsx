@@ -2,48 +2,46 @@
 import React, { useState } from "react";
 import Carousel from "../carousel/page";
 import "../styles/cart.css";
+import { useFetchGraphQL } from "@/hooks";
+import { gql } from 'graphql-request';
+
+interface Product {
+    id: number;
+    name: string;
+    description: string;
+    price: number; 
+    image?: string;
+    category: { name: string };
+}
+
+const query = gql`
+  query {
+    products {
+      id
+      name
+      description
+      price
+      image
+      category {
+        name
+      }
+    }
+  }
+`;
 
 const initialCartItems = [
-    {
-        id: 1,
-        img: "LandingImg5.jpeg",
-        name: "HERE&NOW",
-        description: "Corduroy Weave Oversized Casual Shirt",
-        seller: "Sixth Sense",
-        price: "₹2,399",
-        discount: "68% OFF",
-        deliveryDate: "13 Mar 2025",
-        quantity: 1,
-    },
-    {
-        id: 2,
-        img: "LandingImg4.jpeg",
-        name: "Zara",
-        description: "Slim Fit Casual Shirt",
-        seller: "Zara Store",
-        price: "₹1,999",
-        discount: "50% OFF",
-        deliveryDate: "15 Mar 2025",
-        quantity: 2,
-    },
-    {
-        id: 3,
-        img: "LandingImg3.jpg",
-        name: "Overcoat",
-        description: "Women's Overcoat",
-        seller: "Zara Store",
-        price: "₹2,599",
-        discount: "",
-        deliveryDate: "20 Mar 2025",
-        quantity: 10,
-    },
+  // Example initial cart items
+  { id: 1, name: "Product 1", description: "Description 1", price: 100, img: "product1.jpg", seller: "Seller 1", deliveryDate: "Tomorrow", quantity: 1 },
+  { id: 2, name: "Product 2", description: "Description 2", price: 200, img: "product2.jpg", seller: "Seller 2", deliveryDate: "Tomorrow", quantity: 1 },
 ];
 
 const CartPage = () => {
+    const { data, loading, error } = useFetchGraphQL<{ products: Product[] }>(query);
+    const items = data?.products || [];
     const [cartItems, setCartItems] = useState(initialCartItems);
 
     // Function to update quantity
-    const updateQuantity = (id, change) => {
+    const updateQuantity = (id: number, change: number) => {
         setCartItems((prevItems) =>
             prevItems.map((item) =>
                 item.id === id
@@ -52,6 +50,9 @@ const CartPage = () => {
             )
         );
     };
+
+    if (loading) return <p className="text-center text-gray-500">Loading...</p>;
+    if (error) return <p className="text-center text-red-500">Error fetching product information: {error.message}</p>;
 
     return (
         <div className="cart-container">
@@ -77,26 +78,29 @@ const CartPage = () => {
                     </div>
 
                     {/* Cart Items */}
-                    {cartItems.map((item) => (
-                        <div key={item.id} className="cart-item">
-                            <img src={`/images/${item.img}`} alt={item.name} className="cart-item-img" />
-                            <div className="cart-item-details">
-                                <h2>{item.name}</h2>
-                                <p>{item.description}</p>
-                                <p className="seller">Sold by: {item.seller}</p>
-                                <p className="price">
-                                    <span className="original-price">{item.price}</span>
-                                </p>
-                                <p className="delivery">Delivery by {item.deliveryDate}</p>
-                                <div className="quantity-control">
-                                    <button onClick={() => updateQuantity(item.id, -1)}>-</button>
-                                    <span>{item.quantity}</span>
-                                    <button onClick={() => updateQuantity(item.id, 1)}>+</button>
+                    {cartItems.map((cartItem) => {
+                        const item = items.find((product) => product.id === cartItem.id);
+                        return (
+                            <div key={cartItem.id} className="cart-item">
+                                <img src={item?.image || `/backend/product_images/${item?.image}`} alt={cartItem.name} className="cart-item-img" />
+                                <div className="cart-item-details">
+                                    <h2>{item?.name || cartItem.name}</h2>
+                                    <p>{item?.description || cartItem.description}</p>
+                                    <p className="seller">Category: {item?.category.name || cartItem.seller}</p>
+                                    <p className="price">
+                                        <span className="original-price">{item?.price || cartItem.price}</span>
+                                    </p>
+                                    <p className="delivery">Delivery by {cartItem.deliveryDate}</p>
+                                    <div className="quantity-control">
+                                        <button onClick={() => updateQuantity(cartItem.id, -1)}>-</button>
+                                        <span>{cartItem.quantity}</span>
+                                        <button onClick={() => updateQuantity(cartItem.id, 1)}>+</button>
+                                    </div>
                                 </div>
+                                <input type="checkbox" className="cart-checkbox" />
                             </div>
-                            <input type="checkbox" className="cart-checkbox" />
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {/* Vertical Line */}

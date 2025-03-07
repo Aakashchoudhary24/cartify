@@ -3,26 +3,28 @@ import Head from "next/head";
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import "../styles/carousel.css";
+import { gql } from 'graphql-request';
+import { useFetchGraphQL } from "@/hooks";
 
-const CartPage = () => {
-    const recommendedItems = [
-        { id: 1, img: "Jacket1.png", name: "Casual Jacket", price: "₹1,499" },
-        { id: 2, img: "Sneaker1.png", name: "Sneakers", price: "₹2,999" },
-        { id: 3, img: "Denim.png", name: "Denim Jeans", price: "₹1,899" },
-        { id: 4, img: "smartwatch.png", name: "Smart Watch", price: "₹4,999" },
-        { id: 5, img: "smartwatch.png", name: "Smart Watch", price: "₹4,999" },
-        { id: 6, img: "smartwatch.png", name: "Smart Watch", price: "₹4,999" },
-        { id: 7, img: "smartwatch.png", name: "Smart Watch", price: "₹4,999" },
-        { id: 8, img: "smartwatch.png", name: "Smart Watch", price: "₹4,999" },
-        { id: 9, img: "smartwatch.png", name: "Smart Watch", price: "₹4,999" },
-        { id: 10, img: "smartwatch.png", name: "Smart Watch", price: "₹4,999" },
-    ];
+const PRODUCTS_QUERY = gql`
+  query {
+    products {
+      id
+      image
+      name
+      price
+    }
+  }
+`;
 
+const CarouselPage = () => {
+    const { data, loading, error } = useFetchGraphQL<{ products: { id: number, image: string, name: string, price: string }[] }>(PRODUCTS_QUERY);
+    const products = data?.products || [];
     const [scrollIndex, setScrollIndex] = useState(0);
     const itemsPerView = 6;
     const scrollAmount = 183;
 
-    const maxScrollIndex = recommendedItems.length - itemsPerView; // Stop scrolling when full view can't be filled
+    const maxScrollIndex = products.length - itemsPerView; // Stop scrolling when full view can't be filled
 
     // Auto-scroll every 3 seconds
     useEffect(() => {
@@ -42,6 +44,9 @@ const CartPage = () => {
     const scrollRight = () => {
         setScrollIndex((prev) => (prev < maxScrollIndex ? prev + 1 : 0));
     };
+
+    if (loading) return <p className="text-center text-gray-500">Loading...</p>;
+    if (error) return <p className="text-center text-red-500">Error fetching products: {error.message}</p>;
 
     return (
         <>
@@ -69,9 +74,9 @@ const CartPage = () => {
                             className="carousel-track"
                             style={{ transform: `translateX(-${scrollIndex * scrollAmount}px)` }}
                         >
-                            {recommendedItems.map((item) => (
+                            {products.map((item) => (
                                 <div key={item.id} className="item-card">
-                                    <img src={`/images/${item.img}`} alt={item.name} className="item-image" />
+                                    <img src={'backend/product_images/7MJY6oCf_4cea68b5bd2845eea44bd3649fe0be77.jpg'} className="item-image" />
                                     <p className="item-name">{item.name}</p>
                                     <p className="item-price">{item.price}</p>
                                 </div>
@@ -89,4 +94,4 @@ const CartPage = () => {
     );
 };
 
-export default CartPage;
+export default CarouselPage;
