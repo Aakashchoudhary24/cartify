@@ -22,7 +22,7 @@ function Navbar() {
                     </span>
                     <input type="text" placeholder="Search..." />
                 </div>
-
+                
                 <div className={styles.cartIcon} onClick={() => router.push("/cart")}>
                     <FaShoppingCart /> {' '}CART
                 </div>
