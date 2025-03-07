@@ -1,0 +1,299 @@
+.cart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    background: #F4EEFF;
+}
+
+/* Main content layout */
+.cart-content {
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px;
+    width: 100%;
+    background: white;
+    padding: 32px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+    .cart-content {
+        flex-direction: row;
+    }
+}
+
+/* Left Section */
+.cart-left {
+    width: 100%;
+    padding: 24px;
+}
+
+@media (min-width: 768px) {
+    .cart-left {
+        width: 75%;
+    }
+}
+
+/* Delivery Address */
+.delivery-address {
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
+    padding: 16px;
+    background: #DCD6F7;
+    /* Light shade for backgrounds */
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+.delivery-address h2 {
+    font-weight: bold;
+    color: #424874;
+    /* Darkest shade for text */
+}
+
+.delivery-address span {
+    color: #424874;
+    /* Darkest shade for text */
+}
+
+.delivery-address button {
+    margin-top: 8px;
+    padding: 8px 16px;
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
+    color: #424874;
+    /* Darkest shade for text */
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+}
+
+.delivery-address button:hover {
+    background: #A6B1E1;
+    /* Medium shade for hover */
+    color: white;
+}
+
+/* Offers Section */
+.offers-section {
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
+    padding: 16px;
+    margin-bottom: 16px;
+    background: #DCD6F7;
+    /* Light shade for backgrounds */
+    border-radius: 4px;
+}
+
+.offers-section h3 {
+    color: #424874;
+    /* Darkest shade for text */
+}
+
+.offers-section p {
+    color: #424874;
+    /* Darkest shade for text */
+}
+
+.cart-title {
+    font-size: xx-large;
+    color: #424874;
+    /* Darkest shade for text */
+}
+
+/* Cart Item */
+.cart-item {
+    display: flex;
+    align-items: center;
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
+    padding: 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    background: white;
+}
+
+.cart-item-img {
+    width: 160px;
+    height: 192px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 40px;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+}
+
+.seller {
+    color: #6b7280;
+}
+
+.price {
+    color: #424874;
+    /* Darkest shade for text */
+    font-weight: bold;
+}
+
+.original-price {
+    color: #424874;
+    /* Darkest shade for text */
+}
+
+.delivery {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.quantity-control {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    margin: 2px;
+}
+
+.quantity-control button {
+    padding: 0.5px 8px 0.5px 8px;
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
+    border-radius: 5px;
+    cursor: pointer;
+    background: white;
+    color: #424874;
+    /* Darkest shade for text */
+}
+
+.quantity-control button:hover {
+    background: #A6B1E1;
+    /* Medium shade for hover */
+    color: white;
+}
+
+.cart-checkbox {
+    margin-left: auto;
+}
+
+/* Vertical Divider */
+.vertical-divider {
+    width: 2px;
+    background: #A6B1E1;
+    /* Medium shade for borders */
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .vertical-divider {
+        display: block;
+    }
+}
+
+/* Right Section */
+.cart-right {
+    width: 100%;
+    padding: 24px;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+@media (min-width: 768px) {
+    .cart-right {
+        width: 30%;
+    }
+}
+
+/* Boxed sections (Apply Coupons, Donation, Price Summary) */
+.apply-coupons,
+.donation-section,
+.price-summary {
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
+    padding: 16px;
+    border-radius: 4px;
+    background: #DCD6F7;
+    /* Light shade for backgrounds */
+    margin-bottom: 16px;
+}
+
+/* Headings inside sections */
+.apply-coupons h2,
+.donation-section h2,
+.price-summary h2 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #424874;
+    /* Darkest shade for text */
+    margin-bottom: 8px;
+}
+
+/* Donation buttons */
+.donation-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.donation-buttons button {
+    padding: 6px 12px;
+    border: 1px solid #A6B1E1;
+    /* Medium shade for borders */
+    border-radius: 8px;
+    color: #424874;
+    /* Darkest shade for text */
+    background: white;
+    cursor: pointer;
+}
+
+.donation-buttons button:hover {
+    background: #A6B1E1;
+    /* Medium shade for hover */
+    color: white;
+}
+
+/* Price Details */
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #424874;
+    /* Darkest shade for text */
+    padding: 4px 0;
+}
+
+.total-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #424874;
+    /* Darkest shade for text */
+    border-top: 1px solid #A6B1E1;
+    /* Medium shade for borders */
+    padding-top: 12px;
+    margin-top: 8px;
+}
+
+/* Place Order Button */
+.place-order-btn {
+    width: 100%;
+    background: #424874;
+    /* Darkest shade for buttons */
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+.place-order-btn:hover {
+    background: #A6B1E1;
+    /* Medium shade for hover */
+}
+
+/* Carousel Section */
+.carousel-section {
+    width: 100%;
+    max-width: 1167px;
+    margin-top: 24px;
+}

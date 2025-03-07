@@ -4,6 +4,100 @@ import { useRouter } from "next/navigation";
 
 export default function Login() {
     const router = useRouter();
+<<<<<<< HEAD
+=======
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    useEffect(() => {
+        const getCookie = (name: string) => {
+            const cookies = document.cookie.split('; ');
+            for (const cookie of cookies) {
+                const [cookieName, cookieValue] = cookie.split('=');
+                if (cookieName === name) return cookieValue;
+            }
+            return null;
+        };
+    
+        const token = getCookie('jwt');
+        if (token) {
+            setIsAuthenticated(true);
+        }
+    }, []);
+
+
+    const setCookie = (name: string, value: string, days: number) => {
+        const expires = new Date();
+        expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+        document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+    };
+
+    const getCookie = (name: string) => {
+        const cookies = document.cookie.split('; ');
+        for (const cookie of cookies) {
+            const [cookieName, cookieValue] = cookie.split('=');
+            if (cookieName === name) return cookieValue;
+        }
+        return null;
+    };
+
+    // Function to handle login
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+    
+        try {
+            const response = await fetch('http://127.0.0.1:8000/auth/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: `
+                        mutation Login($username: String!, $password: String!) {
+                            login(username: $username, password: $password)
+                        }
+                    `,
+                    variables: {
+                        username,
+                        password,
+                    },
+                }),
+            });
+    
+            const result = await response.json();
+    
+            if (result.errors) {
+                setError('Invalid credentials');
+            } else {
+                const token = result.data?.login;
+                if (token) {
+                    setCookie('jwt', token, 7);
+                    setIsAuthenticated(true);
+                    router.push('/');
+                }
+            }
+        } catch {
+            setError('Something went wrong');
+        }
+    };
+
+    // Function to handle logout
+    const handleLogout = () => {
+        document.cookie = 'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        router.push('/login');
+    };
+
+    // Auto-redirect if user is already logged in
+    useEffect(() => {
+        const token = getCookie('jwt');
+        if (token) {
+            router.push('/');
+        }
+    }, []);
+>>>>>>> 5016182 (change navbar, fix layouts, fix tokenization for auth, changed stylesheets)
 
     return (
         <>
