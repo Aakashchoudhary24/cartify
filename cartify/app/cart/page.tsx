@@ -82,7 +82,7 @@ const CartPage = () => {
                         const item = items.find((product) => product.id === cartItem.id);
                         return (
                             <div key={cartItem.id} className="cart-item">
-                                <img src={item?.image || `/backend/product_images/${item?.image}`} alt={cartItem.name} className="cart-item-img" />
+                                <img src={`http://localhost:8000/media/${item?.image}`} alt={cartItem.name} className="cart-item-img" />
                                 <div className="cart-item-details">
                                     <h2>{item?.name || cartItem.name}</h2>
                                     <p>{item?.description || cartItem.description}</p>
