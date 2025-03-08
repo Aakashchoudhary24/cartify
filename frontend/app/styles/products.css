@@ -1,0 +1,12 @@
+.product-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.products {
+    border: 1px solid black;
+    margin-top: 10vh;
+    padding: 10px;
+}

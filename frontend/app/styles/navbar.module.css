@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bungee+Shade&family=Faculty+Glyphic&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Parkinsans:wght@300..800&family=Playwrite+CU:wght@100..400&family=Playwrite+HR+Lijeva:wght@100..400&display=swap');
+
+.navLinks {
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  align-items: center;
+  font-size: 25px;
+  letter-spacing: 2px;
+  justify-content: space-evenly;
+  font-family: 'Bebas Neue';
+}
+
+.navLinks li:hover {
+  transition: 400ms;
+  transform: scale(1.07);
+  cursor: pointer;
+}
+
+.navLinks li:has(.logo):hover {
+  transform: none;
+}
+
+.logo {
+  font-size: 50px;
+  font-family: 'Bungee Shade';
+  font-weight: bolder;
+  letter-spacing: 3px;
+}
