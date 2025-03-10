@@ -21,6 +21,7 @@ class ProductType:
     category: CategoryType
     image1: Optional[str]
     image2: Optional[str]
+    gender: str
 
 @strawberry.type
 class ProfileType:
@@ -105,9 +106,9 @@ class Query:
 @strawberry.type
 class Mutation:
     @strawberry.mutation
-    def add_product(self, name: str, description: str, price: float, category_id: int, image1: Optional[str], image2: Optional[str]) -> ProductType:
+    def add_product(self, name: str, description: str, price: float, category_id: int, image1: Optional[str], image2: Optional[str], gender: str) -> ProductType:
         category = Category.objects.get(id=category_id)
-        product = Product.objects.create(name=name, description=description, price=price, category=category, image1=image1, image2=image2)
+        product = Product.objects.create(name=name, description=description, price=price, category=category, image1=image1, image2=image2, gender=gender)
         return ProductType(
             id=product.id,
             name=product.name,
@@ -115,7 +116,8 @@ class Mutation:
             price=product.price,
             category=CategoryType(id=category.id, name=category.name, description=category.description),
             image1=product.image1,
-            image2=product.image2
+            image2=product.image2,
+            gender=product.gender
         )
 
     @strawberry.mutation
