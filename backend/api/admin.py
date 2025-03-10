@@ -1,21 +1,16 @@
 from django.contrib import admin
-from .models import Category, Brand, Product, Profile, Cart, CartItem, Order, OrderItem
+from .models import Category, Product, Profile, Cart, CartItem, Order, OrderItem
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'description')
     search_fields = ('name', 'description')
 
-@admin.register(Brand)
-class BrandAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'gender', 'category', 'brand', 'colour')
-    search_fields = ('name', 'description', 'category__name', 'brand__name', 'colour')
-    list_filter = ('gender', 'category', 'brand', 'colour')
+    list_display = ('name', 'price', 'category', 'image1', 'image2')
+    search_fields = ('name', 'description', 'category__name')
+    list_filter = ('category',)
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
