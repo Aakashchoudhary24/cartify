@@ -31,6 +31,7 @@ class Command(BaseCommand):
                 price = row['Price']
                 details = row['Details']
                 categories = row['Categories'].split(', ')
+                gender = row['Gender']
                 
                 # Ensure categories exist in the database
                 category_objects = []
@@ -45,7 +46,8 @@ class Command(BaseCommand):
                     description=details,
                     image1=image1_keys[0],
                     image2=image2_keys[0],
-                    category=category_objects[0]  # Assuming the first category is the main category
+                    category=category_objects[0],  # Assuming the first category is the main category
+                    gender=gender
                 )
                 
                 self.stdout.write(self.style.SUCCESS(f'Product {product_name} created successfully'))
