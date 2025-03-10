@@ -1,163 +1,96 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from "../components/Navbar";
+import { gql } from 'graphql-request';
+import { useFetchGraphQL } from "@/hooks";
+
+const PRODUCTS_QUERY = gql`
+  query {
+    products {
+      id
+      name
+      description
+      price
+      image
+    }
+  }
+`;
 
 const ProductsPage = () => {
-  // Mock data for products (replace with API data later)
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: 'United Colors of Benetton',
-      description: 'High of Printed Tahrit',
-      price: 714,
-      image: '/images/h1.png',
-    },
-    {
-      id: 2,
-      name: 'DAMENSCH',
-      description: 'Pure Cotton Lounge Tahrit',
-      price: 1399,
-      image: '/images/h2.png',
-    },
-    {
-      id: 3,
-      name: 'Mr Bowerbird',
-      description: 'Solid Sweater Pure Cotton',
-      price: 939,
-      image: '/images/h3.png',
-    },
-    {
-      id: 4,
-      name: 'Levis',
-      description: 'Solid Lounge Tahrit',
-      price: 336,
-      image: '/images/Levis.jpeg',
-    },
-    {
-      id: 5,
-      name: 'ADDO',
-      description: 'Pure Cotton Regular Tahrit',
-      price: 939,
-      image: '/images/h1.png',
-    },
-    {
-      id: 6,
-      name: 'United Colors of Benetton',
-      description: 'High of Printed Tahrit',
-      price: 714,
-      image: '/images/h1.png',
-    },
-    {
-      id: 7,
-      name: 'DAMENSCH',
-      description: 'Pure Cotton Lounge Tahrit',
-      price: 1399,
-      image: '/images/h2.png',
-    },
-    {
-      id: 8,
-      name: 'Mr Bowerbird',
-      description: 'Solid Sweater Pure Cotton',
-      price: 939,
-      image: '/images/h3.png',
-    },
-    {
-      id: 9,
-      name: 'Levis',
-      description: 'Solid Lounge Tahrit',
-      price: 336,
-      image: '/images/Levis.jpeg',
-    },
-    {
-      id: 10,
-      name: 'ADDO',
-      description: 'Pure Cotton Regular Tahrit',
-      price: 939,
-      image: '/images/h1.png',
-    },
-    {
-      id: 111,
-      name: 'United Colors of Benetton',
-      description: 'High of Printed Tahrit',
-      price: 714,
-      image: '/images/h1.png',
-    },
-    {
-      id: 21,
-      name: 'DAMENSCH',
-      description: 'Pure Cotton Lounge Tahrit',
-      price: 1399,
-      image: '/images/h2.png',
-    },
-    {
-      id: 31,
-      name: 'Mr Bowerbird',
-      description: 'Solid Sweater Pure Cotton',
-      price: 939,
-      image: '/images/h3.png',
-    },
-    {
-      id: 41,
-      name: 'Levis',
-      description: 'Solid Lounge Tahrit',
-      price: 336,
-      image: '/images/Levis.jpeg',
-    },
-    {
-      id: 51,
-      name: 'ADDO',
-      description: 'Pure Cotton Regular Tahrit',
-      price: 939,
-      image: '/images/h1.png',
-    },
-    {
-      id: 11,
-      name: 'United Colors of Benetton',
-      description: 'High of Printed Tahrit',
-      price: 714,
-      image: '/images/h1.png',
-    },
-    {
-      id: 12,
-      name: 'DAMENSCH',
-      description: 'Pure Cotton Lounge Tahrit',
-      price: 1399,
-      image: '/images/h2.png',
-    },
-    {
-      id: 13,
-      name: 'Mr Bowerbird',
-      description: 'Solid Sweater Pure Cotton',
-      price: 939,
-      image: '/images/h3.png',
-    },
-    {
-      id: 14,
-      name: 'Levis',
-      description: 'Solid Lounge Tahrit',
-      price: 336,
-      image: '/images/Levis.jpeg',
-    },
-    {
-      id: 15,
-      name: 'ADDO',
-      description: 'Pure Cotton Regular Tahrit',
-      price: 939,
-      image: '/images/h1.png',
-    },
-    
-    // Add more products here
-  ]);
+  const { data, loading, error } = useFetchGraphQL<{ products: { id: number, name: string, description: string, price: number, image: string }[] }>(PRODUCTS_QUERY);
+  const products = data?.products || [];
+  const [sortedProducts, setSortedProducts] = useState(products);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedPrices, setSelectedPrices] = useState<string[]>([]);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
 
-  // Updated filter options
+  useEffect(() => {
+    setSortedProducts(products);
+  }, [products]);
+
+  useEffect(() => {
+    let filteredProducts = products;
+
+    if (selectedCategories.length > 0) {
+      filteredProducts = filteredProducts.filter(product => selectedCategories.includes(product.category));
+    }
+
+    if (selectedBrands.length > 0) {
+      filteredProducts = filteredProducts.filter(product => selectedBrands.includes(product.brand));
+    }
+
+    if (selectedPrices.length > 0) {
+      filteredProducts = filteredProducts.filter(product => {
+        const price = product.price;
+        return selectedPrices.some(priceRange => {
+          const [min, max] = priceRange.split(' - ').map(p => parseInt(p.replace('Rs. ', '').replace('+', '')));
+          return price >= min && (max ? price <= max : true);
+        });
+      });
+    }
+
+    if (selectedColors.length > 0) {
+      filteredProducts = filteredProducts.filter(product => selectedColors.includes(product.color));
+    }
+
+    setSortedProducts(filteredProducts);
+  }, [selectedCategories, selectedBrands, selectedPrices, selectedColors, products]);
+
+  const handleFilterChange = (filterType, value) => {
+    const updateFilter = (selectedFilters, setSelectedFilters) => {
+      if (selectedFilters.includes(value)) {
+        setSelectedFilters(selectedFilters.filter(filter => filter !== value));
+      } else {
+        setSelectedFilters([...selectedFilters, value]);
+      }
+    };
+
+    switch (filterType) {
+      case 'category':
+        updateFilter(selectedCategories, setSelectedCategories);
+        break;
+      case 'brand':
+        updateFilter(selectedBrands, setSelectedBrands);
+        break;
+      case 'price':
+        updateFilter(selectedPrices, setSelectedPrices);
+        break;
+      case 'color':
+        updateFilter(selectedColors, setSelectedColors);
+        break;
+      default:
+        break;
+    }
+  };
+
   const categories = ['Tahrits', 'Lounge Tahrits', 'Casual Tahrits', 'Formal Tahrits'];
   const brands = ['Roadster', 'Fishkens', 'Greybong', 'H&M', 'Zara', 'Tommy Hilfiger', 'U.S. Polo Assn.', 'Levis'];
   const prices = ['Rs. 369 - Rs. 1000', 'Rs. 1000 - Rs. 2000', 'Rs. 2000 - Rs. 5000', 'Rs. 5000+'];
   const colors = ['Black', 'White', 'Blue', 'Navy Blue', 'Green', 'Grey', 'Red', 'Yellow'];
 
-  // Sort products
   const sortProducts = (order) => {
-    const sortedProducts = [...products].sort((a, b) => {
+    const sorted = [...sortedProducts].sort((a, b) => {
       if (order === 'highToLow') {
         return b.price - a.price;
       } else if (order === 'lowToHigh') {
@@ -165,8 +98,11 @@ const ProductsPage = () => {
       }
       return 0;
     });
-    setProducts(sortedProducts);
+    setSortedProducts(sorted);
   };
+
+  if (loading) return <p className="text-center text-gray-500">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">Error fetching products: {error.message}</p>;
 
   return (
     <div>
@@ -181,7 +117,11 @@ const ProductsPage = () => {
                 {categories.map((category, index) => (
                   <li key={index}>
                     <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
+                      <input
+                        type="checkbox"
+                        className="mr-2"
+                        onChange={() => handleFilterChange('category', category)}
+                      />
                       <span className="text-sm">{category}</span>
                     </label>
                   </li>
@@ -193,7 +133,11 @@ const ProductsPage = () => {
                 {brands.map((brand, index) => (
                   <li key={index}>
                     <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
+                      <input
+                        type="checkbox"
+                        className="mr-2"
+                        onChange={() => handleFilterChange('brand', brand)}
+                      />
                       <span className="text-sm">{brand}</span>
                     </label>
                   </li>
@@ -205,7 +149,11 @@ const ProductsPage = () => {
                 {prices.map((price, index) => (
                   <li key={index}>
                     <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
+                      <input
+                        type="checkbox"
+                        className="mr-2"
+                        onChange={() => handleFilterChange('price', price)}
+                      />
                       <span className="text-sm">{price}</span>
                     </label>
                   </li>
@@ -217,7 +165,11 @@ const ProductsPage = () => {
                 {colors.map((color, index) => (
                   <li key={index}>
                     <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
+                      <input
+                        type="checkbox"
+                        className="mr-2"
+                        onChange={() => handleFilterChange('color', color)}
+                      />
                       <span className="text-sm">{color}</span>
                     </label>
                   </li>
@@ -245,10 +197,10 @@ const ProductsPage = () => {
 
               {/* Products Grid */}
               <div className="grid grid-cols-5 gap-6">
-                {products.map((product) => (
+                {sortedProducts.map((product) => (
                   <div key={product.id} className="bg-white p-4 rounded-lg">
                     <img
-                      src={product.image}
+                      src={`http://localhost:8000/media/${product.image}`}
                       alt={product.name}
                       className="w-full h-64 object-cover rounded-lg"
                     />
