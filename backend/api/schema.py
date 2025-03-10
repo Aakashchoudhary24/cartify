@@ -2,7 +2,7 @@ import strawberry
 from typing import List, Optional
 from datetime import datetime
 from django.contrib.auth.models import User
-from .models import Category, Brand, Product, Profile, Cart, CartItem, Order, OrderItem
+from .models import Category, Product, Profile, Cart, CartItem, Order, OrderItem
 from strawberry.tools import merge_types
 from authentication.schema import AuthQuery, AuthMutation
 
@@ -13,23 +13,14 @@ class CategoryType:
     description: Optional[str]
 
 @strawberry.type
-class BrandType:
-    id: int
-    name: str
-
-@strawberry.type
 class ProductType:
     id: int
     name: str
     description: str
     price: float
-    gender: str
     category: CategoryType
     image1: Optional[str]
     image2: Optional[str]
-    image3: Optional[str]
-    brand: Optional[BrandType]
-    colour: Optional[str]
 
 @strawberry.type
 class ProfileType:
@@ -79,10 +70,6 @@ class Query:
         return Category.objects.all()
 
     @strawberry.field
-    def brands(self) -> List[BrandType]:
-        return Brand.objects.all()
-
-    @strawberry.field
     def products(self) -> List[ProductType]:
         return Product.objects.all()
 
@@ -118,10 +105,9 @@ class Query:
 @strawberry.type
 class Mutation:
     @strawberry.mutation
-    def add_product(self, name: str, description: str, price: float, gender: str, category_id: int, brand_id: Optional[int], colour: Optional[str]) -> ProductType:
+    def add_product(self, name: str, description: str, price: float, category_id: int, image1: Optional[str], image2: Optional[str]) -> ProductType:
         category = Category.objects.get(id=category_id)
-        brand = Brand.objects.get(id=brand_id) if brand_id else None
-        product = Product.objects.create(name=name, description=description, price=price, gender=gender, category=category, brand=brand, colour=colour)
+        product = Product.objects.create(name=name, description=description, price=price, category=category, image1=image1, image2=image2)
         return product
 
     @strawberry.mutation
