@@ -12,7 +12,7 @@
   margin: auto;
   padding: 2rem;
   background-color: #ffffff;
-  border-radius: 16px;
+  border-radius: 8px;
   position: relative;
   z-index: 0;
   border-top: 2px solid #A6B1E1;
@@ -27,7 +27,7 @@
   left: -5px;
   right: -5px;
   height: calc(100% + 5px); /* Adjusted to exclude bottom border */
-  border-radius: 20px 20px 0 0; /* Matches container but slightly larger */
+  border-radius: 15px 15px 0 0; /* Matches container but slightly larger */
   background: linear-gradient(90deg, #A6B1E1, #424874, #DCD6F7);
   z-index: -2;
 }
@@ -40,7 +40,7 @@
   right: 0;
   height: 100%; /* Adjusted to exclude bottom border */
   background-color: #ffffff; /* Ensures inner background remains white */
-  border-radius: 16px 16px 0 0;
+  border-radius: 12px 12px 0 0;
   z-index: -1;
 }
 
@@ -138,9 +138,13 @@
   padding-bottom: 6px;
 }
 
+.price{
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
 .priceSection {
   padding-top: 15px;
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 
 /* Buttons */

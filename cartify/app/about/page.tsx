@@ -1,38 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { request, gql } from "graphql-request";
 import Navbar from "../components/Navbar";
-import { useFetchGraphQL } from "@/hooks";
 import styles from "../styles/about.module.css";
 
-// Define TypeScript types
-interface About {
-  email: string;
-  phone: string;
-  github: string;
-  linkedin: string;
-}
-
-const ABOUT_QUERY = gql`
-  query {
-    about {
-      email
-      phone
-      github
-      linkedin
-    }
-  }
-`;
-
 export default function AboutPage() {
-  
-  const { data, loading, error } = useFetchGraphQL<{ about: About }>(ABOUT_QUERY);
-  const about = data?.about;
-  const [showContact, setShowContact] = useState<boolean>(false); // Toggle state
-
-  if (loading) return <p className={styles.loading}>Loading...</p>;
-  if (error) return <p className={styles.error}>Error fetching about information: {error.message}</p>;
+  const [showContact, setShowContact] = useState<boolean>(false);
 
   return (
     <>
@@ -64,12 +37,12 @@ export default function AboutPage() {
               </button>
 
               {/* Contact Info (Shown only when Get in Touch is clicked) */}
-              {showContact && about && (
+              {showContact && (
                 <div className={styles.contactInfo}>
-                  <p>📧 Email: {about.email}</p>
-                  <p>📞 Call/Text: {about.phone}</p>
-                  <p>🌐 Github: <a href={about.github} target="_blank" rel="noopener noreferrer">{about.github}</a></p>
-                  <p>🔗 LinkedIn: <a href={about.linkedin} target="_blank" rel="noopener noreferrer">{about.linkedin}</a></p>
+                  <p>📧 Email: cartify.professinal@gmail.com</p>
+                  <p>📞 Call/Text: 9448200330</p>
+                  <p>🌐 Github: <a href="https://github.com/Aakashchoudhary24/cartify.git" target="_blank" rel="noopener noreferrer">https://github.com/Aakashchoudhary24/cartify.git</a></p>
+                  <p>🔗 LinkedIn: <a href="" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>
                 </div>
               )}
             </div>

@@ -5,7 +5,7 @@ import "../styles/cart.css";
 import { useFetchGraphQL } from "@/hooks";
 import { gql } from 'graphql-request';
 
-interface Product {
+interface cart {
     id: number;
     name: string;
     description: string;

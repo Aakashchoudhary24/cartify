@@ -1,0 +1,256 @@
+/* General Page Styling */
+
+.collectionTitle{
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  background-color: #F4EEFF;
+  min-height: 100vh;
+  padding: 80px 20px 40px;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 400px;
+  padding: 20px;
+  background: linear-gradient(135deg, #DCD6F7, #A6B1E1);
+  border-radius: 12px;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid #A6B1E1;
+
+  /* Make Sidebar Fixed */
+  position: fixed;
+  top: 50px; /* Adjust according to navbar height */
+  left: 50px;
+  height: calc(100vh - 100px); /* Full height minus padding */
+  overflow-y: auto; /* Scroll inside if content overflows */
+}
+
+
+.sidebarTitle {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #424874;
+  margin-bottom: 15px;
+  margin-top: 40px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* Category Buttons */
+.categoryButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.categoryButton {
+  background: white;
+  border: 2px solid #A6B1E1;
+  color: #424874;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.categoryButton:hover {
+  background: #A6B1E1;
+  color: white;
+  transform: scale(1.05);
+}
+
+.activeButton {
+  background: #424874;
+  color: white;
+  border: 2px solid #424874;
+}
+
+/* Content */
+
+/* Ensure content doesn't overlap sidebar */
+.content {
+  flex-grow: 1;
+  margin-left: 470px; /* Adjust based on sidebar width + margin */
+  margin-right: 50px;
+}
+
+/* Product Grid */
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* Product Card */
+.productCard {
+  position: relative;
+  width: 280px;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.15);
+  background: white;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: solid 3px #A6B1E1;
+}
+
+.productCard:hover {
+  transform: scale(1.03);
+  box-shadow: 6px 6px 16px rgba(15, 15, 15, 0.151);
+  border: solid 2px #8289a8;
+}
+
+/* Image */
+.productImage {
+  width: 100%;
+  height: 410px;
+  object-fit: cover;
+  border-radius: 12px 10px 0 0;
+  border-bottom: solid 3px #A6B1E1;
+  border: #424874 solid 2px;
+}
+
+/* Product Info */
+.productInfo {
+  padding: 12px;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+.productName {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #424874;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid #A6B1E1;
+  padding-bottom: 5px;
+}
+
+.productPrice {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #A6B1E1;
+  margin-top: 5px;
+}
+
+/* Hide Title & Price on Hover */
+.productCard:hover .productInfo {
+  opacity: 0;
+}
+
+/* Back Side (Overlay) */
+.cardBack {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 12px;
+}
+
+/* Full Title */
+.fullProductName {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+  max-width: 90%;
+  text-align: center;
+}
+
+/* Product Description */
+.productDescription {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #F4EEFF;
+  max-width: 90%;
+  text-align: center;
+}
+
+/* Hover Effect */
+.productCard:hover .productImage {
+  filter: blur(4px);
+}
+
+.productCard:hover .cardBack {
+  opacity: 1;
+}
+
+/* Loading & Error Messages */
+.loading,
+.error {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 20px;
+}
+
+.loading {
+  color: #A6B1E1;
+}
+
+.error {
+  color: red;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .productGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sidebar {
+    width: 90%;
+    margin-left: 0;
+    margin-bottom: 20px;
+  }
+
+  .content {
+    margin: 0;
+  }
+
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .productCard {
+    width: 100%;
+  }
+}
