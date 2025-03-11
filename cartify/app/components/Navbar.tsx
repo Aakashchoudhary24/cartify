@@ -45,10 +45,18 @@ function Navbar() {
                     ) : (
                         <li onClick={() => router.push("/login")}>Login</li>
                     )}
+
+                    {!isAuthenticated && (
+                        <li onClick={() => router.push('/signup')}>Sign Up</li>
+                    )}
                     
-                    <li className={styles.cartIcon} onClick={() => router.push("/cart")}>
-                        <FaShoppingCart />
-                    </li>
+
+                    {isAuthenticated && (
+                        <li className={styles.cartIcon} onClick={() => router.push("/cart")}>
+                            <FaShoppingCart />
+                        </li>
+                    )}
+
                 </ul>
             </nav>
 

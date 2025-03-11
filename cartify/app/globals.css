@@ -4,10 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
-    font-family: "Faculty Glyphic";
-}
-
 body {
 margin: 0;
 padding: 0;

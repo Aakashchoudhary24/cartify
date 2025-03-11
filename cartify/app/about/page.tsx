@@ -1,84 +1,112 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
+import { useState } from "react";
+import Link from "next/link";
 import styles from "../styles/about.module.css";
+import Image from "next/image";
+import Navbar from "../components/Navbar";
 
 export default function AboutPage() {
-  const [showContact, setShowContact] = useState<boolean>(false);
+    const [showContact, setShowContact] = useState(false);
 
-  return (
-    <>
-      <Navbar />
-      <div className={styles.container}>
-        {/* About Us Section */}
-        <section className={styles.aboutSection}>
-          <h2 className={styles.heading}>About us</h2>
-          <p className={styles.subHeading}>
-            As a Clothing Brand, we are committed to providing high-quality fashion that defines elegance and comfort.
-          </p>
-          <div className={styles.content}>
-            <img src="/images/team.png" alt="Team working" className={styles.image} />
-            
-            {/* Divider Line */}
-            <div className={styles.divider}></div>
-
-            <div className={styles.text}>
-              <p>
-                Our clothing brand is dedicated to crafting stylish, high-quality apparel for individuals who appreciate modern fashion.
-                We focus on sustainable fabrics, innovative designs, and excellent craftsmanship to ensure our customers get the best.
-              </p>
-              <p>
-                Our mission is to provide trendy yet timeless pieces that fit seamlessly into your lifestyle. We stay ahead of fashion trends
-                while maintaining the essence of comfort and individuality in every piece we create.
-              </p>
-              <button className={styles.button} onClick={() => setShowContact(!showContact)}>
-                {showContact ? "Hide Contact" : "Get in Touch"}
-              </button>
-
-              {/* Contact Info (Shown only when Get in Touch is clicked) */}
-              {showContact && (
-                <div className={styles.contactInfo}>
-                  <p>📧 Email: cartify.professinal@gmail.com</p>
-                  <p>📞 Call/Text: 9448200330</p>
-                  <p>🌐 Github: <a href="https://github.com/Aakashchoudhary24/cartify.git" target="_blank" rel="noopener noreferrer">https://github.com/Aakashchoudhary24/cartify.git</a></p>
-                  <p>🔗 LinkedIn: <a href="" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>
+    return (
+        <>
+        <Navbar/>
+        <div className={styles.container}>
+            <section className={styles.aboutSection}>
+                <h2 className={styles.sectionTitle}>Our Story</h2>
+                <p className={styles.sectionDescription}>
+                    Cartify was founded with a simple idea — to create stylish and comfortable clothing for everyone. 
+                    We believe fashion should not only look good but also feel great. 
+                    Our journey began with a passion for quality and attention to detail, and we have never looked back.
+                </p>
+                <div className={styles.aboutContent}>
+                    <Image
+                        src="/images/about.jpg"
+                        alt="Our Team"
+                        className={styles.image}
+                        width={300} height={300}
+                    />
+                    <div className={styles.text}>
+                        <p>
+                            Our products are designed with high-quality materials, ensuring durability and comfort.
+                            We stay ahead of trends, blending modern aesthetics with timeless designs.
+                        </p>
+                        <p>
+                            Sustainability is at the core of our business. We source eco-friendly materials and 
+                            partner with ethical manufacturers to minimize our environmental impact.
+                        </p>
+                    </div>
                 </div>
-              )}
-            </div>
-          </div>
-        </section>
+            </section>
 
-        {/* Why Choose Us Section */}
-        <section className={styles.whyChooseUs}>
-          <h2 className={styles.heading}>Why choose us</h2>
-          <p className={styles.subHeading}>
-            Discover why we stand out in the fashion industry. Our expertise, quality, and commitment make us the perfect choice.
-          </p>
-          <div className={styles.cards}>
-            <div className={styles.card}>
-              <span className={styles.icon}>🌟</span>
-              <h3>Quality Materials</h3>
-              <p>We use the finest fabrics to ensure premium comfort and durability.</p>
-            </div>
-            <div className={styles.card}>
-              <span className={styles.icon}>🎨</span>
-              <h3>Unique Designs</h3>
-              <p>Our designers create trendy and timeless fashion pieces for every occasion.</p>
-            </div>
-            <div className={styles.card}>
-              <span className={styles.icon}>💬</span>
-              <h3>Customer Satisfaction</h3>
-              <p>We prioritize customer experience and offer outstanding service and support.</p>
-            </div>
-            <div className={styles.card}>
-              <span className={styles.icon}>🌍</span>
-              <h3>Sustainability</h3>
-              <p>We embrace eco-friendly practices to create sustainable fashion.</p>
-            </div>
-          </div>
-        </section>
-      </div>
-    </>
-  );
+            {/* Why Choose Us */}
+            <section className={styles.whyChooseSection}>
+                <h2 className={styles.sectionTitle}>Why Choose Us?</h2>
+                <div className={styles.cards}>
+                    <div className={styles.card}>
+                        <h3>🌍 Sustainable</h3>
+                        <p>
+                            We use eco-friendly fabrics and follow ethical manufacturing practices.
+                        </p>
+                    </div>
+                    <div className={styles.card}>
+                        <h3>👗 High Quality</h3>
+                        <p>
+                            Our clothes are made from premium materials for lasting comfort and style.
+                        </p>
+                    </div>
+                    <div className={styles.card}>
+                        <h3>🚚 Fast Shipping</h3>
+                        <p>
+                            We offer quick and reliable delivery to ensure customer satisfaction.
+                        </p>
+                    </div>
+                    <div className={styles.card}>
+                        <h3>❤️ Customer Support</h3>
+                        <p>
+                            Our support team is available 24/7 to help with any questions or issues.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section className={styles.hero}>
+                <div className={styles.heroContent}>
+                    <h1 className={styles.title}>Welcome to Cartify</h1>
+                    <p className={styles.subtitle}>
+                        Redefining fashion with comfort, style, and quality.
+                    </p>
+                    <button
+                        className={styles.ctaButton}
+                        onClick={() => setShowContact(!showContact)}
+                    >
+                        {showContact ? "Hide Contact Info" : "Contact Us"}
+                    </button>
+                </div>
+            </section>
+
+            {/* Contact Info */}
+            {showContact && (
+                <section className={styles.contactSection}>
+                    <h2 className={styles.sectionTitle}>Get in Touch</h2>
+                    <div className={styles.contactInfo}>
+                        <p>Email: <a href="mailto:cartify.professional@gmail.com">cartify.professional@gmail.com</a></p>
+                        <p>Phone: <a href="tel:+919448200330">+91 94482 00330</a></p>
+                        <p>GitHub: 
+                            <Link href="https://github.com/Aakashchoudhary24/cartify.git" target="_blank" rel="noopener noreferrer">
+                                github.com/Aakashchoudhary24/cartify
+                            </Link>
+                        </p>
+                        <p>LinkedIn: 
+                            <Link href="#" target="_blank" rel="noopener noreferrer">
+                                LinkedIn
+                            </Link>
+                        </p>
+                    </div>
+                </section>
+            )}
+        </div>
+        </>
+    );
 }

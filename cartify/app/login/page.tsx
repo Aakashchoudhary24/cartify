@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaEnvelope, FaLock, FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa";
+import { FaUser, FaLock} from "react-icons/fa";
 import Navbar from '../components/Navbar';
 
 export default function Login() {
@@ -71,23 +71,17 @@ export default function Login() {
     return (
         <>
         <Navbar/>
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="max-w-2xl w-full flex overflow-hidden rounded-2xl border border-black shadow-2xl">
-                <div className="hidden md:flex flex-col justify-center items-center w-1/2 p-10 bg-gray-200 text-black">
-                    <h1 className="text-3xl font-bold">Welcome to CARTIFY</h1>
+        <div className="mt-16 flex items-center justify-center">
+            <div className="max-w-3xl w-full flex overflow-hidden rounded-2xl border shadow-2xl">
+                <div className="hidden md:flex flex-col justify-center items-center w-1/2 p-10 bg-blue-300 text-white">
+                    <h1 className="text-5xl font-bold">Welcome to CARTIFY</h1>
                     <p className="mt-3 text-center">Be Bold, Be Fashionable</p>
-                    <div className="flex gap-4 mt-5 text-xl text-black">
-                        <FaLinkedin className="cursor-pointer" />
-                        <FaFacebook className="cursor-pointer" />
-                        <FaInstagram className="cursor-pointer" />
-                        <FaTwitter className="cursor-pointer" />
-                    </div>
                 </div>
                 <div className="w-full md:w-1/2 p-10 bg-white">
-                    <h2 className="text-2xl font-semibold text-center mb-6 text-black">Sign In</h2>
+                    <h2 className="text-2xl font-semibold text-center mb-6 text-black">Log In</h2>
                     <form className="space-y-4" onSubmit={handleLogin}>
                         <div className="relative">
-                            <FaEnvelope className="absolute left-3 top-3 text-black" />
+                            <FaUser className="absolute left-3 top-4 text-black" />
                             <input
                                 type="text"
                                 placeholder="Username"
@@ -97,7 +91,7 @@ export default function Login() {
                             />
                         </div>
                         <div className="relative">
-                            <FaLock className="absolute left-3 top-3 text-black" />
+                            <FaLock className="absolute left-3 top-4 text-black" />
                             <input
                                 type="password"
                                 placeholder="Password"
@@ -111,15 +105,15 @@ export default function Login() {
                                 <input type="checkbox" className="form-checkbox text-red-500" />
                                 <span>Remember me</span>
                             </label>
-                            <a href="#" className="text-red-500 hover:underline">Forgot password?</a>
+                            <a href="#" className="text-blue-500 hover:underline">Forgot password?</a>
                         </div>
-                        <button className="w-full py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition" type="submit">
-                            Sign In
+                        <button className="w-full py-3 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition" type="submit">
+                            Log In
                         </button>
                     </form>
                     {error && <p className="text-red-500 text-center mt-2">{error}</p>}
                     <p className="text-center mt-4 text-black">
-                        Don&apos;t have an account? <a href="#" onClick={() => router.push("/signup")} className="text-red-500 hover:underline">Sign up</a>
+                        Don&apos;t have an account?  <a href="#" onClick={() => router.push("/signup")} className="text-blue-500 hover:underline"> Sign up</a>
                     </p>
                 </div>
             </div>
