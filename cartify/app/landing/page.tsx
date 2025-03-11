@@ -9,8 +9,8 @@ export default function Landing(){
         <>
         <Navbar/>
         <div className="poster-images">
-            <Image className="male-poster-image" alt="male supermodel" src='/images/males.jpeg' width={1000} height={100}></Image>
-            <Image className="male-poster-image" alt="male supermodel" src='/images/male.jpeg' width={500} height={100}></Image>
+            <Image className="male-poster-image" alt="male supermodel" src='/images/people.png' width={1200} height={0}></Image>
+            <Image className="male-poster-image" alt="male supermodel" src='/images/couple.webp' width={550} height={0}></Image>
         </div>
         </>
     )

@@ -167,7 +167,6 @@ const ProductsPage: React.FC = () => {
                   <div className={styles.cardBack}>
                     <h3 className={styles.fullProductName}>{product.name}</h3>
                     <p className={styles.productDescription}>{product.description}</p>
-                    <span className={styles.productPrice}>Rs. {product.price}</span>
                   </div>
                 </div>
               </div>
