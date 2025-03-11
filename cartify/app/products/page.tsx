@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { gql } from "graphql-request";
 import { useFetchGraphQL } from "@/hooks";
 import styles from "../styles/products.module.css";
+import Navbar from "../components/Navbar";
 
 // Define Product Interface
 interface Product {
@@ -79,97 +80,102 @@ const ProductsPage: React.FC = () => {
 
   const handleCategoryFilterChange = (category: string) => {
     setSelectedCategories((prev) =>
-      prev.includes(category) ? prev.filter((cat) => cat !== category) : [...prev, category]
-    );
-  };
+        prev.includes(category) ? prev.filter((cat) => cat !== category) : [...prev, category]
+      );
+    };
 
-  const handleGenderFilterChange = (gender: string) => {
-    setSelectedGenders((prev) =>
-      prev.includes(gender) ? prev.filter((g) => g !== gender) : [...prev, gender]
-    );
-  };
+    const handleGenderFilterChange = (gender: string) => {
+      setSelectedGenders((prev) =>
+        prev.includes(gender) ? prev.filter((g) => g !== gender) : [...prev, gender]
+      );
+    };
 
-  const categories = [...new Set(products.map((p) => p.category.name))];
-  const genders = [...new Set(products.map((p) => p.gender))];
+    const categories = [...new Set(products.map((p) => p.category.name))];
+    const genders = [...new Set(products.map((p) => p.gender))];
 
-  if (loading) return <p className={styles.loading}>Loading...</p>;
-  if (error) return <p className={styles.error}>Error fetching products: {error.message}</p>;
+    if (loading) return <p className={styles.loading}>Loading...</p>;
+    if (error) return <p className={styles.error}>Error fetching products: {error.message}</p>;
 
-  return (
-    <div className={styles.container}>
-      {/* Sidebar for Filters */}
-      <div className={styles.sidebar}>
-        <h3 className={styles.sidebarTitle}>CATEGORIES</h3>
-        <div className={styles.categoryButtons}>
-          {categories.map((category, index) => (
-            <button
-              key={index}
-              className={`${styles.categoryButton} ${
-                selectedCategories.includes(category) ? styles.activeButton : ""
-              }`}
-              onClick={() => handleCategoryFilterChange(category)}
-            >
-              {category}
-            </button>
-          ))}
+
+
+
+    return (
+      <>
+      <Navbar/>
+      <div className={styles.container}>
+        {/* Sidebar for Filters */}
+        <div className={styles.sidebar}>
+          <h3 className={styles.sidebarTitle}>CATEGORIES</h3>
+          <div className={styles.categoryButtons}>
+            {categories.map((category, index) => (
+              <button
+                key={index}
+                className={`${styles.categoryButton} ${
+                  selectedCategories.includes(category) ? styles.activeButton : ""
+                }`}
+                onClick={() => handleCategoryFilterChange(category)}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
+          <h3 className={styles.sidebarTitle}>GENDER</h3>
+          <div className={styles.categoryButtons}>
+            {genders.map((gender, index) => (
+              <button
+                key={index}
+                className={`${styles.categoryButton} ${
+                  selectedGenders.includes(gender) ? styles.activeButton : ""
+                }`}
+                onClick={() => handleGenderFilterChange(gender)}
+              >
+                {gender.charAt(0).toUpperCase() + gender.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <h3 className={styles.sidebarTitle}>GENDER</h3>
-        <div className={styles.categoryButtons}>
-          {genders.map((gender, index) => (
-            <button
-              key={index}
-              className={`${styles.categoryButton} ${
-                selectedGenders.includes(gender) ? styles.activeButton : ""
-              }`}
-              onClick={() => handleGenderFilterChange(gender)}
-            >
-              {gender.charAt(0).toUpperCase() + gender.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
+        {/* Product Grid */}
+        <div className={styles.content}>
+          <div className={styles.productGrid}>
+            {sortedProducts.map((product) => (
+              <div
+                key={product.id}
+                className={styles.productCard}
+                onClick={() =>
+                  router.push(
+                    `/products/${product.id}?name=${encodeURIComponent(
+                      product.name
+                    )}&description=${encodeURIComponent(
+                      product.description
+                    )}&price=${product.price}&image=${encodeURIComponent(product.image1)}`
+                  )
+                }
+              >
+                <div className={styles.cardInner}>
+                  {/* Front Side */}
+                  <div className={styles.cardFront}>
+                    <img src={product.image1} alt={product.name} className={styles.productImage} />
+                    <div className={styles.productInfo}>
+                      <h3 className={styles.productName}>{product.name}</h3>
+                      <span className={styles.productPrice}>Rs. {product.price}</span>
+                    </div>
+                  </div>
 
-      {/* Product Grid */}
-      <div className={styles.content}>
-        <h2 className={styles.collectionTitle}>Product Collection</h2>
-        <div className={styles.productGrid}>
-          {sortedProducts.map((product) => (
-            <div
-              key={product.id}
-              className={styles.productCard}
-              onClick={() =>
-                router.push(
-                  `/products/${product.id}?name=${encodeURIComponent(
-                    product.name
-                  )}&description=${encodeURIComponent(
-                    product.description
-                  )}&price=${product.price}&image=${encodeURIComponent(product.image1)}`
-                )
-              }
-            >
-              <div className={styles.cardInner}>
-                {/* Front Side */}
-                <div className={styles.cardFront}>
-                  <img src={product.image1} alt={product.name} className={styles.productImage} />
-                  <div className={styles.productInfo}>
-                    <h3 className={styles.productName}>{product.name}</h3>
+                  {/* Back Side */}
+                  <div className={styles.cardBack}>
+                    <h3 className={styles.fullProductName}>{product.name}</h3>
+                    <p className={styles.productDescription}>{product.description}</p>
                     <span className={styles.productPrice}>Rs. {product.price}</span>
                   </div>
                 </div>
-
-                {/* Back Side */}
-                <div className={styles.cardBack}>
-                  <h3 className={styles.fullProductName}>{product.name}</h3>
-                  <p className={styles.productDescription}>{product.description}</p>
-                  <span className={styles.productPrice}>Rs. {product.price}</span>
-                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+      </>
   );
 };
 

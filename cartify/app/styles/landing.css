@@ -1,51 +1,9 @@
-.categories ul{
-    margin-top: 20px;
-    list-style-type: none;
+.poster-images {
     display: flex;
-    gap: 50px;
-    justify-content: center;
-    height: 100px;
-}
-
-.landing {
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-}
-
-.welcome {
-    display: flex;
-    flex-direction: column;
-    height: 40vh;
-    width: 40vw;
-    justify-content: center;
-    align-items: center;
-}
-
-.welcome-text {
-    text-align: center;
-    font-weight: 100;
-    font-size: 6rem;
-}
-
-.motto-paragraph{
-    text-align: center;
-    margin-top: -30px;
-    font-size: 25px;
-}
-
-.landing-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.landing-buttons button {
-    height: 45px;
-    width: 240px;
-    background: white;
-    color: black;
-    border-radius: 10px;
+    flex-direction: row;
+    justify-self: center;
     border: 1px solid black;
-    font-size: 20px;
+    padding: 10px;
+    width: 100vw;
+    
 }
