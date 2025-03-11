@@ -1,12 +1,12 @@
-/* Wrapper to ensure carousel layout is maintained */
+/* General styles for the carousel wrapper */
 .carousel-wrapper {
     position: relative;
-    max-width: 1167px;
+    max-width: 1200px;
     width: 100%;
     margin: auto;
     padding: 20px;
     border-radius: 8px;
-    background: #F4EEFF;
+    background: #F4EEFF; /* Background color */
 }
 
 /* Carousel container */
@@ -25,7 +25,7 @@
     white-space: nowrap;
     transition: transform 0.5s ease-in-out;
     background: #F4EEFF;
-    gap: 2px
+    gap: 5px;
 }
 
 /* Individual product card */
@@ -41,26 +41,34 @@
 /* Product image */
 .item-image {
     width: 160px;
-    height: 180px;
+    height: 250px;
     object-fit: cover;
-    border-radius: 4px;
-    border: #333 solid 1px;
+    border: 1px solid #424874;
     border-radius: 10px;
+    object-position: top;
 }
 
-/* Product name */
-.item-name {
+/* Product info section */
+.item-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 6px 8px;
     font-size: 14px;
-    font-weight: 600;
-    margin-top: 5px;
-    color: #333;
+    font-weight: 500;
+    border-radius: 4px;
 }
 
-/* Product price */
-.item-price {
-    color: #007bff;
-    font-weight: bold;
-    font-size: 16px;
+/* Product name - Limit to two words */
+.item-name {
+    color: #333;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    display: inline-block;
 }
 
 /* Carousel buttons */
@@ -69,23 +77,56 @@
     top: 48%;
     transform: translateY(-50%);
     border: none;
-    padding: 8px 8px;
+    padding: 10px;
     border-radius: 50%;
-    color: rgb(19, 4, 4);
     cursor: pointer;
     z-index: 10;
+    transition: background 0.3s ease;
 }
 
 /* Align buttons inside the carousel */
 .carousel-btn.left {
-    left: -5px;
+    left: -15px;
 }
 
 .carousel-btn.right {
-    right: -5px;
+    right: -15px;
 }
 
-/* Make the buttons more visible on hover */
+/* Button hover effect */
 .carousel-btn:hover {
     background: rgba(0, 0, 0, 0.7);
+    color: white;
+}
+
+/* Media Queries - Responsive Design */
+@media (max-width: 768px) {
+    .carousel-wrapper {
+        padding: 15px;
+    }
+
+    .item-card {
+        width: 150px;
+    }
+
+    .item-image {
+        width: 140px;
+        height: 160px;
+    }
+
+    .item-name {
+        font-size: 12px;
+    }
+
+    .carousel-btn {
+        padding: 8px;
+    }
+
+    .carousel-btn.left {
+        left: -10px;
+    }
+
+    .carousel-btn.right {
+        right: -10px;
+    }
 }

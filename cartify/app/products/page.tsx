@@ -18,6 +18,7 @@ interface Product {
   };
   gender: string;
   image1: string;
+  image2: string;
 }
 
 // Define API Response Interface
@@ -52,6 +53,19 @@ const ProductsPage: React.FC = () => {
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
   const router = useRouter();
 
+  // Sidebar scroll effect
+  const [top, setTop] = useState(100); // Initially below navbar
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setTop(Math.max(0, 100 - scrollY)); // Move up but stop at 0px
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => {
     if (products.length > 0) {
       setSortedProducts(products);
@@ -80,31 +94,28 @@ const ProductsPage: React.FC = () => {
 
   const handleCategoryFilterChange = (category: string) => {
     setSelectedCategories((prev) =>
-        prev.includes(category) ? prev.filter((cat) => cat !== category) : [...prev, category]
-      );
-    };
+      prev.includes(category) ? prev.filter((cat) => cat !== category) : [...prev, category]
+    );
+  };
 
-    const handleGenderFilterChange = (gender: string) => {
-      setSelectedGenders((prev) =>
-        prev.includes(gender) ? prev.filter((g) => g !== gender) : [...prev, gender]
-      );
-    };
+  const handleGenderFilterChange = (gender: string) => {
+    setSelectedGenders((prev) =>
+      prev.includes(gender) ? prev.filter((g) => g !== gender) : [...prev, gender]
+    );
+  };
 
-    const categories = [...new Set(products.map((p) => p.category.name))];
-    const genders = [...new Set(products.map((p) => p.gender))];
+  const categories = [...new Set(products.map((p) => p.category.name))];
+  const genders = [...new Set(products.map((p) => p.gender))];
 
-    if (loading) return <p className={styles.loading}>Loading...</p>;
-    if (error) return <p className={styles.error}>Error fetching products: {error.message}</p>;
+  if (loading) return <p className={styles.loading}>Loading...</p>;
+  if (error) return <p className={styles.error}>Error fetching products: {error.message}</p>;
 
-
-
-
-    return (
-      <>
-      <Navbar/>
+  return (
+    <>
+      <Navbar />
       <div className={styles.container}>
-        {/* Sidebar for Filters */}
-        <div className={styles.sidebar}>
+        {/* Sidebar with Dynamic Top Value */}
+        <div className={styles.sidebar} style={{ top: `${top}px`, transition: "top 0.3s ease-in-out" }}>
           <h3 className={styles.sidebarTitle}>CATEGORIES</h3>
           <div className={styles.categoryButtons}>
             {categories.map((category, index) => (
@@ -120,7 +131,7 @@ const ProductsPage: React.FC = () => {
             ))}
           </div>
 
-          <h3 className={styles.sidebarTitle}>GENDER</h3>
+          <h3 className={styles.sidebarTitle} style={{ paddingTop: "15px" }}>GENDER</h3>
           <div className={styles.categoryButtons}>
             {genders.map((gender, index) => (
               <button
@@ -149,7 +160,9 @@ const ProductsPage: React.FC = () => {
                       product.name
                     )}&description=${encodeURIComponent(
                       product.description
-                    )}&price=${product.price}&image=${encodeURIComponent(product.image1)}`
+                    )}&price=${product.price}&image1=${encodeURIComponent(
+                      product.image1
+                    )}&image2=${encodeURIComponent(product.image2)}`
                   )
                 }
               >
@@ -167,6 +180,7 @@ const ProductsPage: React.FC = () => {
                   <div className={styles.cardBack}>
                     <h3 className={styles.fullProductName}>{product.name}</h3>
                     <p className={styles.productDescription}>{product.description}</p>
+                    <span className={styles.productPrice}>Rs. {product.price}</span>
                   </div>
                 </div>
               </div>
@@ -174,7 +188,7 @@ const ProductsPage: React.FC = () => {
           </div>
         </div>
       </div>
-      </>
+    </>
   );
 };
 

@@ -1,47 +1,59 @@
+/* General Page Styling */
+
+
 .container {
   display: flex;
-  justify-content: center;
-  background-color: white;
+  background-color: #F4EEFF;
   min-height: 100vh;
-  width: 80vw;
-  justify-self: center;
-  margin-top: 15px;
+  padding: 20px 20px 40px;
+  padding-left: 0;
 }
 
 .sidebar {
-  width: 300px;
-  height: max-content;
-  background: linear-gradient(135deg, #DCD6F7, #A6B1E1);
-  border-radius: 12px;
+  width: 400px;
+  padding: 20px;
+  background: rgba(220, 214, 247, 0.5);
   box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 10px;
-  margin-right: 40px;
+  border: 2px solid rgba(166, 177, 225, 0.6);
+  backdrop-filter: blur(10px);
+  position: fixed;
+  height: 100vh;
+  top: 0;
+  overflow-y: auto;
+  transition: top 0.3s ease-in-out;
 }
 
+
+/* Sidebar Title */
 .sidebarTitle {
   font-size: 1.4rem;
   font-weight: bold;
   color: #424874;
   margin-bottom: 15px;
-  margin-top: 25px;
+  margin-top: 40px;
   text-align: center;
   text-transform: uppercase;
 }
 
+/* Category Button Grid (2 buttons per row) */
 .categoryButtons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 15px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 equal columns */
+  gap: 10px; /* Space between buttons */
+  width: 100%;
+  justify-content: center;
+  padding: 10px 5px;
 }
 
+/* Buttons */
 .categoryButton {
   background: white;
+  border: 2px solid #A6B1E1;
   color: #424874;
-  padding: 10px 15px;
+  padding: 10px;
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: bold;
@@ -49,34 +61,46 @@
   transition: all 0.3s ease;
   outline: none;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Ensures it fills the grid cell */
+  text-align: center;
 }
 
+/* Hover effect */
 .categoryButton:hover {
-  background: #6886ff;
+  background: #A6B1E1;
   color: white;
   transform: scale(1.05);
 }
 
+/* Active Button */
 .activeButton {
-  background: #3e54ff;
+  background: #424874;
   color: white;
+  border: 2px solid #424874;
 }
 
+/* Content */
+
+/* Ensure content doesn't overlap sidebar */
 .content {
   flex-grow: 1;
+  margin-left: 500px; /* Adjust based on sidebar width + margin */
+  margin-right: 100px;
 }
 
+/* Product Grid */
 .productGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 }
 
+/* Product Card */
 .productCard {
   position: relative;
   width: 280px;
   height: auto;
-  background: white;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -84,15 +108,21 @@
 
 .productCard:hover {
   transform: scale(1.03);
+  box-shadow: 6px 6px 16px rgba(56, 54, 54, 0.856);
+  border: solid 2px #8289a8;
+  cursor: pointer;
 }
 
+/* Image */
 .productImage {
   width: 100%;
   height: 410px;
   object-fit: cover;
-  border-radius: 12px;
+  border-bottom: solid 3px #A6B1E1;
+  box-shadow: 12px 12px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* Product Info */
 .productInfo {
   padding: 12px;
   text-align: center;
@@ -105,14 +135,15 @@
   color: #424874;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;  
+  text-overflow: ellipsis;
+  border-bottom: 1px solid #A6B1E1;
   padding-bottom: 5px;
 }
 
 .productPrice {
   font-size: 1.1rem;
   font-weight: bold;
-  color: rgb(143, 143, 255);  
+  color: #A6B1E1;
   margin-top: 5px;
 }
 
@@ -128,7 +159,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(41, 38, 38, 0.55);
   color: white;
   display: flex;
   flex-direction: column;
@@ -136,18 +167,18 @@
   align-items: center;
   padding: 20px;
   text-align: center;
+  gap: 12px;
   opacity: 0;
   transition: opacity 0.3s ease;
-  border-radius: 12px;
 }
 
+/* Full Title */
 .fullProductName {
   font-size: 1.2rem;
   font-weight: bold;
   color: white;
   max-width: 90%;
   text-align: center;
-  margin-bottom: 10px;
 }
 
 /* Product Description */

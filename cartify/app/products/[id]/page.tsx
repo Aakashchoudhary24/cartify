@@ -1,23 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import styles from "../../styles/productinfo.module.css";
-import Link from "next/link";
+import Carousel from "../../carousel/page";
 
 export default function ProductPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  
   const id = searchParams.get("id") || "";
   const name = searchParams.get("name") || "Unknown Product";
   const description = searchParams.get("description") || "No description available.";
   const price = searchParams.get("price") || "0";
-  const image = searchParams.get("image") || "/default.jpg"; // Fallback image
+  const image1 = searchParams.get("image1") || "/default.jpg";
+  const image2 = searchParams.get("image2") || null;
 
   const [selectedSize, setSelectedSize] = useState("M");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Example: If you had multiple images, you could rotate them here
-  const images = [image]; // Add more image URLs if available
+  const images = [image1, image2].filter((img): img is string => Boolean(img));
 
   useEffect(() => {
     if (images.length > 1) {
@@ -32,6 +35,12 @@ export default function ProductPage() {
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
         <div className={styles.productGrid}>
+          
+          {/* Back Button */}
+          <button className={styles.backButton} onClick={() => router.push("/products")}>
+            <ArrowLeft size={24} />
+          </button>
+
           {/* Image Display */}
           <div className={styles.carousel}>
             <img
@@ -78,24 +87,8 @@ export default function ProductPage() {
             </div>
           </div>
         </div>
-
-        {/* Similar Product Recommendations - Static for now */}
-        <div className={styles.recommendationsSection}>
-          <h2 className={styles.sectionTitle}>You May Also Like</h2>
-          <div className={styles.recommendationsGrid}>
-            {/* Placeholder Recommendations */}
-            {[1, 2, 3, 4].map((num) => (
-              <Link
-                href={`/product/${num}`}
-                key={num}
-                className={styles.recommendationCard}
-              >
-                <img src="/default.jpg" alt="Recommended Product" className={styles.recommendationImage} />
-                <h3 className={styles.recommendationTitle}>Product {num}</h3>
-                <span className={styles.recommendationPrice}>Rs. {999 + num * 10}</span>
-              </Link>
-            ))}
-          </div>
+        <div className={styles.carouselGrid}>
+          <Carousel />
         </div>
       </div>
     </div>
