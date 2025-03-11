@@ -7,6 +7,11 @@ from strawberry.tools import merge_types
 from authentication.schema import AuthQuery, AuthMutation
 from strawberry.tools import merge_types
 
+
+from django.core.mail import send_mail
+from django.conf import settings
+from typing import Optional
+
 MergedQuery = merge_types("MergedQuery", (AuthQuery,))
 MergedMutation = merge_types("MergedMutation", (AuthMutation,))
 
@@ -73,6 +78,7 @@ class PaymentType:
     status: str
     transaction_id: Optional[str]
     created_at: datetime
+    
 
 @strawberry.type
 class Query:
@@ -113,3 +119,28 @@ class Mutation:
         return order
 
 schema = strawberry.Schema(query=MergedQuery, mutation=MergedMutation)
+
+
+import strawberry
+from .models import Order
+from .utils import send_order_confirmation_email
+
+@strawberry.type
+class Mutation:
+    @strawberry.mutation
+    def send_order_email(self, user_email: str) -> bool:
+        try:
+            send_order_confirmation_email(user_email)
+            print(f"📧 Email sent to {user_email}")
+            return True
+        except Exception as e:
+            print(f"❌ Error sending email: {e}")
+            return False
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)  # ✅ Fix: Added query
+
+
+# mutation {
+#   sendOrderEmail(userEmail: "test@example.com")
+# }
