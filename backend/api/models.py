@@ -34,6 +34,7 @@ class Profile(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=15)
+    image = models.ImageField(upload_to='profile_images/', blank=True, null=True)  # Add this line
 
     def __str__(self):
         return self.user.username
