@@ -7,7 +7,6 @@ import { useFetchGraphQL } from "@/hooks";
 import styles from "../styles/products.module.css";
 import Navbar from "../components/Navbar";
 
-// Define Product Interface
 interface Product {
   id: number;
   name: string;
@@ -21,12 +20,10 @@ interface Product {
   image2: string;
 }
 
-// Define API Response Interface
 interface ProductsResponse {
   products: Product[];
 }
 
-// GraphQL Query
 const PRODUCTS_QUERY = gql`
   query {
     products {
@@ -54,22 +51,19 @@ const ProductsPage: React.FC = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([1000, 10000]);
   const router = useRouter();
 
-  // References for min and max range inputs
   const minRangeRef = useRef<HTMLInputElement>(null);
   const maxRangeRef = useRef<HTMLInputElement>(null);
 
-  // Constants for price range
   const MIN_PRICE = 1000;
   const MAX_PRICE = 10000;
-  const RANGE_GAP = 500; // Minimum gap between min and max values
+  const RANGE_GAP = 500;
 
-  // Sidebar scroll effect
-  const [top, setTop] = useState(100); // Initially below navbar
+  const [top, setTop] = useState(100);
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      setTop(Math.max(0, 100 - scrollY)); // Move up but stop at 0px
+      setTop(Math.max(0, 100 - scrollY));
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -97,7 +91,6 @@ const ProductsPage: React.FC = () => {
       );
     }
 
-    // Filter by price range
     filteredProducts = filteredProducts.filter(
       (product) => product.price >= priceRange[0] && product.price <= priceRange[1]
     );
@@ -107,24 +100,20 @@ const ProductsPage: React.FC = () => {
     }
   }, [selectedCategories, selectedGenders, priceRange, products]);
 
-  // Function to calculate percentage position for visual slider track
   const getPercentage = (value: number) => {
     return ((value - MIN_PRICE) / (MAX_PRICE - MIN_PRICE)) * 100;
   };
 
-  // Handle minimum price change
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const minValue = parseInt(e.target.value);
     const maxValue = priceRange[1];
     
-    // Ensure min value doesn't exceed max value minus gap
     if (minValue + RANGE_GAP <= maxValue) {
       setPriceRange([minValue, maxValue]);
       if (minRangeRef.current) {
         minRangeRef.current.value = minValue.toString();
       }
     } else {
-      // If min is too close to max, keep a gap
       setPriceRange([maxValue - RANGE_GAP, maxValue]);
       if (minRangeRef.current) {
         minRangeRef.current.value = (maxValue - RANGE_GAP).toString();
@@ -132,19 +121,16 @@ const ProductsPage: React.FC = () => {
     }
   };
 
-  // Handle maximum price change
   const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const minValue = priceRange[0];
     const maxValue = parseInt(e.target.value);
     
-    // Ensure max value doesn't go below min value plus gap
     if (maxValue >= minValue + RANGE_GAP) {
       setPriceRange([minValue, maxValue]);
       if (maxRangeRef.current) {
         maxRangeRef.current.value = maxValue.toString();
       }
     } else {
-      // If max is too close to min, keep a gap
       setPriceRange([minValue, minValue + RANGE_GAP]);
       if (maxRangeRef.current) {
         maxRangeRef.current.value = (minValue + RANGE_GAP).toString();
@@ -169,7 +155,6 @@ const ProductsPage: React.FC = () => {
     setSelectedGenders([]);
     setPriceRange([MIN_PRICE, MAX_PRICE]);
     
-    // Reset range input values
     if (minRangeRef.current) minRangeRef.current.value = MIN_PRICE.toString();
     if (maxRangeRef.current) maxRangeRef.current.value = MAX_PRICE.toString();
   };
@@ -246,9 +231,7 @@ const ProductsPage: React.FC = () => {
                 </div>
               </div>
               
-              {/* Dual range slider implementation */}
               <div className={styles.rangeSliderContainer}>
-                {/* Progress bar that shows the selected range */}
                 <div 
                   className={styles.priceTrack}
                   style={{
@@ -257,7 +240,6 @@ const ProductsPage: React.FC = () => {
                   }}
                 ></div>
                 
-                {/* Minimum value slider */}
                 <input
                   ref={minRangeRef}
                   type="range"
@@ -268,7 +250,6 @@ const ProductsPage: React.FC = () => {
                   className={`${styles.rangeSlider} ${styles.minRangeSlider}`}
                 />
                 
-                {/* Maximum value slider */}
                 <input
                   ref={maxRangeRef}
                   type="range"
@@ -297,7 +278,6 @@ const ProductsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Product Grid */}
         <div className={styles.content}>
           <div className={styles.productGrid}>
             {sortedProducts.map((product) => (
@@ -317,7 +297,6 @@ const ProductsPage: React.FC = () => {
                 }
               >
                 <div className={styles.cardInner}>
-                  {/* Front Side */}
                   <div className={styles.cardFront}>
                     <img src={product.image1} alt={product.name} className={styles.productImage} />
                     <div className={styles.productInfo}>
@@ -326,7 +305,6 @@ const ProductsPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Back Side */}
                   <div className={styles.cardBack}>
                     <h3 className={styles.fullProductName}>{product.name}</h3>
                     <p className={styles.productDescription}>{product.description}</p>
