@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import styles from "../../styles/productinfo.module.css";
 import Carousel from "../../carousel/page";
+import Navbar from "@/app/components/Navbar";
 
 export default function ProductPage() {
   const searchParams = useSearchParams();
@@ -33,6 +34,7 @@ export default function ProductPage() {
 
   return (
     <div className={styles.pageWrapper}>
+      <Navbar/>
       <div className={styles.container}>
         <div className={styles.productGrid}>
           

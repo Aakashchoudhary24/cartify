@@ -1,6 +1,158 @@
+/* Price Range Styling */
+.priceRangeContainer {
+  padding: 10px 0;
+  width: 100%;
+}
+
+.priceInputs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.priceLabel {
+  font-size: 0.85rem;
+  color: #424874;
+  font-weight: 500;
+}
+
+.priceRange {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #7868E6;
+}
+
+/* Dual Range Slider Component */
+.rangeSliderContainer {
+  position: relative;
+  width: 100%;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  padding: 0 10px;
+}
+
+/* Base styling for range inputs */
+.rangeSlider {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+  position: absolute;
+  left: 0;
+  pointer-events: none;
+  z-index: 1; /* Lower z-index for the track */
+}
+
+/* Basic track styling for all browsers */
+.rangeSlider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: #DCD6F7;
+  border-radius: 5px;
+  border: none;
+}
+
+.rangeSlider::-moz-range-track {
+  height: 4px;
+  background: #DCD6F7;
+  border-radius: 5px;
+  border: none;
+}
+
+/* Create the active track appearance using a separate element */
+.priceTrack {
+  position: absolute;
+  height: 4px;
+  background: linear-gradient(to right, #A6B1E1, #7868E6);
+  border-radius: 5px;
+  z-index: 1; /* Lower z-index for the track */
+  pointer-events: none;
+}
+
+/* Thumb styling for all browsers */
+.rangeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #7868E6;
+  box-shadow: 0 1px 4px rgba(120, 104, 230, 0.3);
+  cursor: pointer;
+  pointer-events: auto;
+  margin-top: -7px;
+  z-index: 2; /* Higher z-index for the thumb */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rangeSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #7868E6;
+  box-shadow: 0 1px 4px rgba(120, 104, 230, 0.3);
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 2; /* Higher z-index for the thumb */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover effects */
+.rangeSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(120, 104, 230, 0.4);
+  background: #F4EEFF;
+}
+
+.rangeSlider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(120, 104, 230, 0.4);
+  background: #F4EEFF;
+}
+
+/* Active state */
+.rangeSlider::-webkit-slider-thumb:active {
+  transform: scale(1.15);
+  background: #7868E6;
+  border-color: #6a5adb;
+}
+
+.rangeSlider::-moz-range-thumb:active {
+  transform: scale(1.15);
+  background: #7868E6;
+  border-color: #6a5adb;
+}
+
+/* Z-index adjustment to ensure both thumbs can be dragged */
+.minRangeSlider {
+  z-index: 3; /* Higher z-index for the min thumb */
+}
+
+.maxRangeSlider {
+  z-index: 4; /* Higher z-index for the max thumb */
+}
+
+/* Focus styles */
+.rangeSlider:focus {
+  outline: none;
+}
+
+.rangeSlider:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(120, 104, 230, 0.3);
+}
+
+.rangeSlider:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 3px rgba(120, 104, 230, 0.3);
+}
+
 /* General Page Styling */
-
-
 .container {
   display: flex;
   background-color: #F4EEFF;
@@ -10,73 +162,162 @@
 }
 
 .sidebar {
-  width: 400px;
-  padding: 20px;
-  background: rgba(220, 214, 247, 0.5);
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
+  width: 300px;
+  background: rgba(246, 242, 255, 0.85);
+  box-shadow: 0 8px 32px rgba(115, 103, 240, 0.15);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  border: 2px solid rgba(166, 177, 225, 0.6);
+  border-right: 1px solid rgba(173, 159, 235, 0.3);
   backdrop-filter: blur(10px);
   position: fixed;
   height: 100vh;
-  top: 0;
+  left: 140px;
   overflow-y: auto;
-  transition: top 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  z-index: 100;
+  padding: 0;
 }
 
+.sidebarHeader {
+  background: linear-gradient(135deg, #a6b1e1 0%, #7868e6 100%);
+  padding: 25px 20px;
+  text-align: center;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.sidebarLogo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin: 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.sidebarSubtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin: 5px 0 0;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.filterSection {
+  padding: 0 20px 15px;
+}
 
 /* Sidebar Title */
 .sidebarTitle {
-  font-size: 1.4rem;
-  font-weight: bold;
+  font-size: 1.1rem;
+  font-weight: 600;
   color: #424874;
   margin-bottom: 15px;
-  margin-top: 40px;
-  text-align: center;
-  text-transform: uppercase;
+  position: relative;
+  display: flex;
+  align-items: center;
+  letter-spacing: 1px;
+}
+
+.titleIcon {
+  color: #7868E6;
+  margin-right: 8px;
+  font-size: 0.8rem;
+}
+
+/* Divider between sections */
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(166, 177, 225, 0.5), transparent);
+  margin: 10px 15px 20px;
+  width: calc(100% - 30px);
 }
 
 /* Category Button Grid (2 buttons per row) */
 .categoryButtons {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 equal columns */
-  gap: 10px; /* Space between buttons */
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
   width: 100%;
-  justify-content: center;
-  padding: 10px 5px;
 }
 
 /* Buttons */
 .categoryButton {
   background: white;
-  border: 2px solid #A6B1E1;
+  border: 1px solid #d4d2f3;
   color: #424874;
-  padding: 10px;
+  padding: 10px 8px;
   border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: bold;
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   outline: none;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-  width: 100%; /* Ensures it fills the grid cell */
+  box-shadow: 0 2px 4px rgba(166, 177, 225, 0.1);
+  width: 100%;
   text-align: center;
 }
 
 /* Hover effect */
 .categoryButton:hover {
-  background: #A6B1E1;
-  color: white;
-  transform: scale(1.05);
+  background: #f0edff;
+  border-color: #a6b1e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(166, 177, 225, 0.2);
 }
 
 /* Active Button */
 .activeButton {
-  background: #424874;
+  background: #7868E6;
   color: white;
-  border: 2px solid #424874;
+  border: 1px solid #7868E6;
+  box-shadow: 0 4px 8px rgba(120, 104, 230, 0.3);
+}
+
+.activeButton:hover {
+  background: #6a5adb;
+  border-color: #6a5adb;
+}
+
+/* Footer with reset button */
+.sidebarFooter {
+  padding: 20px;
+  border-top: 1px solid rgba(166, 177, 225, 0.2);
+  text-align: center;
+}
+
+.resetButton {
+  background: transparent;
+  border: 1px solid #7868E6;
+  color: #7868E6;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.resetButton:hover {
+  background: rgba(120, 104, 230, 0.1);
+}
+
+/* Scrollbar styling */
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(246, 242, 255, 0.5);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(166, 177, 225, 0.5);
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 104, 230, 0.5);
 }
 
 /* Content */
@@ -116,9 +357,10 @@
 /* Image */
 .productImage {
   width: 100%;
-  height: 410px;
+  height: 420px;
   object-fit: cover;
   border-bottom: solid 3px #A6B1E1;
+  border-top: solid 3px #A6B1E1;
   box-shadow: 12px 12px 12px rgba(0, 0, 0, 0.15);
 }
 
