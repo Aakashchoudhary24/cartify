@@ -42,7 +42,7 @@ media/
 .env.production.local
 
 # Static files directory
-/static/
+# /static/
 staticfiles/
 
 # Coverage reports
