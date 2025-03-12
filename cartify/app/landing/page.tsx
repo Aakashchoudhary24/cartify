@@ -30,45 +30,42 @@ const CartifyHomepage: React.FC = () => {
       </div>
       
       {/* Product Carousel */}
-      <div className="mt-20 relative overflow-hidden">
+      <div className="mt-20 relative overflow-hidden pb-5">
         <div className="flex justify-center items-center gap-4 px-8">
-          {/* Navigation Arrows */}
-          <button className="absolute left-4 z-10 bg-[#A6B1E1]/30 rounded-full p-2 hover:bg-[#A6B1E1] transition duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
           
           {/* Product Cards */}
-          <div className="w-1/5 aspect-[3/4] rounded-full overflow-hidden relative group border border-white">
+          <div className="w-1/5 aspect-[3/4] mt-10 rounded-full overflow-hidden relative group shadow-black shadow-sm">
             <div className="relative w-full h-full">
               <Image 
-                src="/api/placeholder/350/450" 
+                src="/images/Homepage1.jpg" 
                 alt="Fashion item" 
                 fill
                 className="object-cover" 
+                unoptimized
               />
             </div>
           </div>
           
-          <div className="w-1/5 aspect-[3/4] rounded-full overflow-hidden relative group border border-white">
+          <div className="w-1/5 aspect-[3/4] mt-5 rounded-full overflow-hidden relative group shadow-black shadow-md">
             <div className="relative w-full h-full">
               <Image 
-                src="/api/placeholder/350/450" 
+                src="/images/Homepage2.jpg" 
                 alt="Fashion item" 
                 fill
                 className="object-cover" 
+                unoptimized
               />
             </div>
           </div>
           
-          <div className="w-1/5 aspect-[3/4] rounded-full overflow-hidden relative group border border-white">
+          <div className="w-1/5 aspect-[3/4] rounded-full overflow-hidden relative group shadow-black shadow-lg">
             <div className="relative w-full h-full">
               <Image 
-                src="/api/placeholder/350/450" 
+                src="/images/Homepage3.jpg" 
                 alt="Fashion item" 
                 fill
                 className="object-cover" 
+                unoptimized
               />
             </div>
             <div className="absolute bottom-12 left-0 right-0 text-center bg-[#DCD6F7] p-2 rounded-lg">
@@ -77,33 +74,29 @@ const CartifyHomepage: React.FC = () => {
             </div>
           </div>
           
-          <div className="w-1/5 aspect-[3/4] rounded-full overflow-hidden relative group border border-white">
+          <div className="w-1/5 aspect-[3/4] mt-5 rounded-full overflow-hidden relative group shadow-black shadow-md">
             <div className="relative w-full h-full">
               <Image 
-                src="/api/placeholder/350/450" 
+                src="/images/Homepage4.jpg" 
                 alt="Fashion item" 
                 fill
                 className="object-cover" 
+                unoptimized
               />
             </div>
           </div>
           
-          <div className="w-1/5 aspect-[3/4] rounded-full overflow-hidden relative group border border-white">
+          <div className="w-1/5 aspect-[3/4] mt-10 rounded-full overflow-hidden relative group shadow-black shadow-sm">
             <div className="relative w-full h-full">
               <Image 
-                src="/api/placeholder/350/450" 
+                src="/images/Homepage5.jpg" 
                 alt="Fashion item" 
                 fill
                 className="object-cover" 
+                unoptimized
               />
             </div>
           </div>
-          
-          <button className="absolute right-4 z-10 bg-[#A6B1E1]/30 rounded-full p-2 hover:bg-[#A6B1E1] transition duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
         </div>
       </div>
     </div>

@@ -37,10 +37,10 @@ const Navbar: React.FC = () => {
     };
 
     return (
-        <nav className={`flex items-center justify-between px-8 py-6 ${bgColor} ${textColor}`}>
+        <nav className={`flex items-center justify-between px-7 py-6 ${bgColor} ${textColor}`}>
             <div className="flex items-center">
                 {/* Logo */}
-                <Link href="/" className="text-xl font-bold flex items-center">
+                <Link href="/" className="text-xl ml-10 font-bold flex items-center">
                     <span>CARTIFY</span>
                 </Link>
             </div>
@@ -50,9 +50,7 @@ const Navbar: React.FC = () => {
                 {[
                     { href: "/", label: "Home" },
                     { href: "/products", label: "Shop" },
-                    { href: "/sale", label: "Sale" },
                     { href: "/about", label: "About" },
-                    { href: "/showcase", label: "Showcase" },
                 ].map((link) => (
                     <Link
                         key={link.href}
@@ -67,8 +65,31 @@ const Navbar: React.FC = () => {
             </div>
             
             {/* Right Navigation */}
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-5 mr-10">
                 <ul className="flex items-center gap-5 text-lg font-medium">
+
+
+                    {isAuthenticated && (
+                        <li
+                            onClick={() => router.push("/cart")}
+                            className="cursor-pointer hover:text-[#A6B1E1] transition bg-[#A6B1E1] p-2 rounded-full"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-6 w-6 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                                />
+                            </svg>
+                        </li>
+                    )}
                     {isAuthenticated ? (
                         <li 
                             onClick={handleLogout} 
@@ -94,14 +115,6 @@ const Navbar: React.FC = () => {
                         </li>
                     )}
                 
-                    {isAuthenticated && (
-                        <li 
-                            onClick={() => router.push("/cart")} 
-                            className="cursor-pointer hover:text-[#A6B1E1] transition"
-                        >
-                            <FaShoppingCart />
-                        </li>
-                    )}
                 </ul>
             </div>
         </nav>
