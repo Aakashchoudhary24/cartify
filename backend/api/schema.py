@@ -30,6 +30,7 @@ class ProfileType:
     first_name: str
     last_name: str
     phone_number: str
+    image: Optional[str]
 
 @strawberry.type
 class CartItemType:
@@ -84,6 +85,7 @@ class Query:
                 first_name=profile.first_name,
                 last_name=profile.last_name,
                 phone_number=profile.phone_number,
+                image=profile.image.url if profile.image else None
             )
         return None
 
@@ -159,6 +161,19 @@ class Mutation:
             items=cart.items.all(),
             created_at=cart.created_at
         )
+
+    @strawberry.mutation
+    def delete_product_from_cart(self, user_id: int, product_id: int) -> CartType:
+        user = User.objects.get(id=user_id)
+        cart = Cart.objects.get(user=user)
+        cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+        cart_item.delete()
+        return CartType(
+            id=cart.id,
+            user=cart.user.username,
+            items=cart.items.all(),
+            created_at=cart.created_at
+        )   
 
 MergedQuery = merge_types("MergedQuery", (AuthQuery, Query))
 MergedMutation = merge_types("MergedMutation", (AuthMutation, Mutation))
