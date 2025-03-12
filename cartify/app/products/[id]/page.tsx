@@ -21,13 +21,22 @@ export default function ProductPage() {
   const [selectedSize, setSelectedSize] = useState("M");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [fadeIn, setFadeIn] = useState(true);
 
   const images = [image1, image2].filter((img): img is string => Boolean(img));
 
   useEffect(() => {
     if (images.length > 1) {
       const interval = setInterval(() => {
-        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+        // Start fade out transition
+        setFadeIn(false);
+        
+        // After transition completes, change the image and fade in
+        setTimeout(() => {
+          setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+          setFadeIn(true);
+        }, 300); // This delay should be shorter than your CSS transition duration
+        
       }, 4000);
       return () => clearInterval(interval);
     }
@@ -39,6 +48,16 @@ export default function ProductPage() {
 
   const increaseQuantity = () => {
     setQuantity(quantity + 1);
+  };
+
+  const handleThumbnailClick = (index: number) => {
+    if (currentImageIndex !== index) {
+      setFadeIn(false);
+      setTimeout(() => {
+        setCurrentImageIndex(index);
+        setFadeIn(true);
+      }, 300);
+    }
   };
 
   return (
@@ -58,7 +77,7 @@ export default function ProductPage() {
               <img
                 src={images[currentImageIndex]}
                 alt={name}
-                className={styles.carouselImage}
+                className={`${styles.carouselImage} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}
               />
             </div>
             
@@ -70,7 +89,7 @@ export default function ProductPage() {
                     src={img}
                     alt={`${name} thumbnail ${index + 1}`}
                     className={`${styles.thumbnail} ${currentImageIndex === index ? styles.activeThumbnail : ''}`}
-                    onClick={() => setCurrentImageIndex(index)}
+                    onClick={() => handleThumbnailClick(index)}
                   />
                 ))}
               </div>

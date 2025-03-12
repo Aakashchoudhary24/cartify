@@ -56,7 +56,7 @@
 .carousel {
   position: relative;
   left: 20px;
-  width:400px;
+  width: 400px;
   height: 100%;
   overflow: hidden;
   box-shadow: 0 10px 25px rgba(162, 177, 225, 0.2);
@@ -70,6 +70,18 @@
   border-bottom: solid 3px #A6B1E1;
   border-top: solid 3px #A6B1E1;
   box-shadow: 12px 12px 12px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.5s ease-in-out;
+  position: relative;
+  z-index: 1;
+}
+
+/* Added for smooth transitions */
+.fadeIn {
+  opacity: 1;
+}
+
+.fadeOut {
+  opacity: 0;
 }
 
 /* Thumbnail Container */

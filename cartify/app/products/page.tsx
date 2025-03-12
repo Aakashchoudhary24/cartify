@@ -18,6 +18,7 @@ interface Product {
   gender: string;
   image1: string;
   image2: string;
+  hasValidImage?: boolean; // New property to track image validity
 }
 
 interface ProductsResponse {
@@ -45,6 +46,7 @@ const ProductsPage: React.FC = () => {
   const { data, loading, error } = useFetchGraphQL<ProductsResponse>(PRODUCTS_QUERY);
   const products: Product[] = data?.products || [];
 
+  const [processedProducts, setProcessedProducts] = useState<Product[]>([]);
   const [sortedProducts, setSortedProducts] = useState<Product[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
@@ -60,6 +62,18 @@ const ProductsPage: React.FC = () => {
 
   const [top, setTop] = useState(100);
 
+  // Add image validation check
+  useEffect(() => {
+    if (products.length > 0) {
+      // Initialize all products with hasValidImage as true
+      const enhancedProducts = products.map(product => ({
+        ...product,
+        hasValidImage: true
+      }));
+      setProcessedProducts(enhancedProducts);
+    }
+  }, [products]);
+
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
@@ -71,13 +85,20 @@ const ProductsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (products.length > 0) {
-      setSortedProducts(products);
+    if (processedProducts.length > 0) {
+      // Only include products with valid images
+      const productsWithValidImages = processedProducts.filter(
+        (product) => product.hasValidImage
+      );
+      setSortedProducts(productsWithValidImages);
     }
-  }, [products]);
+  }, [processedProducts]);
 
   useEffect(() => {
-    let filteredProducts = [...products];
+    // Start with products that have valid images
+    let filteredProducts = [...processedProducts].filter(
+      (product) => product.hasValidImage
+    );
 
     if (selectedCategories.length > 0) {
       filteredProducts = filteredProducts.filter((product) =>
@@ -98,7 +119,17 @@ const ProductsPage: React.FC = () => {
     if (JSON.stringify(filteredProducts) !== JSON.stringify(sortedProducts)) {
       setSortedProducts(filteredProducts);
     }
-  }, [selectedCategories, selectedGenders, priceRange, products]);
+  }, [selectedCategories, selectedGenders, priceRange, processedProducts]);
+
+  const handleImageError = (productId: number) => {
+    setProcessedProducts(prev => 
+      prev.map(product => 
+        product.id === productId 
+          ? { ...product, hasValidImage: false } 
+          : product
+      )
+    );
+  };
 
   const getPercentage = (value: number) => {
     return ((value - MIN_PRICE) / (MAX_PRICE - MIN_PRICE)) * 100;
@@ -298,7 +329,12 @@ const ProductsPage: React.FC = () => {
               >
                 <div className={styles.cardInner}>
                   <div className={styles.cardFront}>
-                    <img src={product.image1} alt={product.name} className={styles.productImage} />
+                    <img 
+                      src={product.image1} 
+                      alt={product.name} 
+                      className={styles.productImage}
+                      onError={() => handleImageError(product.id)}
+                    />
                     <div className={styles.productInfo}>
                       <h3 className={styles.productName}>{product.name}</h3>
                       <span className={styles.productPrice}>Rs. {product.price}</span>
