@@ -1,34 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaEnvelope, FaUser, FaLock} from "react-icons/fa";
 import Navbar from '../components/Navbar';
 
-export default function Signup() {
+export default function Register() {
     const router = useRouter();
     const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
-    const setCookie = (name: string, value: string, days: number) => {
-        const expires = new Date();
-        expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-        document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
-    };
-
-    const getCookie = (name: string) => {
-        const cookies = document.cookie.split('; ');
-        for (const cookie of cookies) {
-            const [cookieName, cookieValue] = cookie.split('=');
-            if (cookieName === name) return cookieValue;
-        }
-        return null;
-    };
-
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setSuccess('');
 
         try {
             const response = await fetch('http://127.0.0.1:8000/auth/', {
@@ -38,35 +26,30 @@ export default function Signup() {
                 },
                 body: JSON.stringify({
                     query: `
-                        mutation Login($username: String!, $password: String!) {
-                            login(username: $username, password: $password)
+                        mutation Register($username: String!, $email: String!, $password: String!) {
+                            register(username: $username, email: $email, password: $password){
+                                id
+                            }
                         }
                     `,
-                    variables: { username, password },
+                    variables: { username, email, password },
                 }),
             });
 
             const result = await response.json();
+
             if (result.errors) {
                 setError('Invalid credentials');
             } else {
-                const token = result.data?.login;
-                if (token) {
-                    setCookie('jwt', token, 7);
-                    router.push('/');
-                }
+                setSuccess('Registration successful! Redirecting to login...');
+                setTimeout(() => {
+                    router.push('/login'); 
+                }, 2000);
             }
         } catch {
             setError('Something went wrong');
         }
     };
-
-    useEffect(() => {
-        const token = getCookie('jwt');
-        if (token) {
-            router.push('/');
-        }
-    }, [router]);
 
     return (
         <>
@@ -79,7 +62,7 @@ export default function Signup() {
                 </div>
                 <div className="w-full md:w-1/2 p-10 bg-white">
                     <h2 className="text-2xl font-semibold text-center mb-6 text-black">Sign Up</h2>
-                    <form className="space-y-4" onSubmit={handleLogin}>
+                    <form className="space-y-4" onSubmit={handleRegister}>
                         <div className="relative">
                             <FaUser className="absolute left-3 top-4 text-black" />
                             <input
@@ -95,8 +78,8 @@ export default function Signup() {
                             <input
                                 type="text"
                                 placeholder="Email"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full px-10 py-3 border border-black rounded-lg bg-transparent text-black placeholder-black focus:ring-2 focus:ring-red-500"
                             />
                         </div>
@@ -118,12 +101,14 @@ export default function Signup() {
                             <a href="#" className="text-blue-500 hover:underline">Forgot password?</a>
                         </div>
                         <button className="w-full py-3 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition" type="submit">
-                            Log In
+                            Sign Up
                         </button>
                     </form>
                     {error && <p className="text-red-500 text-center mt-2">{error}</p>}
+                    {success && <p className="text-green-500 text-center mt-2">{success}</p>} {/* ✅ Success message */}
                     <p className="text-center mt-4 text-black">
-                        Have an account?  <a href="#" onClick={() => router.push("/login")} className="text-blue-500 hover:underline"> Log In</a>
+                        Have an account?  
+                        <a href="#" onClick={() => router.push("/login")} className="text-blue-500 hover:underline"> Log In</a>
                     </p>
                 </div>
             </div>
