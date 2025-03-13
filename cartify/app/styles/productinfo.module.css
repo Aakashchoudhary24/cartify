@@ -1,11 +1,9 @@
-/* General Page Styling */
 .pageWrapper {
   background-color: #F8F5FF;
   min-height: 100vh;
   font-family: 'Poppins', sans-serif;
 }
 
-/* Main Container */
 .container {
   max-width: 1200px;
   margin: auto;
@@ -18,7 +16,6 @@
   box-shadow: 0 6px 30px rgba(163, 167, 212, 0.15);
 }
 
-/* Back Button */
 .backButton {
   display: flex;
   align-items: center;
@@ -37,7 +34,6 @@
   transform: translateX(-4px);
 }
 
-/* Product Grid Layout */
 .productGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -45,14 +41,12 @@
   align-items: flex-start;
 }
 
-/* Image Section */
 .imageSection {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* Carousel */
 .carousel {
   position: relative;
   left: 20px;
@@ -75,7 +69,6 @@
   z-index: 1;
 }
 
-/* Added for smooth transitions */
 .fadeIn {
   opacity: 1;
 }
@@ -84,7 +77,6 @@
   opacity: 0;
 }
 
-/* Thumbnail Container */
 .thumbnailContainer {
   display: flex;
   gap: 12px;
@@ -120,7 +112,6 @@
   padding: 1rem;
 }
 
-/* Title Section */
 .titleSection {
   display: flex;
   justify-content: space-between;
@@ -171,7 +162,6 @@
   transform: scale(1.1);
 }
 
-/* Rating Section */
 .rating {
   display: flex;
   align-items: center;
@@ -197,7 +187,6 @@
   color: #666;
 }
 
-/* Price Section */
 .priceSection {
   display: flex;
   align-items: center;
@@ -228,14 +217,12 @@
   font-weight: 600;
 }
 
-/* Divider */
 .divider {
   height: 1px;
   background: linear-gradient(to right, transparent, #DCD6F7, transparent);
   margin: 8px 0;
 }
 
-/* Description */
 .description {
   font-size: 1rem;
   line-height: 1.6;
@@ -243,7 +230,6 @@
   margin: 10px 0;
 }
 
-/* Selection Sections */
 .selectionSection {
   margin: 16px 0;
 }
@@ -255,7 +241,6 @@
   margin-bottom: 10px;
 }
 
-/* Size Options */
 .sizeOptions {
   display: flex;
   gap: 12px;
@@ -280,7 +265,6 @@
   box-shadow: 0 4px 12px rgba(166, 177, 225, 0.3);
 }
 
-/* Quantity Selector */
 .quantitySelector {
   display: flex;
   align-items: center;
@@ -318,7 +302,6 @@
   text-align: center;
 }
 
-/* Buttons */
 .buttonContainer {
   display: flex;
   gap: 16px;
@@ -362,7 +345,6 @@
   box-shadow: 0 4px 15px rgba(166, 177, 225, 0.3);
 }
 
-/* Recommendation Section */
 .carouselGrid {
   margin-top: 60px;
 }
@@ -389,7 +371,6 @@
   border-radius: 3px;
 }
 
-/* Responsive Design */
 @media (max-width: 992px) {
   .productGrid {
     grid-template-columns: 1fr;

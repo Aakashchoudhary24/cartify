@@ -6,6 +6,7 @@ import { gql } from "graphql-request";
 import { useFetchGraphQL } from "@/hooks";
 import styles from "../styles/products.module.css";
 import Navbar from "../components/Navbar";
+import { motion } from "framer-motion";
 
 interface Product {
   id: number;
@@ -18,7 +19,7 @@ interface Product {
   gender: string;
   image1: string;
   image2: string;
-  hasValidImage?: boolean; // New property to track image validity
+  hasValidImage?: boolean; 
 }
 
 interface ProductsResponse {
@@ -62,10 +63,8 @@ const ProductsPage: React.FC = () => {
 
   const [top, setTop] = useState(100);
 
-  // Add image validation check
   useEffect(() => {
     if (products.length > 0) {
-      // Initialize all products with hasValidImage as true
       const enhancedProducts = products.map(product => ({
         ...product,
         hasValidImage: true
@@ -77,7 +76,7 @@ const ProductsPage: React.FC = () => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      setTop(Math.max(0, 100 - scrollY));
+      setTop(Math.max(0, 90 - scrollY));
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -86,7 +85,6 @@ const ProductsPage: React.FC = () => {
 
   useEffect(() => {
     if (processedProducts.length > 0) {
-      // Only include products with valid images
       const productsWithValidImages = processedProducts.filter(
         (product) => product.hasValidImage
       );
@@ -95,7 +93,6 @@ const ProductsPage: React.FC = () => {
   }, [processedProducts]);
 
   useEffect(() => {
-    // Start with products that have valid images
     let filteredProducts = [...processedProducts].filter(
       (product) => product.hasValidImage
     );
@@ -200,7 +197,13 @@ const ProductsPage: React.FC = () => {
     <>
       <Navbar />
       <div className={styles.container}>
-        <div className={styles.sidebar} style={{ top: `${top}px`, transition: "top 0.1s ease-in-out" }}>
+        <motion.div 
+          className={styles.sidebar} 
+          style={{ top: `${top}px`, transition: "top 0.1s ease-in-out" }}
+          initial={{ opacity: 0, x: -100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className={styles.sidebarHeader}>
             <h2 className={styles.sidebarLogo}>CARTIFY</h2>
             <p className={styles.sidebarSubtitle}>Refine your style</p>
@@ -212,15 +215,17 @@ const ProductsPage: React.FC = () => {
             </h3>
             <div className={styles.categoryButtons}>
               {categories.map((category, index) => (
-                <button
+                <motion.button
                   key={index}
                   className={`${styles.categoryButton} ${
                     selectedCategories.includes(category) ? styles.activeButton : ""
                   }`}
                   onClick={() => handleCategoryFilterChange(category)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   {category}
-                </button>
+                </motion.button>
               ))}
             </div>
           </div>
@@ -233,15 +238,17 @@ const ProductsPage: React.FC = () => {
             </h3>
             <div className={styles.categoryButtons}>
               {genders.map((gender, index) => (
-                <button
+                <motion.button
                   key={index}
                   className={`${styles.categoryButton} ${
                     selectedGenders.includes(gender) ? styles.activeButton : ""
                   }`}
                   onClick={() => handleGenderFilterChange(gender)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   {gender.charAt(0).toUpperCase() + gender.slice(1)}
-                </button>
+                </motion.button>
               ))}
             </div>
           </div>
@@ -263,6 +270,8 @@ const ProductsPage: React.FC = () => {
               </div>
               
               <div className={styles.rangeSliderContainer}>
+                <div className={styles.sliderTrack}></div>
+                
                 <div 
                   className={styles.priceTrack}
                   style={{
@@ -300,19 +309,26 @@ const ProductsPage: React.FC = () => {
           </div>
           
           <div className={styles.sidebarFooter}>
-            <button 
+            <motion.button 
               className={styles.resetButton}
               onClick={handleResetFilters}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               Reset Filters
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
-        <div className={styles.content}>
+        <motion.div 
+          className={styles.content}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className={styles.productGrid}>
             {sortedProducts.map((product) => (
-              <div
+              <motion.div
                 key={product.id}
                 className={styles.productCard}
                 onClick={() =>
@@ -326,6 +342,10 @@ const ProductsPage: React.FC = () => {
                     )}&image2=${encodeURIComponent(product.image2)}`
                   )
                 }
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
               >
                 <div className={styles.cardInner}>
                   <div className={styles.cardFront}>
@@ -347,10 +367,10 @@ const ProductsPage: React.FC = () => {
                     <span className={styles.productPrice}>Rs. {product.price}</span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </>
   );

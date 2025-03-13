@@ -1,4 +1,3 @@
-/* Price Range Styling */
 .priceRangeContainer {
   padding: 10px 0;
   width: 100%;
@@ -24,7 +23,6 @@
   color: #7868E6;
 }
 
-/* Dual Range Slider Component */
 .rangeSliderContainer {
   position: relative;
   width: 100%;
@@ -32,10 +30,27 @@
   display: flex;
   align-items: center;
   margin: 10px 0;
-  padding: 0 10px;
 }
 
-/* Base styling for range inputs */
+.sliderTrack {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background-color: #DCD6F7;
+  border-radius: 5px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.priceTrack {
+  position: absolute;
+  height: 5px;
+  background: #7868E6; 
+  border-radius: 5px;
+  z-index: 2;
+  pointer-events: none;
+}
+
 .rangeSlider {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -46,35 +61,20 @@
   position: absolute;
   left: 0;
   pointer-events: none;
-  z-index: 1; /* Lower z-index for the track */
+  z-index: 3;
 }
 
-/* Basic track styling for all browsers */
 .rangeSlider::-webkit-slider-runnable-track {
   height: 4px;
-  background: #DCD6F7;
-  border-radius: 5px;
+  background: transparent;
   border: none;
 }
 
 .rangeSlider::-moz-range-track {
   height: 4px;
-  background: #DCD6F7;
-  border-radius: 5px;
+  background: transparent;
   border: none;
 }
-
-/* Create the active track appearance using a separate element */
-.priceTrack {
-  position: absolute;
-  height: 4px;
-  background: linear-gradient(to right, #A6B1E1, #7868E6);
-  border-radius: 5px;
-  z-index: 1; /* Lower z-index for the track */
-  pointer-events: none;
-}
-
-/* Thumb styling for all browsers */
 .rangeSlider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -82,12 +82,12 @@
   height: 18px;
   border-radius: 50%;
   background: white;
-  border: 2px solid #7868E6;
-  box-shadow: 0 1px 4px rgba(120, 104, 230, 0.3);
+  border: 2px solid #22D3EE; 
+  box-shadow: 0 1px 4px rgba(34, 156, 238, 0.3);
   cursor: pointer;
   pointer-events: auto;
   margin-top: -7px;
-  z-index: 2; /* Higher z-index for the thumb */
+  z-index: 4;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -96,69 +96,63 @@
   height: 18px;
   border-radius: 50%;
   background: white;
-  border: 2px solid #7868E6;
-  box-shadow: 0 1px 4px rgba(120, 104, 230, 0.3);
+  border: 2px solid #22D3EE;
+  box-shadow: 0 1px 4px rgba(34, 211, 238, 0.3);
   cursor: pointer;
   pointer-events: auto;
-  z-index: 2; /* Higher z-index for the thumb */
+  z-index: 4;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Hover effects */
 .rangeSlider::-webkit-slider-thumb:hover {
   transform: scale(1.1);
-  box-shadow: 0 2px 6px rgba(120, 104, 230, 0.4);
-  background: #F4EEFF;
+  box-shadow: 0 2px 6px rgba(34, 211, 238, 0.4);
 }
 
 .rangeSlider::-moz-range-thumb:hover {
   transform: scale(1.1);
-  box-shadow: 0 2px 6px rgba(120, 104, 230, 0.4);
-  background: #F4EEFF;
+  box-shadow: 0 2px 6px rgba(34, 211, 238, 0.4);
 }
 
-/* Active state */
 .rangeSlider::-webkit-slider-thumb:active {
   transform: scale(1.15);
-  background: #7868E6;
-  border-color: #6a5adb;
+  background: #22D3EE;
+  border-color: #0FB5D4;
 }
 
 .rangeSlider::-moz-range-thumb:active {
   transform: scale(1.15);
-  background: #7868E6;
-  border-color: #6a5adb;
+  background: #22D3EE;
+  border-color: #0FB5D4;
 }
 
-/* Z-index adjustment to ensure both thumbs can be dragged */
 .minRangeSlider {
-  z-index: 3; /* Higher z-index for the min thumb */
+  z-index: 5; 
 }
 
 .maxRangeSlider {
-  z-index: 4; /* Higher z-index for the max thumb */
+  z-index: 6; 
 }
 
-/* Focus styles */
 .rangeSlider:focus {
   outline: none;
 }
 
 .rangeSlider:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 3px rgba(120, 104, 230, 0.3);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.3);
 }
 
 .rangeSlider:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 3px rgba(120, 104, 230, 0.3);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.3);
 }
 
-/* General Page Styling */
 .container {
   display: flex;
   background-color: #ece2fd;
   min-height: 100vh;
-  padding: 20px 20px 40px;
   padding-left: 0;
+  padding-top: 20px;
+  justify-content: center;
 }
 
 .sidebar {
@@ -172,8 +166,7 @@
   position: fixed;
   height: 100vh;
   left: 140px;
-  overflow-y: auto;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.1s ease-in-out;
   z-index: 100;
   padding: 0;
 }
@@ -206,7 +199,6 @@
   padding: 0 20px 15px;
 }
 
-/* Sidebar Title */
 .sidebarTitle {
   font-size: 1.1rem;
   font-weight: 600;
@@ -224,7 +216,6 @@
   font-size: 0.8rem;
 }
 
-/* Divider between sections */
 .divider {
   height: 1px;
   background: linear-gradient(to right, transparent, rgba(166, 177, 225, 0.5), transparent);
@@ -232,7 +223,6 @@
   width: calc(100% - 30px);
 }
 
-/* Category Button Grid (2 buttons per row) */
 .categoryButtons {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -240,7 +230,6 @@
   width: 100%;
 }
 
-/* Buttons */
 .categoryButton {
   background: white;
   border: 1px solid #d4d2f3;
@@ -257,7 +246,6 @@
   text-align: center;
 }
 
-/* Hover effect */
 .categoryButton:hover {
   background: #f0edff;
   border-color: #a6b1e1;
@@ -265,7 +253,6 @@
   box-shadow: 0 4px 8px rgba(166, 177, 225, 0.2);
 }
 
-/* Active Button */
 .activeButton {
   background: #7868E6;
   color: white;
@@ -302,7 +289,6 @@
   background: rgba(120, 104, 230, 0.1);
 }
 
-/* Scrollbar styling */
 .sidebar::-webkit-scrollbar {
   width: 5px;
 }
@@ -320,23 +306,18 @@
   background: rgba(120, 104, 230, 0.5);
 }
 
-/* Content */
-
-/* Ensure content doesn't overlap sidebar */
 .content {
   flex-grow: 1;
-  margin-left: 500px; /* Adjust based on sidebar width + margin */
+  margin-left: 500px;
   margin-right: 100px;
 }
 
-/* Product Grid */
 .productGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 }
 
-/* Product Card */
 .productCard {
   position: relative;
   width: 280px;
@@ -354,7 +335,6 @@
   cursor: pointer;
 }
 
-/* Image */
 .productImage {
   width: 100%;
   height: 420px;
@@ -364,7 +344,6 @@
   box-shadow: 12px 12px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Product Info */
 .productInfo {
   padding: 12px;
   text-align: center;
@@ -389,12 +368,10 @@
   margin-top: 5px;
 }
 
-/* Hide Title & Price on Hover */
 .productCard:hover .productInfo {
   opacity: 0;
 }
 
-/* Back Side (Overlay) */
 .cardBack {
   width: 100%;
   height: 100%;
@@ -414,7 +391,6 @@
   transition: opacity 0.3s ease;
 }
 
-/* Full Title */
 .fullProductName {
   font-size: 1.2rem;
   font-weight: bold;
@@ -423,7 +399,6 @@
   text-align: center;
 }
 
-/* Product Description */
 .productDescription {
   font-size: 0.9rem;
   line-height: 1.4;
@@ -432,7 +407,6 @@
   text-align: center;
 }
 
-/* Hover Effect */
 .productCard:hover .productImage {
   filter: blur(4px);
 }
@@ -441,7 +415,6 @@
   opacity: 1;
 }
 
-/* Loading & Error Messages */
 .loading,
 .error {
   text-align: center;
@@ -458,7 +431,6 @@
   color: red;
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
   .productGrid {
     grid-template-columns: repeat(3, 1fr);

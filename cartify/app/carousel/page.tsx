@@ -7,7 +7,6 @@ import "../styles/carousel.css";
 import { gql } from "graphql-request";
 import { useFetchGraphQL } from "@/hooks";
 
-// GraphQL Query to Fetch Products
 const PRODUCTS_QUERY = gql`
   query {
     products {
@@ -25,7 +24,6 @@ const PRODUCTS_QUERY = gql`
   }
 `;
 
-// Define Product Interface
 interface Product {
   id: number;
   name: string;
@@ -39,8 +37,8 @@ const CarouselPage = () => {
   const router = useRouter();
   const { data, loading, error } = useFetchGraphQL<{ products: Product[] }>(PRODUCTS_QUERY);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [processedProducts, setProcessedProducts] = useState<Product[]>([]);
 
-  // Randomly select 10 products when data is fetched
   useEffect(() => {
     if (data?.products && data.products.length > 0) {
       const shuffled = [...data.products].sort(() => Math.random() - 0.5);
@@ -53,8 +51,7 @@ const CarouselPage = () => {
   const scrollAmount = 183;
   const maxScrollIndex = Math.max(0, selectedProducts.length - itemsPerView);
 
-  // Auto-scroll every 3 seconds
-  useEffect(() => {
+  useEffect(() => {   // For Auto Scrolling.
     const interval = setInterval(() => {
       setScrollIndex((prev) => (prev < maxScrollIndex ? prev + 1 : 0));
     }, 3000);
@@ -82,6 +79,16 @@ const CarouselPage = () => {
     );
   };
 
+  const handleImageError = (productId: number) => {
+    setProcessedProducts(prev => 
+      prev.map(product => 
+        product.id === productId 
+          ? { ...product, hasValidImage: false } 
+          : product
+      )
+    );
+  };
+
   if (loading) return <p className="text-center text-gray-500">Loading...</p>;
   if (error) return <p className="text-center text-red-500">Error fetching products: {error.message}</p>;
 
@@ -96,16 +103,13 @@ const CarouselPage = () => {
         />
       </Head>
       <div className="container d-flex flex-column align-items-center p-4">
-        {/* Recommended Items Section */}
         <div className="carousel-wrapper">
           <h2 className="text-dark text-2xl pl-10 fw-bold mb-3">Recommended for You</h2>
 
-          {/* Left Navigation Button */}
           <button onClick={scrollLeft} className="carousel-btn left">
             <ChevronLeft size={24} />
           </button>
 
-          {/* Carousel Container */}
           <div className="carousel-container">
             <div
               className="carousel-track"
@@ -118,13 +122,12 @@ const CarouselPage = () => {
                   onClick={() => navigateToProductPage(item)}
                   style={{ cursor: "pointer" }}
                 >
-                  {/* Image */}
                   <img
                     src={item.image1}
                     className="item-image"
                     alt={item.name}
+                    onError={() => handleImageError(item.id)}
                   />
-                  {/* Title (First Two Words Only) */}
                   <div className="item-info">
                     <span className="item-name">
                       {item.name.split(" ").slice(0, 2).join(" ")}
@@ -135,7 +138,6 @@ const CarouselPage = () => {
             </div>
           </div>
 
-          {/* Right Navigation Button */}
           <button onClick={scrollRight} className="carousel-btn right">
             <ChevronRight size={24} />
           </button>

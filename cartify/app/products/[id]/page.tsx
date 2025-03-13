@@ -106,7 +106,7 @@ export default function ProductPage() {
             <div className={styles.priceSection}>
               <span className={styles.price}>Rs. {parseFloat(price).toFixed(2)}</span>
               <span className={styles.originalPrice}>Rs. {(parseFloat(price) * 1.2).toFixed(2)}</span>
-              <span className={styles.discount}>20% OFF</span>
+              <span className={styles.discount}>16% OFF</span>
             </div>
 
             <div className={styles.divider}></div>
