@@ -25,13 +25,22 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+
+declare namespace Cypress {
+    interface Chainable {
+      login(username : string,password: string): Chainable<void>
+      logout(): Chainable<void>
+
+    }
+  }
+
+Cypress.Commands.add('login', (username,password) => {
+    cy.get('input[type=text]').should('be.visible').click().type(username);
+    cy.get('input[type=password]').should('be.visible').click().type(password);
+    cy.get('button').should('be.visible').click();
+    cy.contains('Where style speaks, trends resonate, fashion flourishes').should('exist');
+  });
+Cypress.Commands.add('logout', () => {
+    cy.contains('Logout').should('be.visible').click();
+    cy.contains('Where style speaks, trends resonate, fashion flourishes').should('exist');
+    });
