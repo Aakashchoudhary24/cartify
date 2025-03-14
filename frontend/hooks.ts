@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { request } from 'graphql-request';
 
 // 🔹 Function to Get CSRF Token
-function getCSRFToken(): string {
+export function getCSRFToken(): string {
   return Object.fromEntries(
     document.cookie.split('; ').map(c => c.split('='))
   )['csrftoken'] || '';
