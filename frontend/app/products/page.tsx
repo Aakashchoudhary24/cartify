@@ -333,8 +333,7 @@ const ProductsPage: React.FC = () => {
                 className={styles.productCard}
                 onClick={() =>
                   router.push(
-                    `/products/${product.id}?name=${encodeURIComponent(
-                      product.name
+                    `/products/${product.id}?id=${encodeURIComponent(product.id)}&name=${encodeURIComponent(product.name
                     )}&description=${encodeURIComponent(
                       product.description
                     )}&price=${product.price}&image1=${encodeURIComponent(

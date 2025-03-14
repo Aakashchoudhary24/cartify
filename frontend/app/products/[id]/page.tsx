@@ -6,6 +6,19 @@ import { ArrowLeft, Heart, Share2 } from "lucide-react";
 import styles from "../../styles/productinfo.module.css";
 import Carousel from "../../carousel/page";
 import Navbar from "@/app/components/Navbar";
+import { request, gql } from "graphql-request";
+import { getCSRFToken } from "@/hooks"; // Adjust import path as needed
+
+// Add to Cart Mutation
+const ADD_TO_CART_MUTATION = gql`
+  mutation AddToCart($userId: Int!, $productId: Int!, $quantity: Int!) {
+    addProductToCart(userId: $userId, productId: $productId, quantity: $quantity) {
+      id
+      user
+    }
+  }
+`;
+
 
 export default function ProductPage() {
   const searchParams = useSearchParams();
@@ -22,6 +35,8 @@ export default function ProductPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [fadeIn, setFadeIn] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState({ message: "", type: "" });
 
   const images = [image1, image2].filter((img): img is string => Boolean(img));
 
@@ -42,6 +57,16 @@ export default function ProductPage() {
     }
   }, [images]);
 
+  // Clear notification after 3 seconds
+  useEffect(() => {
+    if (notification.message) {
+      const timer = setTimeout(() => {
+        setNotification({ message: "", type: "" });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
   const decreaseQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
@@ -59,6 +84,47 @@ export default function ProductPage() {
       }, 300);
     }
   };
+
+  const handleAddToCart = async () => {
+    if (!id) {
+      setNotification({ message: "Invalid product ID", type: "error" });
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const variables = {
+        userId: 9, // Hardcoded user ID as per your example
+        productId: parseInt(id),
+        quantity: quantity
+      };
+
+      // Use the same endpoint you're using for queries
+      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const headers = { 'X-CSRFToken': getCSRFToken() };
+
+      const result = await request(endpoint, ADD_TO_CART_MUTATION, variables, headers);
+      
+      console.log("Add to cart success:", result);
+      setNotification({ 
+        message: `Added ${quantity} ${name} to your cart!`, 
+        type: "success" 
+      });
+      
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      setNotification({ 
+        message: "Failed to add item to cart. Please try again.", 
+        type: "error" 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  console.log("Product ID:", id);
+
 
   return (
     <div className={styles.pageWrapper}>
@@ -141,8 +207,20 @@ export default function ProductPage() {
               </div>
             </div>
 
+            {notification.message && (
+              <div className={`${styles.notification} ${styles[notification.type]}`}>
+                {notification.message}
+              </div>
+            )}
+
             <div className={styles.buttonContainer}>
-              <button className={styles.addToCart}>Add to Cart</button>
+              <button 
+                className={styles.addToCart} 
+                onClick={handleAddToCart}
+                disabled={loading}
+              >
+                {loading ? 'Adding...' : 'Add to Cart'}
+              </button>
               <button className={styles.checkout}>Buy Now</button>
             </div>
           </div>

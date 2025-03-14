@@ -7,6 +7,7 @@ import "../styles/carousel.css";
 import { gql } from "graphql-request";
 import { useFetchGraphQL } from "@/hooks";
 
+
 const PRODUCTS_QUERY = gql`
   query {
     products {
@@ -41,7 +42,11 @@ const CarouselPage = () => {
 
   useEffect(() => {
     if (data?.products && data.products.length > 0) {
-      const shuffled = [...data.products].sort(() => Math.random() - 0.5);
+      const validProducts = data.products.filter(
+        product => product.image1 && product.image2
+      );
+      
+      const shuffled = [...validProducts].sort(() => Math.random() - 0.5);
       setSelectedProducts(shuffled.slice(0, 10));
     }
   }, [data]);
@@ -51,7 +56,7 @@ const CarouselPage = () => {
   const scrollAmount = 183;
   const maxScrollIndex = Math.max(0, selectedProducts.length - itemsPerView);
 
-  useEffect(() => {   // For Auto Scrolling.
+  useEffect(() => {  
     const interval = setInterval(() => {
       setScrollIndex((prev) => (prev < maxScrollIndex ? prev + 1 : 0));
     }, 3000);
@@ -80,12 +85,8 @@ const CarouselPage = () => {
   };
 
   const handleImageError = (productId: number) => {
-    setProcessedProducts(prev => 
-      prev.map(product => 
-        product.id === productId 
-          ? { ...product, hasValidImage: false } 
-          : product
-      )
+    setSelectedProducts(prev => 
+      prev.filter(product => product.id !== productId)
     );
   };
 
