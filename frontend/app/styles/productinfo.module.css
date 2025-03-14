@@ -259,7 +259,7 @@
 
 .sizeButton:hover,
 .selectedSize {
-  background: #A6B1E1;
+  background: #424874;
   color: white;
   transform: translateY(-3px);
   box-shadow: 0 4px 12px rgba(166, 177, 225, 0.3);
@@ -291,7 +291,7 @@
 }
 
 .quantityButton:hover {
-  background: #A6B1E1;
+  background: #424874;
   color: white;
 }
 
@@ -322,7 +322,7 @@
 }
 
 .addToCart {
-  background: linear-gradient(135deg, #A6B1E1, #424874);
+  background: linear-gradient(90deg, #A6B1E1, #424874);
   color: white;
   box-shadow: 0 4px 15px rgba(166, 177, 225, 0.4);
 }

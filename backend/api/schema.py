@@ -195,6 +195,24 @@ class Mutation:
             items=cart.items.all(),
             created_at=cart.created_at
         )   
+    
+    @strawberry.mutation
+    def update_cart_product(self, user_id: int, product_id: int, quantity: int) -> CartType:
+        user = User.objects.get(id=user_id)
+        cart = Cart.objects.get(user=user)
+        cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+
+        if quantity > 0:
+            cart_item.quantity = quantity
+            cart_item.save()
+        else:
+            cart_item.delete()
+        return CartType(
+            id=cart.id,
+            user=cart.user.username,
+            items=cart.items.all(),
+            created_at=cart.created_at
+        )
 
 MergedQuery = merge_types("MergedQuery", (AuthQuery, Query))
 MergedMutation = merge_types("MergedMutation", (AuthMutation, Mutation))

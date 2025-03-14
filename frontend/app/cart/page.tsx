@@ -5,9 +5,8 @@ import "../styles/cart.css";
 import { useFetchGraphQL } from "@/hooks";
 import { gql, request } from "graphql-request";
 import Navbar from "../components/Navbar";
-import { getCSRFToken } from "@/hooks"; // Import the same CSRF token getter you use in ProductPage
+import { getCSRFToken } from "@/hooks";
 
-// Define interfaces for type safety
 interface Product {
   id: number;
   name: string;
@@ -29,13 +28,13 @@ interface CartData {
     items: CartItem[];
   };
 }
+
 interface ProfileData {
   me?: {
     id: number;
   };
 }
 
-// Query to get the current user's ID
 const PROFILE_QUERY = gql`
   query {
     me {
@@ -44,7 +43,6 @@ const PROFILE_QUERY = gql`
   }
 `;
 
-// Cart query
 const CART_QUERY = gql`
   query {
     cart(userId: 9) {
@@ -65,7 +63,6 @@ const CART_QUERY = gql`
   }
 `;
 
-// Delete product mutation
 const DELETE_PRODUCT_MUTATION = gql`
   mutation DeleteProductFromCart($userId: Int!, $productId: Int!) {
     deleteProductFromCart(userId: $userId, productId: $productId) {
@@ -75,21 +72,54 @@ const DELETE_PRODUCT_MUTATION = gql`
   }
 `;
 
+const UPDATE_CART_PRODUCT_MUTATION = gql`
+  mutation UpdateCartProduct($userId: Int!, $productId: Int!, $quantity: Int!) {
+    updateCartProduct(userId: $userId, productId: $productId, quantity: $quantity) {
+      id
+      user
+      items {
+        product {
+          id
+          name
+        }
+        quantity
+        subtotal
+      }
+      createdAt
+    }
+  }
+`;
+
 const CartPage = () => {
-  const { data: cartData, loading: cartLoading, error: cartError, refetch } = useFetchGraphQL<CartData>(CART_QUERY);
+  const { data: cartData, loading: cartLoading, error: cartError } = useFetchGraphQL<CartData>(CART_QUERY);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<boolean[]>([]);
   const [donation, setDonation] = useState<number>(0);
   const [notification, setNotification] = useState({ message: "", type: "" });
-  const [removeLoading, setRemoveLoading] = useState<number | null>(null); // Track which item is being removed
+  const [removeLoading, setRemoveLoading] = useState<number | null>(null);
+  const [updateLoading, setUpdateLoading] = useState<number | null>(null);
 
-  // Calculate cart totals
   const [totals, setTotals] = useState({
     totalMRP: 0,
     platformFee: 20,
     shipping: 0,
     total: 0,
   });
+
+  const refreshCartData = async () => {
+    try {
+      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const headers = { 'X-CSRFToken': getCSRFToken() };
+      
+      const result = await request(endpoint, CART_QUERY, {}, headers);
+      if (result && result.cart && result.cart.items) {
+        setCartItems(result.cart.items);
+        setSelectedItems(new Array(result.cart.items.length).fill(true));
+      }
+    } catch (error) {
+      console.error("Failed to refresh cart data:", error);
+    }
+  };
 
   useEffect(() => {
     if (cartData?.cart?.items) {
@@ -102,7 +132,6 @@ const CartPage = () => {
     updateTotals();
   }, [cartItems, selectedItems, donation]);
 
-  // Clear notification after 3 seconds
   useEffect(() => {
     if (notification.message) {
       const timer = setTimeout(() => {
@@ -115,7 +144,7 @@ const CartPage = () => {
   const updateTotals = () => {
     const selectedCartItems = cartItems.filter((_, index) => selectedItems[index]);
     const totalMRP = selectedCartItems.reduce((sum, item) => sum + item.subtotal, 0);
-    const finalTotal = totalMRP + totals.platformFee + donation;
+    const finalTotal = totalMRP + donation;
 
     setTotals({
       totalMRP,
@@ -125,27 +154,70 @@ const CartPage = () => {
     });
   };
 
-  const updateQuantity = (index: number, change: number) => {
-    setCartItems((prevItems) => {
-      const newItems = [...prevItems];
-      newItems[index] = {
-        ...newItems[index],
-        quantity: Math.max(1, newItems[index].quantity + change),
-        subtotal: newItems[index].product.price * Math.max(1, newItems[index].quantity + change),
+  const updateQuantity = async (index: number, change: number) => {
+    const newQuantity = Math.max(1, cartItems[index].quantity + change);
+    const productId = cartItems[index].product.id;
+    const productName = cartItems[index].product.name;
+    
+    if (newQuantity === cartItems[index].quantity) return;
+    
+    setUpdateLoading(index);
+    
+    try {
+      setCartItems((prevItems) => {
+        const newItems = [...prevItems];
+        newItems[index] = {
+          ...newItems[index],
+          quantity: newQuantity,
+          subtotal: newItems[index].product.price * newQuantity,
+        };
+        return newItems;
+      });
+      
+      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const headers = { 'X-CSRFToken': getCSRFToken() };
+      
+      const variables = {
+        userId: 9,
+        productId: productId,
+        quantity: newQuantity
       };
-      return newItems;
-    });
+      
+      const result = await request(endpoint, UPDATE_CART_PRODUCT_MUTATION, variables, headers);
+      
+      await refreshCartData();
+      
+    } 
+    catch (error) {
+        console.error("Failed to update quantity:", error);
+        
+        // Revert the optimistic UI update
+        setCartItems((prevItems) => {
+          const newItems = [...prevItems];
+          newItems[index] = {
+            ...newItems[index],
+            quantity: newItems[index].quantity - change,
+            subtotal: newItems[index].product.price * (newItems[index].quantity - change),
+          };
+          return newItems;
+        });
+        
+        setNotification({ 
+          message: "Failed to update quantity. Please try again.", 
+          type: "error" 
+        });
+    } finally {
+      setUpdateLoading(null);
+    }
   };
 
   const removeItem = async (index: number) => {
-    // Get the product ID from the cart item
     const productId = cartItems[index].product.id;
     const productName = cartItems[index].product.name;
     
     setRemoveLoading(index);
     
     try {
-      // Use the same endpoint you're using in ProductPage
       const endpoint = "http://127.0.0.1:8000/graphql/";
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
@@ -156,7 +228,6 @@ const CartPage = () => {
       
       const result = await request(endpoint, DELETE_PRODUCT_MUTATION, variables, headers);
       
-      // Update the UI after successful deletion
       setCartItems((prevItems) => prevItems.filter((_, i) => i !== index));
       setSelectedItems((prevSelected) => prevSelected.filter((_, i) => i !== index));
       
@@ -220,7 +291,7 @@ const CartPage = () => {
 
           <div className="offers-section">
             <h3>Available Offers</h3>
-            <p>- 10% Instant Discount on Axis Bank Credit Card on a min spend of ₹3,500.</p>
+            <p>Flat 16% Discount on all Products on the Fresh Launch of Cartify.</p>
           </div>
 
           {cartItems.length > 0 ? (
@@ -246,9 +317,19 @@ const CartPage = () => {
                     })}
                   </p>
                   <div className="quantity-control">
-                    <button onClick={() => updateQuantity(index, -1)}>-</button>
-                    <span>{item.quantity}</span>
-                    <button onClick={() => updateQuantity(index, 1)}>+</button>
+                    <button 
+                      onClick={() => updateQuantity(index, -1)}
+                      disabled={updateLoading === index}
+                    >
+                      -
+                    </button>
+                    <span>{updateLoading === index ? '...' : item.quantity}</span>
+                    <button 
+                      onClick={() => updateQuantity(index, 1)}
+                      disabled={updateLoading === index}
+                    >
+                      +
+                    </button>
                   </div>
                   <button 
                     className="remove-btn" 
@@ -273,15 +354,10 @@ const CartPage = () => {
           )}
         </div>
 
-        {/* Vertical Line */}
         <div className="vertical-divider"></div>
 
         {/* Right Section - Price Summary */}
         <div className="cart-right">
-          <div className="apply-coupons">
-            <h2>Apply Coupons</h2>
-            <button>Apply</button>
-          </div>
           <div className="donation-section">
             <h2>Donate and Make a Difference</h2>
             <div className="donation-buttons">
@@ -297,10 +373,6 @@ const CartPage = () => {
             <div className="price-item">
               <span>Total MRP:</span>
               <span>₹{totals.totalMRP.toLocaleString("en-IN")}</span>
-            </div>
-            <div className="price-item">
-              <span>Platform Fee:</span>
-              <span>₹{totals.platformFee}</span>
             </div>
             <div className="price-item">
               <span>Donation:</span>
@@ -325,5 +397,3 @@ const CartPage = () => {
 };
 
 export default CartPage;
-
-

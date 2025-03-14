@@ -74,8 +74,7 @@ const CarouselPage = () => {
 
   const navigateToProductPage = (product: Product) => {
     router.push(
-      `/products/${product.id}?name=${encodeURIComponent(
-        product.name
+      `/products/${product.id}?id=${encodeURIComponent(product.id)}&name=${encodeURIComponent(product.name
       )}&description=${encodeURIComponent(
         product.description
       )}&price=${product.price}&image1=${encodeURIComponent(
