@@ -1,9 +1,10 @@
 import strawberry
 from django.contrib.auth import get_user_model
+from chowkidar.authentication import authenticate
+from chowkidar.extension import JWTAuthExtension
 from chowkidar.decorators import login_required
 from chowkidar.wrappers import issue_tokens_on_login, revoke_tokens_on_logout
-from chowkidar.authentication import authenticate 
-from chowkidar.extension import JWTAuthExtension
+from django.http import HttpRequest
 
 User = get_user_model()
 
@@ -15,27 +16,35 @@ class UserType:
 
 @strawberry.type
 class AuthPayload:
-    token: str
     user: UserType
+    access_token: str
+    refresh_token: str
 
 @strawberry.type
 class AuthMutation:
     @strawberry.mutation
     @issue_tokens_on_login
-    def login(self, info, username : str, password : str) -> bool : 
-        user = authenticate(username = username, password = password)
+    def login(self, info, username: str, password: str) -> AuthPayload:
+        user = authenticate(username=username, password=password)
         if user is None:
             raise Exception("Invalid username or password")
-        
+
         info.context.LOGIN_USER = user
         
-        return True
-    
+        request: HttpRequest = info.context.request
+        access_token = request.COOKIES.get('csrftoken')
+        refresh_token = request.COOKIES.get('JWT_REFRESH_TOKEN')
+        
+        return AuthPayload(
+            user=UserType(id=user.id, username=user.username, email=user.email),
+            access_token=access_token,
+            refresh_token=refresh_token
+        )
+
     @strawberry.mutation
     @revoke_tokens_on_logout
     def logout(self, info) -> bool:
         info.context.LOGOUT_USER = True
-
         return True
 
     @strawberry.mutation
@@ -43,7 +52,6 @@ class AuthMutation:
         user = User.objects.create_user(username=username, email=email, password=password)
         return UserType(id=user.id, username=user.username, email=user.email)
 
-    
 @strawberry.type
 class AuthQuery:
     @strawberry.field
@@ -51,7 +59,6 @@ class AuthQuery:
     def me(self, info) -> UserType:
         user = info.context.user
         return UserType(id=user.id, username=user.username, email=user.email)
-
 
 schema = strawberry.Schema(
     query=AuthQuery,
