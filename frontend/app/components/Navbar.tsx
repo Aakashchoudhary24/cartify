@@ -13,25 +13,22 @@ const Navbar: React.FC = () => {
     const activeLinkColor = "text-white bg-[#A6B1E1] rounded-full";
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-    const getCookie = (name: string) => {
-        const cookies = document.cookie.split("; ");
-        for (const cookie of cookies) {
-            const [cookieName, cookieValue] = cookie.split("=");
-            if (cookieName === name) return cookieValue;
-        }
-        return null;
-    };
+    const [username, setUsername] = useState("");
 
     useEffect(() => {
-        const token = getCookie("jwt");
+        const token = localStorage.getItem("accessToken");
+        const storedUsername = localStorage.getItem("username");
         setIsAuthenticated(!!token);
+        if (storedUsername) setUsername(storedUsername);
     }, []);
 
     const handleLogout = () => {
-        document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("username");
         setIsAuthenticated(false);
-        router.push("/");
+        setUsername("");
+        router.push("/login");
     };
 
     return (
@@ -72,25 +69,28 @@ const Navbar: React.FC = () => {
             <motion.div className="flex items-center gap-5 mr-10">
                 <ul className="flex items-center gap-5 text-lg font-medium">
                     {isAuthenticated && (
-                        <li
-                        onClick={() => router.push("/cart")}
-                        className="cursor-pointer hover:text-[#A6B1E1] transition bg-[#A6B1E1] p-2 rounded-full"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6 text-white"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                            />
-                        </svg>
-                    </li>
+                        <>
+                            <span className="font-medium text-[#424874]">Welcome, {username}</span>
+                            <li
+                                onClick={() => router.push("/cart")}
+                                className="cursor-pointer hover:text-[#A6B1E1] transition bg-[#A6B1E1] p-2 rounded-full"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-6 w-6 text-white"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                                    />
+                                </svg>
+                            </li>
+                        </>
                     )}
                 
                     {isAuthenticated ? (
