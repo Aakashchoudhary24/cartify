@@ -30,6 +30,7 @@ declare namespace Cypress {
     interface Chainable {
       login(username : string,password: string): Chainable<void>
       logout(): Chainable<void>
+      waitGraphqlquery(): Chainable<void>
 
     }
   }
@@ -43,4 +44,7 @@ Cypress.Commands.add('login', (username,password) => {
 Cypress.Commands.add('logout', () => {
     cy.contains('Logout').should('be.visible').click();
     cy.contains('Where style speaks, trends resonate, fashion flourishes').should('exist');
+    });
+Cypress.Commands.add('waitGraphqlquery', () => {
+    cy.wait('@graphql', { timeout: 10000 });
     });
