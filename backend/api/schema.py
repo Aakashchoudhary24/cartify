@@ -107,25 +107,6 @@ class Query:
     @strawberry.field
     def orders(self, user_id: int) -> List[OrderType]:
         return Order.objects.filter(user__user__id=user_id)
-    
-    @strawberry.field
-    def me(self, info: strawberry.types.Info) -> Optional[ProfileType]:
-        # Access the current HTTP request via GraphQL context
-        request = info.context.request
-        user = request.user
-        if user.is_authenticated:
-            profile = Profile.objects.filter(user=user).first()
-            if profile:
-                return ProfileType(
-                    id=profile.id,
-                    user=profile.user.username,
-                    address=profile.address,
-                    first_name=profile.first_name,
-                    last_name=profile.last_name,
-                    phone_number=profile.phone_number,
-                    image=profile.image.url if profile.image else None
-                )
-        return None
 
 @strawberry.type
 class Mutation:

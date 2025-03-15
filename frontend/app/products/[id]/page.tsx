@@ -95,7 +95,7 @@ export default function ProductPage() {
     
     try {
       const variables = {
-        userId: 9, // Hardcoded user ID as per your example
+        userId: 6, // Hardcoded user ID as per your example
         productId: parseInt(id),
         quantity: quantity
       };
@@ -178,24 +178,6 @@ export default function ProductPage() {
             <div className={styles.divider}></div>
 
             <p className={styles.description}>{description}</p>
-
-            {/* Size Selection */}
-            <div className={styles.selectionSection}>
-              <h3 className={styles.subheading}>Size</h3>
-              <div className={styles.sizeOptions}>
-                {["S", "M", "L", "XL"].map((size) => (
-                  <button
-                    key={size}
-                    className={`${styles.sizeButton} ${
-                      selectedSize === size ? styles.selectedSize : ""
-                    }`}
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
 
             {/* Quantity Selection */}
             <div className={styles.selectionSection}>

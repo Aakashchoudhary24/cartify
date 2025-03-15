@@ -45,7 +45,7 @@ const PROFILE_QUERY = gql`
 
 const CART_QUERY = gql`
   query {
-    cart(userId: 9) {
+    cart(userId: 6) {
       items {
         product {
           id
@@ -178,7 +178,7 @@ const CartPage = () => {
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       const variables = {
-        userId: 9,
+        userId: 6,
         productId: productId,
         quantity: newQuantity
       };
@@ -262,8 +262,9 @@ const CartPage = () => {
   if (cartError) return <p className="text-center text-red-500">Error fetching cart: {cartError.message}</p>;
 
   return (
-    <div className="cart-container">
+    <>
       <Navbar />
+    <div className="cart-container">
 
       
       {notification.message && (
@@ -394,6 +395,7 @@ const CartPage = () => {
         <Carousel />
       </div>
     </div>
+    </>
   );
 };
 
