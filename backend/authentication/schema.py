@@ -4,7 +4,9 @@ from chowkidar.authentication import authenticate
 from chowkidar.extension import JWTAuthExtension
 from chowkidar.decorators import login_required
 from chowkidar.wrappers import issue_tokens_on_login, revoke_tokens_on_logout
-from django.http import HttpRequest
+from chowkidar.utils.jwt import generate_token_from_claims # ✅ Import JWT utilities
+
+from datetime import timedelta
 
 User = get_user_model()
 
@@ -23,18 +25,24 @@ class AuthPayload:
 @strawberry.type
 class AuthMutation:
     @strawberry.mutation
-    @issue_tokens_on_login
     def login(self, info, username: str, password: str) -> AuthPayload:
-        user = authenticate(username=username, password=password)
+        """Authenticate user and return access & refresh tokens"""
+        user = authenticate(username=username.lower(), password=password)
         if user is None:
             raise Exception("Invalid username or password")
 
-        info.context.LOGIN_USER = user
-        
-        request: HttpRequest = info.context.request
-        access_token = request.COOKIES.get('csrftoken')
-        refresh_token = request.COOKIES.get('JWT_REFRESH_TOKEN')
-        
+        access_token_data = generate_token_from_claims(
+            {"sub": user.id, "username": user.username},
+            expiration_delta=timedelta(minutes=15)
+        )
+        refresh_token_data = generate_token_from_claims(
+            {"sub": user.id, "type": "refresh"},
+            expiration_delta=timedelta(days=7)
+        )
+
+        # Extract only the token string
+        access_token = access_token_data["token"]
+        refresh_token = refresh_token_data["token"]
         return AuthPayload(
             user=UserType(id=user.id, username=user.username, email=user.email),
             access_token=access_token,
@@ -44,12 +52,19 @@ class AuthMutation:
     @strawberry.mutation
     @revoke_tokens_on_logout
     def logout(self, info) -> bool:
+        """Revoke tokens on logout"""
         info.context.LOGOUT_USER = True
         return True
 
     @strawberry.mutation
     def register(self, username: str, email: str, password: str) -> UserType:
-        user = User.objects.create_user(username=username, email=email, password=password)
+        """Register a new user"""
+        if User.objects.filter(username=username).exists():
+            raise Exception("Username already exists")
+        if User.objects.filter(email=email).exists():
+            raise Exception("Email already exists")
+
+        user = User.objects.create_user(username=username.lower(), email=email, password=password)
         return UserType(id=user.id, username=user.username, email=user.email)
 
 @strawberry.type
@@ -57,6 +72,7 @@ class AuthQuery:
     @strawberry.field
     @login_required
     def me(self, info) -> UserType:
+        """Get details of the currently authenticated user"""
         user = info.context.user
         return UserType(id=user.id, username=user.username, email=user.email)
 

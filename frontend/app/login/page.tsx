@@ -10,25 +10,12 @@ export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-
-    const setCookie = (name: string, value: string, days: number) => {
-        const expires = new Date();
-        expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-        document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
-    };
-
-    const getCookie = (name: string) => {
-        const cookies = document.cookie.split('; ');
-        for (const cookie of cookies) {
-            const [cookieName, cookieValue] = cookie.split('=');
-            if (cookieName === name) return cookieValue;
-        }
-        return null;
-    };
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        setLoading(true);
 
         try {
             const response = await fetch('http://127.0.0.1:8000/auth/', {
@@ -39,7 +26,15 @@ export default function Login() {
                 body: JSON.stringify({
                     query: `
                         mutation Login($username: String!, $password: String!) {
-                            login(username: $username, password: $password)
+                            login(username: $username, password: $password) {
+                                accessToken
+                                refreshToken
+                                user {
+                                    id
+                                    username
+                                    email
+                                }
+                            }
                         }
                     `,
                     variables: { username, password },
@@ -50,20 +45,26 @@ export default function Login() {
             if (result.errors) {
                 setError('Invalid credentials');
             } else {
-                const token = result.data?.login;
-                if (token) {
-                    setCookie('jwt', token, 7);
-                    router.push('/');
+                const accessToken = result.data?.login?.accessToken;
+                const refreshToken = result.data?.login?.refreshToken;
+                
+                if (accessToken && refreshToken) {
+                    localStorage.setItem('accessToken', accessToken);  // Store JWT securely
+                    localStorage.setItem('refreshToken', refreshToken);
+                    router.push('/'); // Redirect to home page after login
                 }
             }
-        } catch {
-            setError('Something went wrong');
+        } catch (error) {
+            console.error("Login error:", error);
+            setError('Network error. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        const token = getCookie('jwt');
-        if (token) {
+        const accessToken = localStorage.getItem('accessToken');
+        if (accessToken) {
             router.push('/');
         }
     }, [router]);
@@ -146,8 +147,9 @@ export default function Login() {
                             <button 
                                 className="w-full py-3 px-4 bg-gradient-to-r from-purple-800 to-purple-600 text-white rounded-lg hover:from-purple-700 hover:to-purple-500 transition transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 shadow-lg"
                                 type="submit"
+                                disabled={loading}
                             >
-                                Log In
+                                {loading ? 'Logging in...' : 'Log In'}
                             </button>
                         </form>
                         

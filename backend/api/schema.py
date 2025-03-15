@@ -1,7 +1,8 @@
 import strawberry
 from typing import List, Optional
 from datetime import datetime
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from .models import Category, Product, Profile, Cart, CartItem, Order, OrderItem
 from strawberry.tools import merge_types
 from authentication.schema import AuthQuery, AuthMutation

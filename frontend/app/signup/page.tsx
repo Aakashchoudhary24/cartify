@@ -19,7 +19,7 @@ export default function Register() {
         setSuccess('');
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/auth/', {
+            const response = await fetch('http://127.0.0.1:8000/graphql/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export default function Register() {
             const result = await response.json();
 
             if (result.errors) {
-                setError('Invalid credentials');
+                setError(result.errors[0]?.message || "Registration failed. Please try again.");
             } else {
                 setSuccess('Registration successful! Redirecting to login...');
                 setTimeout(() => {
