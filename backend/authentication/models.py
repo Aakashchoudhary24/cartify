@@ -3,26 +3,21 @@ from django.db import models
 from chowkidar.models import AbstractRefreshToken
 from datetime import timedelta
 from django.utils import timezone
+from django.conf import settings
 
 def default_expiry():
     return timezone.now() + timedelta(days=7) 
 
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
-    
-    groups = models.ManyToManyField(
-        "auth.Group",
-        related_name="customuser_set", 
-        blank=True
-    )
-    user_permissions = models.ManyToManyField(
-        "auth.Permission",
-        related_name="customuser_permissions_set", 
-        blank=True
-    )
+    refresh_token_value = models.CharField(max_length=255, blank=True, null=True, unique=True)
 
     def __str__(self):
         return self.username
 
 class RefreshToken(AbstractRefreshToken, models.Model):
-    pass
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,  # Link to CustomUser
+        related_name='refresh_token',
+        on_delete=models.CASCADE
+    )
