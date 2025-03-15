@@ -160,23 +160,39 @@
 }
 
 .cart-item-details p {
-    color: #5D5A8D;
+    color: #424874;
     margin-bottom: 6px;
+    font-weight: bold;
 }
 
 .seller {
     color: #6b7280;
 }
 
-.price {
-    color: #424874;
-    font-weight: bold;
-    font-size: 1.1rem;
-    margin: 10px 0;
+.discount-price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #424874;
+  font-family: 'Cambria', serif;
 }
 
 .original-price {
-    color: #424874;
+  font-size: 1.2rem;
+  font-family: 'Cambria', serif;
+  color: #999;
+  text-decoration: line-through;
+  margin-left: 5px;
+}
+
+.discount-percent {
+  background: #e9f7ef;
+  color: #27ae60;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  padding-left: 5px;
+  margin-left: 5px;
 }
 
 .delivery {

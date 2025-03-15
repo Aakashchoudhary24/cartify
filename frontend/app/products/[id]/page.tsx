@@ -8,6 +8,7 @@ import Carousel from "../../carousel/page";
 import Navbar from "@/app/components/Navbar";
 import { request, gql } from "graphql-request";
 import { getCSRFToken } from "@/hooks"; // Adjust import path as needed
+import { useAuth } from "@/app/context/AuthContext"; // Import useAuth from AuthContext
 
 // Add to Cart Mutation
 const ADD_TO_CART_MUTATION = gql`
@@ -19,10 +20,10 @@ const ADD_TO_CART_MUTATION = gql`
   }
 `;
 
-
 export default function ProductPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user } = useAuth(); // Get user from context
   
   const id = searchParams.get("id") || "";
   const name = searchParams.get("name") || "Unknown Product";
@@ -91,11 +92,16 @@ export default function ProductPage() {
       return;
     }
 
+    if (!user) {
+      setNotification({ message: "You need to be logged in to add items to the cart", type: "error" });
+      return;
+    }
+
     setLoading(true);
     
     try {
       const variables = {
-        userId: 6, // Hardcoded user ID as per your example
+        userId: parseInt(user.id), // Get user ID from context
         productId: parseInt(id),
         quantity: quantity
       };
@@ -124,7 +130,6 @@ export default function ProductPage() {
   };
 
   console.log("Product ID:", id);
-
 
   return (
     <div className={styles.pageWrapper}>

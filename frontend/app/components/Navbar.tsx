@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar: React.FC = () => {
     const router = useRouter();
@@ -12,21 +13,19 @@ const Navbar: React.FC = () => {
     const textColor = "text-[#424874]";
     const activeLinkColor = "text-white bg-[#A6B1E1] rounded-full";
 
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { isAuthenticated, user, logout } = useAuth();
     const [username, setUsername] = useState("");
 
     useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        const storedUsername = localStorage.getItem("username");
-        setIsAuthenticated(!!token);
-        if (storedUsername) setUsername(storedUsername);
-    }, []);
+        if (isAuthenticated && user) {
+            setUsername(user.username);
+        } else {
+            setUsername("");
+        }
+    }, [isAuthenticated, user]);
 
     const handleLogout = () => {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("username");
-        setIsAuthenticated(false);
+        logout();
         setUsername("");
         router.push("/login");
     };
@@ -68,7 +67,7 @@ const Navbar: React.FC = () => {
             
             <motion.div className="flex items-center gap-5 mr-10">
                 <ul className="flex items-center gap-5 text-lg font-medium">
-                    {isAuthenticated && (
+                    {isAuthenticated && user ? (
                         <>
                             <span className="font-medium text-[#424874]">Welcome, {username}</span>
                             <li
@@ -90,18 +89,15 @@ const Navbar: React.FC = () => {
                                     />
                                 </svg>
                             </li>
+                            <motion.li 
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="cursor-pointer hover:text-[#A6B1E1] transition"
+                                onClick={handleLogout}
+                            >
+                                Logout
+                            </motion.li>
                         </>
-                    )}
-                
-                    {isAuthenticated ? (
-                        <motion.li 
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="cursor-pointer hover:text-[#A6B1E1] transition"
-                            onClick={handleLogout}
-                        >
-                            Logout
-                        </motion.li>
                     ) : (
                         <>
                             <motion.li 

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaUser, FaLock } from "react-icons/fa";
 import Navbar from '../components/Navbar';
+import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
     const router = useRouter();
@@ -11,6 +12,7 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const { login, isAuthenticated } = useAuth();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -47,11 +49,14 @@ export default function Login() {
             } else {
                 const accessToken = result.data?.login?.accessToken;
                 const refreshToken = result.data?.login?.refreshToken;
+                const userData = result.data?.login?.user;
                 
-                if (accessToken && refreshToken) {
-                    localStorage.setItem('accessToken', accessToken);  // Store JWT securely
-                    localStorage.setItem('refreshToken', refreshToken);
+                if (accessToken && refreshToken && userData) {
+                    // Use the context login function to store auth data
+                    login(userData, accessToken, refreshToken);
                     router.push('/'); // Redirect to home page after login
+                } else {
+                    setError('Incomplete login data received');
                 }
             }
         } catch (error) {
@@ -63,11 +68,11 @@ export default function Login() {
     };
 
     useEffect(() => {
-        const accessToken = localStorage.getItem('accessToken');
-        if (accessToken) {
+        // If already authenticated, redirect to home page
+        if (isAuthenticated) {
             router.push('/');
         }
-    }, [router]);
+    }, [isAuthenticated, router]);
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-white to-purple-100">

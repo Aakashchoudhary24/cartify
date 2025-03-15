@@ -1,11 +1,12 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Carousel from "../carousel/page";
 import "../styles/cart.css";
 import { useFetchGraphQL } from "@/hooks";
 import { gql, request } from "graphql-request";
 import Navbar from "../components/Navbar";
 import { getCSRFToken } from "@/hooks";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface Product {
   id: number;
@@ -29,23 +30,9 @@ interface CartData {
   };
 }
 
-interface ProfileData {
-  me?: {
-    id: number;
-  };
-}
-
-const PROFILE_QUERY = gql`
-  query {
-    me {
-      id
-    }
-  }
-`;
-
 const CART_QUERY = gql`
-  query {
-    cart(userId: 6) {
+  query Cart($userId: Int!) {
+    cart(userId: $userId) {
       items {
         product {
           id
@@ -91,13 +78,18 @@ const UPDATE_CART_PRODUCT_MUTATION = gql`
 `;
 
 const CartPage = () => {
-  const { data: cartData, loading: cartLoading, error: cartError } = useFetchGraphQL<CartData>(CART_QUERY);
+  const { user, loading: authLoading } = useAuth();
+  const [userId, setUserId] = useState<number | null>(null);
+  const [isClientReady, setIsClientReady] = useState(false);
+  
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<boolean[]>([]);
   const [donation, setDonation] = useState<number>(0);
   const [notification, setNotification] = useState({ message: "", type: "" });
   const [removeLoading, setRemoveLoading] = useState<number | null>(null);
   const [updateLoading, setUpdateLoading] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [totals, setTotals] = useState({
     totalMRP: 0,
@@ -106,27 +98,56 @@ const CartPage = () => {
     total: 0,
   });
 
-  const refreshCartData = async () => {
+  // Set client-side rendering flag
+  useEffect(() => {
+    setIsClientReady(true);
+  }, []);
+
+  // Update userId when user changes
+  useEffect(() => {
+    if (!authLoading && user) {
+      setUserId(parseInt(user.id));
+    } else if (!authLoading) {
+      setUserId(null);
+    }
+  }, [user, authLoading]);
+
+  // Manual fetch function instead of using useFetchGraphQL hook
+  const fetchCartData = useCallback(async () => {
+    if (!userId) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    
     try {
       const endpoint = "http://127.0.0.1:8000/graphql/";
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
-      const result = await request(endpoint, CART_QUERY, {}, headers);
+      const result = await request(endpoint, CART_QUERY, { userId }, headers);
+      
       if (result && result.cart && result.cart.items) {
         setCartItems(result.cart.items);
         setSelectedItems(new Array(result.cart.items.length).fill(true));
       }
+      setIsLoading(false);
     } catch (error) {
-      console.error("Failed to refresh cart data:", error);
+      console.error("Failed to fetch cart data:", error);
+      setError(error instanceof Error ? error.message : "Failed to fetch cart data");
+      setIsLoading(false);
     }
-  };
+  }, [userId]);
 
+  // Fetch cart data when userId changes
   useEffect(() => {
-    if (cartData?.cart?.items) {
-      setCartItems(cartData.cart.items);
-      setSelectedItems(new Array(cartData.cart.items.length).fill(true));
+    if (userId !== null) {
+      fetchCartData();
+    } else if (!authLoading) {
+      setIsLoading(false);
     }
-  }, [cartData]);
+  }, [userId, authLoading, fetchCartData]);
 
   useEffect(() => {
     updateTotals();
@@ -155,6 +176,8 @@ const CartPage = () => {
   };
 
   const updateQuantity = async (index: number, change: number) => {
+    if (!userId) return;
+    
     const newQuantity = Math.max(1, cartItems[index].quantity + change);
     const productId = cartItems[index].product.id;
     const productName = cartItems[index].product.name;
@@ -178,14 +201,14 @@ const CartPage = () => {
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       const variables = {
-        userId: 6,
+        userId,
         productId: productId,
         quantity: newQuantity
       };
       
       const result = await request(endpoint, UPDATE_CART_PRODUCT_MUTATION, variables, headers);
       
-      await refreshCartData();
+      await fetchCartData();
       
     } 
     catch (error) {
@@ -212,6 +235,8 @@ const CartPage = () => {
   };
 
   const removeItem = async (index: number) => {
+    if (!userId) return;
+    
     const productId = cartItems[index].product.id;
     const productName = cartItems[index].product.name;
     
@@ -222,7 +247,7 @@ const CartPage = () => {
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       const variables = {
-        userId: 9,
+        userId,
         productId: productId
       };
       
@@ -258,143 +283,205 @@ const CartPage = () => {
     setDonation((prev) => prev + amount);
   };
 
-  if (cartLoading) return <p className="text-center text-gray-500">Loading your cart...</p>;
-  if (cartError) return <p className="text-center text-red-500">Error fetching cart: {cartError.message}</p>;
+  // Wait for client-side rendering
+  if (!isClientReady) {
+    return (
+      <>
+        <Navbar />
+        <div className="cart-container">
+          <p className="text-center text-gray-500">Loading...</p>
+        </div>
+      </>
+    );
+  }
+
+  // Show loading state
+  if (isLoading || authLoading) {
+    return (
+      <>
+        <Navbar />
+        <div className="cart-container">
+          <p className="text-center text-gray-500">Loading your cart...</p>
+        </div>
+      </>
+    );
+  }
+
+  // Show login message when user is not logged in
+  if (!userId && !authLoading) {
+    return (
+      <>
+        <Navbar />
+        <div className="cart-container">
+          <div className="empty-cart-message">
+            <p>Please log in to view your cart.</p>
+            <button 
+              onClick={() => window.location.href = '/login'}
+              className="place-order-btn" 
+              style={{ maxWidth: '200px', margin: '20px auto' }}
+            >
+              GO TO LOGIN
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Show error message
+  if (error) {
+    return (
+      <>
+        <Navbar />
+        <div className="cart-container">
+          <p className="text-center text-red-500">Error: {error}</p>
+          <button 
+            onClick={fetchCartData}
+            className="place-order-btn" 
+            style={{ maxWidth: '200px', margin: '20px auto' }}
+          >
+            Try Again
+          </button>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <Navbar />
-    <div className="cart-container">
-
-      
-      {notification.message && (
-        <div className={`notification ${notification.type}`} style={{
-          padding: '10px 15px',
-          margin: '10px 0',
-          borderRadius: '4px',
-          backgroundColor: notification.type === 'success' ? '#d4edda' : '#f8d7da',
-          color: notification.type === 'success' ? '#155724' : '#721c24',
-          textAlign: 'center'
-        }}>
-          {notification.message}
-        </div>
-      )}
-      
-      <div className="cart-content">
-        {/* Left Section - Cart Items */}
-        <div className="cart-left">
-          <div className="delivery-address">
-            <h2>
-              Deliver to: <span>Dattanand UD, 673004</span>
-            </h2>
-            <p>Flat C4, Devi Apartments, Puthiyara, Kozhikode</p>
-            <button>Change Address</button>
+      <div className="cart-container">
+        
+        {notification.message && (
+          <div className={`notification ${notification.type}`} style={{
+            padding: '10px 15px',
+            margin: '10px 0',
+            borderRadius: '4px',
+            backgroundColor: notification.type === 'success' ? '#d4edda' : '#f8d7da',
+            color: notification.type === 'success' ? '#155724' : '#721c24',
+            textAlign: 'center'
+          }}>
+            {notification.message}
           </div>
+        )}
+        
+        <div className="cart-content">
+          {/* Left Section - Cart Items */}
+          <div className="cart-left">
+            <div className="delivery-address">
+              <h2>
+                Deliver to: <span>Dattanand UD, 673004</span>
+              </h2>
+              <p>Flat C4, Devi Apartments, Puthiyara, Kozhikode</p>
+              <button>Change Address</button>
+            </div>
 
-          <div className="offers-section">
-            <h3>Available Offers</h3>
-            <p>Flat 16% Discount on all Products on the Fresh Launch of Cartify.</p>
-          </div>
+            <div className="offers-section">
+              <h3>Available Offers</h3>
+              <p>Flat 16% Discount on all Products on the Fresh Launch of Cartify.</p>
+            </div>
 
-          {cartItems.length > 0 ? (
-            cartItems.map((item, index) => (
-              <div key={index} className="cart-item">
-                <img
-                  src={item.product.image1 || "/images/placeholder.jpg"}
-                  alt={item.product.name}
-                  className="cart-item-img"
-                  onError={(e) => ((e.target as HTMLImageElement).src = "/images/placeholder.jpg")}
-                />
-                <div className="cart-item-details">
-                  <h2>{item.product.name}</h2>
-                  <p>Category: {item.product.category.name}</p>
-                  <p className="price">
-                    <span className="original-price">₹{item.product.price}</span>
-                  </p>
-                  <p className="delivery">
-                    Delivery by{" "}
-                    {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "long",
-                    })}
-                  </p>
-                  <div className="quantity-control">
+            {cartItems.length > 0 ? (
+              cartItems.map((item, index) => (
+                <div key={index} className="cart-item">
+                  <img
+                    src={item.product.image1 || "/images/placeholder.jpg"}
+                    alt={item.product.name}
+                    className="cart-item-img"
+                    onError={(e) => ((e.target as HTMLImageElement).src = "/images/placeholder.jpg")}
+                  />
+                  <div className="cart-item-details">
+                    <h2>{item.product.name}</h2>
+                    <p>Category: {item.product.category.name}</p>
+                    <p className="price">
+                      <span className="discount-price">₹{item.product.price}</span>
+                      <span className="original-price">₹{(item.product.price * 1.2).toFixed(2)}</span>
+                      <span className="discount-percent">16% OFF</span>
+                    </p>
+                    <p className="delivery">
+                      Delivery by{" "}
+                      {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "long",
+                      })}
+                    </p>
+                    <div className="quantity-control">
+                      <button 
+                        onClick={() => updateQuantity(index, -1)}
+                        disabled={updateLoading === index}
+                      >
+                        -
+                      </button>
+                      <span>{updateLoading === index ? '...' : item.quantity}</span>
+                      <button 
+                        onClick={() => updateQuantity(index, 1)}
+                        disabled={updateLoading === index}
+                      >
+                        +
+                      </button>
+                    </div>
                     <button 
-                      onClick={() => updateQuantity(index, -1)}
-                      disabled={updateLoading === index}
+                      className="remove-btn" 
+                      onClick={() => removeItem(index)}
+                      disabled={removeLoading === index}
                     >
-                      -
-                    </button>
-                    <span>{updateLoading === index ? '...' : item.quantity}</span>
-                    <button 
-                      onClick={() => updateQuantity(index, 1)}
-                      disabled={updateLoading === index}
-                    >
-                      +
+                      {removeLoading === index ? 'Removing...' : 'Remove'}
                     </button>
                   </div>
-                  <button 
-                    className="remove-btn" 
-                    onClick={() => removeItem(index)}
-                    disabled={removeLoading === index}
-                  >
-                    {removeLoading === index ? 'Removing...' : 'Remove'}
-                  </button>
+                  <input
+                    type="checkbox"
+                    checked={selectedItems[index]}
+                    onChange={() => toggleItemSelection(index)}
+                    className="cart-checkbox"
+                  />
                 </div>
-                <input
-                  type="checkbox"
-                  checked={selectedItems[index]}
-                  onChange={() => toggleItemSelection(index)}
-                  className="cart-checkbox"
-                />
+              ))
+            ) : (
+              <div className="empty-cart-message">
+                <p>Your cart is empty. Start shopping to add items to your cart!</p>
               </div>
-            ))
-          ) : (
-            <div className="empty-cart-message">
-              <p>Your cart is empty. Start shopping to add items to your cart!</p>
+            )}
+          </div>
+
+          <div className="vertical-divider"></div>
+
+          {/* Right Section - Price Summary */}
+          <div className="cart-right">
+            <div className="donation-section">
+              <h2>Donate and Make a Difference</h2>
+              <div className="donation-buttons">
+                {[10, 20, 50, 100].map((amount) => (
+                  <button key={amount} onClick={() => addDonation(amount)}>
+                    ₹{amount}
+                  </button>
+                ))}
+              </div>
             </div>
-          )}
-        </div>
-
-        <div className="vertical-divider"></div>
-
-        {/* Right Section - Price Summary */}
-        <div className="cart-right">
-          <div className="donation-section">
-            <h2>Donate and Make a Difference</h2>
-            <div className="donation-buttons">
-              {[10, 20, 50, 100].map((amount) => (
-                <button key={amount} onClick={() => addDonation(amount)}>
-                  ₹{amount}
-                </button>
-              ))}
+            <div className="price-summary">
+              <h2>Price Details</h2>
+              <div className="price-item">
+                <span>Total MRP:</span>
+                <span>₹{totals.totalMRP.toLocaleString("en-IN")}</span>
+              </div>
+              <div className="price-item">
+                <span>Donation:</span>
+                <span>₹{donation}</span>
+              </div>
+              <div className="total-price">
+                <span>Total:</span>
+                <span>₹{totals.total.toLocaleString("en-IN")}</span>
+              </div>
+              <button className="place-order-btn" disabled={cartItems.length === 0}>
+                PLACE ORDER
+              </button>
             </div>
           </div>
-          <div className="price-summary">
-            <h2>Price Details</h2>
-            <div className="price-item">
-              <span>Total MRP:</span>
-              <span>₹{totals.totalMRP.toLocaleString("en-IN")}</span>
-            </div>
-            <div className="price-item">
-              <span>Donation:</span>
-              <span>₹{donation}</span>
-            </div>
-            <div className="total-price">
-              <span>Total:</span>
-              <span>₹{totals.total.toLocaleString("en-IN")}</span>
-            </div>
-            <button className="place-order-btn" disabled={cartItems.length === 0}>
-              PLACE ORDER
-            </button>
-          </div>
+        </div>
+        <div className="carousel-section">
+          <h2 className="recommended-heading">You may also like</h2>
+          <Carousel />
         </div>
       </div>
-      <div className="carousel-section">
-        <h2 className="recommended-heading">You may also like</h2>
-        <Carousel />
-      </div>
-    </div>
     </>
   );
 };
