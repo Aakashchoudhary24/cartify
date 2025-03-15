@@ -68,6 +68,11 @@ class OrderType:
     order_items: List[OrderItemType]
 
 @strawberry.type
+class DeleteOrderResponse:
+    success: bool
+    message: str
+
+@strawberry.type
 class Query:
     @strawberry.field
     def categories(self) -> List[CategoryType]:
@@ -107,6 +112,7 @@ class Query:
     @strawberry.field
     def orders(self, user_id: int) -> List[OrderType]:
         return Order.objects.filter(user__user__id=user_id)
+    
 
 @strawberry.type
 class Mutation:
@@ -135,19 +141,33 @@ class Mutation:
             items=[],
             created_at=cart.created_at
         )
-
     @strawberry.mutation
     def place_order(self, user_id: int, total_price: float) -> OrderType:
-        user = Profile.objects.get(user__id=user_id)
-        order = Order.objects.create(user=user, total_price=total_price, status="Pending")
+        user = User.objects.get(id=user_id)
+        profile = Profile.objects.filter(user=user).first()
+
+        if not profile:
+            raise Exception("Profile does not exist for this user.")
+
+        order = Order.objects.create(user=profile, total_price=total_price, status="Pending")
+
         return OrderType(
             id=order.id,
-            user=user.user.username,
+            user=order.user.user.username,
             total_price=order.total_price,
             status=order.status,
             created_at=order.created_at,
             order_items=[]
         )
+
+    @strawberry.mutation
+    def delete_order(self, order_id: int) -> DeleteOrderResponse:
+        order = Order.objects.filter(id=order_id).first()
+        if not order:
+            return DeleteOrderResponse(success=False, message="Order not found.")
+
+        order.delete()
+        return DeleteOrderResponse(success=True, message="Order deleted successfully.")
 
     @strawberry.mutation
     def add_product_to_cart(self, user_id: int, product_id: int, quantity: int) -> CartType:
