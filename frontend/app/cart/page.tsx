@@ -263,7 +263,8 @@ const CartPage = () => {
 
   return (
     <div className="cart-container">
-      <h1 className="cart-title">CARTIFY - Your Shopping Cart</h1>
+      <Navbar />
+
       
       {notification.message && (
         <div className={`notification ${notification.type}`} style={{
