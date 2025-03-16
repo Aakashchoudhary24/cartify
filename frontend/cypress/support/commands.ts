@@ -46,5 +46,6 @@ Cypress.Commands.add('logout', () => {
     cy.contains('Where style speaks, trends resonate, fashion flourishes').should('exist');
     });
 Cypress.Commands.add('waitGraphqlquery', () => {
-    cy.wait('@graphql', { timeout: 10000 });
+    cy.intercept('POST', 'http://127.0.0.1:8000/graphql/').as('graphql');
+    cy.wait('@graphql', { timeout: 5000 });
     });
