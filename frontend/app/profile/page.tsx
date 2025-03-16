@@ -4,13 +4,7 @@ import Navbar from "../components/Navbar";
 import { useAuth } from "@/app/context/AuthContext";
 import { request } from 'graphql-request';
 import { gql } from "graphql-request";
-
-// Function to get CSRF token from cookies
-const getCSRFToken = () => {
-  return Object.fromEntries(
-    document.cookie.split('; ').map(c => c.split('='))
-  )['csrftoken'] || '';
-};
+import { getCSRFToken } from '@/hooks'; // Import the getCSRFToken function from hooks.js
 
 const ORDERS_QUERY = gql`
   query Orders($userId: Int!) {
@@ -31,6 +25,44 @@ const ORDERS_QUERY = gql`
   }
 `;
 
+const PROFILE_QUERY = gql`
+  query GetProfile($userId: Int!) {
+    profile(userId: $userId) {
+      user
+      address
+      firstName
+      lastName
+      phoneNumber
+      image
+      email
+    }
+  }
+`;
+
+const EDIT_PROFILE_MUTATION = gql`
+  mutation EditProfile(
+    $userId: Int!, 
+    $username: String!, 
+    $address: String!, 
+    $firstName: String!, 
+    $lastName: String!, 
+    $phoneNumber: String!, 
+    $image: String
+  ) {
+    editProfile(
+      userId: $userId, 
+      username: $username, 
+      address: $address, 
+      firstName: $firstName, 
+      lastName: $lastName, 
+      phoneNumber: $phoneNumber, 
+      image: $image
+    ) {
+      user
+    }
+  }
+`;
+
 const ProfilePage = () => {
   const { user } = useAuth();
   
@@ -40,15 +72,78 @@ const ProfilePage = () => {
   
   const [activeSection, setActiveSection] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [updateError, setUpdateError] = useState(null);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+  
   const [profile, setProfile] = useState({
-    firstName: 'Dilip kumar',
-    lastName: 'Reddy',
-    email: 'mdilip@gmail.com',
-    phone: 'xxxxxxxxxx',
-    username: 'dilip27m',
-    address: 'ERT 2354, Leeds, East London, United Kingdom, Axxxxxx',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    email: '',
+    username: '',
+    address: '',
   });
   const [profileImage, setProfileImage] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [profileError, setProfileError] = useState(null);
+
+  // Fetch profile data
+  useEffect(() => {
+    async function fetchProfile() {
+      if (!user || !user.id) {
+        setProfileLoading(false);
+        return;
+      }
+      
+      const userId = parseInt(user.id);
+      
+      if (isNaN(userId)) {
+        setProfileError(new Error("Invalid user ID"));
+        setProfileLoading(false);
+        return;
+      }
+
+      setProfileLoading(true);
+      setProfileError(null);
+
+      try {
+        const endpoint = "http://127.0.0.1:8000/graphql/";
+        const headers = { 'X-CSRFToken': getCSRFToken() };
+        
+        const result = await request(
+          endpoint, 
+          PROFILE_QUERY, 
+          { userId }, 
+          headers
+        );
+        
+        // Update profile state with fetched data
+        if (result.profile) {
+          setProfile({
+            firstName: result.profile.firstName || '',
+            lastName: result.profile.lastName || '',
+            email: result.profile.email || '',
+            phone: result.profile.phoneNumber || '',
+            username: result.profile.user || '',
+            address: result.profile.address || '',
+          });
+          
+          // Set profile image if available
+          if (result.profile.image) {
+            setProfileImage(result.profile.image);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        setProfileError(err);
+      } finally {
+        setProfileLoading(false);
+      }
+    }
+
+    fetchProfile();
+  }, [user]);
 
   // Fetch orders data
   useEffect(() => {
@@ -97,7 +192,15 @@ const ProfilePage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProfile((prev) => ({ ...prev, [name]: value }));
+  
+    if (name === "phone") {
+      // For phone field, only allow numbers
+      const numericValue = value.replace(/[^0-9]/g, '');
+      setProfile((prev) => ({ ...prev, [name]: numericValue }));
+    } else {
+      // For all other fields
+      setProfile((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleImageUpload = (e) => {
@@ -108,6 +211,54 @@ const ProfilePage = () => {
         setProfileImage(reader.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user || !user.id) {
+      setUpdateError(new Error("User not authenticated"));
+      return;
+    }
+
+    setUpdateLoading(true);
+    setUpdateError(null);
+    setUpdateSuccess(false);
+
+    try {
+      const userId = parseInt(user.id);
+      if (isNaN(userId)) {
+        throw new Error("Invalid user ID");
+      }
+
+      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const headers = { 'X-CSRFToken': getCSRFToken() };
+
+      // Prepare variables for the mutation
+      const variables = {
+        userId,
+        username: profile.username,
+        address: profile.address,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        phoneNumber: profile.phone,
+        image: profileImage // This should be a URL or base64 string
+      };
+
+      const result = await request(
+        endpoint,
+        EDIT_PROFILE_MUTATION,
+        variables,
+        headers
+      );
+
+      console.log("Profile updated successfully:", result);
+      setUpdateSuccess(true);
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      setUpdateError(err);
+    } finally {
+      setUpdateLoading(false);
     }
   };
 
@@ -130,14 +281,21 @@ const ProfilePage = () => {
                 {activeSection !== 'orders' && activeSection !== 'delete' && (
                   <div className="px-8 mb-4">
                     <button
-                      onClick={() => setIsEditing(!isEditing)}
+                      onClick={() => {
+                        if (isEditing) {
+                          handleSaveProfile();
+                        } else {
+                          setIsEditing(true);
+                        }
+                      }}
+                      disabled={updateLoading || profileLoading}
                       className={`w-full py-2.5 rounded-lg font-medium text-sm transition-all ${
                         isEditing 
                           ? "bg-[#A6B1E1] text-white" 
                           : "bg-[#A6B1E1]/20 text-[#424874] hover:bg-[#A6B1E1]/30"
-                      }`}
+                      } ${(updateLoading || profileLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      {isEditing ? 'Save Changes' : 'Edit Profile'}
+                      {updateLoading ? 'Saving...' : isEditing ? 'Save Changes' : 'Edit Profile'}
                     </button>
                   </div>
                 )}
@@ -197,129 +355,163 @@ const ProfilePage = () => {
               {/* Profile Section */}
               {activeSection === 'profile' && (
                 <div className="space-y-6">
-                  <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                    <div className="relative group">
-                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#A6B1E1] to-[#424874] flex items-center justify-center overflow-hidden">
-                        {profileImage ? (
-                          <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="text-3xl font-bold text-white">DK</span>
-                        )}
-                      </div>
-                      {isEditing && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                          <label htmlFor="profile-upload" className="cursor-pointer text-xs text-[#424874] text-center p-2">
-                            Change Photo
-                            <input
-                              id="profile-upload"
-                              type="file"
-                              accept="image/*"
-                              onChange={handleImageUpload}
-                              className="hidden"
-                            />
-                          </label>
+                  {profileLoading ? (
+                    <div className="flex items-center justify-center h-64">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#424874]"></div>
+                    </div>
+                  ) : profileError ? (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                      <strong className="font-bold">Error! </strong>
+                      <span className="block sm:inline">{profileError.message || "Failed to load profile"}</span>
+                    </div>
+                  ) : (
+                    <>
+                      {updateError && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                          <strong className="font-bold">Error! </strong>
+                          <span className="block sm:inline">{updateError.message || "Failed to update profile"}</span>
                         </div>
                       )}
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-[#424874]">{profile.firstName} {profile.lastName}</h2>
-                      <p className="text-[#424874]">@{profile.username}</p>
-                    </div>
-                  </div>
+                      
+                      {updateSuccess && (
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                          <strong className="font-bold">Success! </strong>
+                          <span className="block sm:inline">Your profile has been updated.</span>
+                        </div>
+                      )}
 
-                  {/* Personal Information Card */}
-                  <div className="bg-[#DCD6F7] rounded-xl overflow-hidden shadow-lg">
-                    <div className="px-6 py-4 bg-[#424874] border-b border-white">
-                      <h3 className="text-lg font-semibold text-white">Personal Information</h3>
-                    </div>
-                    <div className="p-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-[#424874] mb-1">First Name</label>
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              name="firstName"
-                              value={profile.firstName}
-                              onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
-                            />
-                          ) : (
-                            <p className="text-[#424874]">{profile.firstName}</p>
+                      <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                        <div className="relative group">
+                          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#A6B1E1] to-[#424874] flex items-center justify-center overflow-hidden">
+                            {profileImage ? (
+                              <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-3xl font-bold text-white">
+                                {profile.firstName && profile.lastName ? 
+                                  `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}` : 
+                                  ""}
+                              </span>
+                            )}
+                          </div>
+                          {isEditing && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                              <label htmlFor="profile-upload" className="cursor-pointer text-xs text-white text-center p-2">
+                                Change Photo
+                                <input
+                                  id="profile-upload"
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleImageUpload}
+                                  className="hidden"
+                                />
+                              </label>
+                            </div>
                           )}
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-[#424874] mb-1">Last Name</label>
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              name="lastName"
-                              value={profile.lastName}
-                              onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
-                            />
-                          ) : (
-                            <p className="text-[#424874]">{profile.lastName}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-[#424874] mb-1">Email Address</label>
-                          {isEditing ? (
-                            <input
-                              type="email"
-                              name="email"
-                              value={profile.email}
-                              onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
-                            />
-                          ) : (
-                            <p className="text-[#424874]">{profile.email}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-[#424874] mb-1">Phone</label>
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              name="phone"
-                              value={profile.phone}
-                              onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
-                            />
-                          ) : (
-                            <p className="text-[#424874]">{profile.phone}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-[#424874] mb-1">Username</label>
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              name="username"
-                              value={profile.username}
-                              onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
-                            />
-                          ) : (<p className="text-[#424874]">{profile.username}</p>
-                          )}
-                        </div>
-                        <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-[#424874] mb-1">Address</label>
-                          {isEditing ? (
-                            <textarea
-                              name="address"
-                              value={profile.address}
-                              onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
-                              rows="3"
-                            />
-                          ) : (
-                            <p className="text-[#424874]">{profile.address}</p>
-                          )}
+                          <h2 className="text-2xl font-bold text-[#424874]">{profile.firstName} {profile.lastName}</h2>
+                          <p className="text-[#424874]">@{profile.username}</p>
                         </div>
                       </div>
-                    </div>
-                  </div>
+
+                      {/* Personal Information Card */}
+                      <div className="bg-[#DCD6F7] rounded-xl overflow-hidden shadow-lg">
+                        <div className="px-6 py-4 bg-[#424874] border-b border-white">
+                          <h3 className="text-lg font-semibold text-white">Personal Information</h3>
+                        </div>
+                        <div className="p-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                              <label className="block text-sm font-medium text-[#424874] mb-1">First Name</label>
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  name="firstName"
+                                  value={profile.firstName}
+                                  onChange={handleInputChange}
+                                  className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white  focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
+                                />
+                              ) : (
+                                <p className="text-[#424874]">{profile.firstName}</p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-[#424874] mb-1">Last Name</label>
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  name="lastName"
+                                  value={profile.lastName}
+                                  onChange={handleInputChange}
+                                  className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
+                                />
+                              ) : (
+                                <p className="text-[#424874]">{profile.lastName}</p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-[#424874] mb-1">Email Address</label>
+                              {isEditing ? (
+                                <input
+                                  type="email"
+                                  name="email"
+                                  value={profile.email}
+                                  className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
+                                  disabled={true} // Email is typically not editable
+                                />
+                              ) : (
+                                <p className="text-[#424874]">{profile.email}</p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-[#424874] mb-1">Phone</label>
+                              {isEditing ? (
+                                <input
+                                  type="tel"
+                                  name="phone"
+                                  inputMode="numeric"
+                                  pattern="[0-9]*"
+                                  value={profile.phone}
+                                  onChange={handleInputChange}
+                                  className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
+                                />
+                              ) : (
+                                <p className="text-[#424874]">{profile.phone}</p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-[#424874] mb-1">Username</label>
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  name="username"
+                                  value={profile.username}
+                                  onChange={handleInputChange}
+                                  className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
+                                />
+                              ) : (
+                                <p className="text-[#424874]">{profile.username}</p>
+                              )}
+                            </div>
+                            <div className="md:col-span-2">
+                              <label className="block text-sm font-medium text-[#424874] mb-1">Address</label>
+                              {isEditing ? (
+                                <textarea
+                                  name="address"
+                                  value={profile.address}
+                                  onChange={handleInputChange}
+                                  className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
+                                  rows="3"
+                                />
+                              ) : (
+                                <p className="text-[#424874]">{profile.address}</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 
@@ -331,7 +523,9 @@ const ProfilePage = () => {
                   </div>
                   <div className="p-8 flex items-center justify-center min-h-[300px]">
                     {ordersLoading ? (
-                      <p className="text-[#424874]">Loading orders...</p>
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#424874]"></div>
+                      </div>
                     ) : ordersError ? (
                       <p className="text-red-500">Error fetching orders: {ordersError.message}</p>
                     ) : ordersData && ordersData.orders && ordersData.orders.length > 0 ? (
@@ -391,17 +585,6 @@ const ProfilePage = () => {
                     </div>
                     
                     <div className="border-t border-[#A6B1E1]/10 pt-6">
-                      <h4 className="text-[#424874] font-medium mb-4">Confirm account deletion</h4>
-                      <p className="text-[#424874] mb-6">Please type "DELETE" to confirm you want to permanently delete your account.</p>
-                      
-                      <div className="mb-6">
-                        <input
-                          type="text"
-                          placeholder="Type DELETE to confirm"
-                          className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-red-500/30 text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        />
-                      </div>
-                      
                       <button className="px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
                         Permanently Delete Account
                       </button>

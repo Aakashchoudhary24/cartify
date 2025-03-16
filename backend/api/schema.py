@@ -30,6 +30,7 @@ class ProfileType:
     address: str
     first_name: str
     last_name: str
+    email: str
     phone_number: str
     image: Optional[str]
     id : int
@@ -87,11 +88,12 @@ class Query:
         profile = Profile.objects.filter(user__id=user_id).first()
         if profile:
             return ProfileType(
-                id=profile.id,
+                id=profile.user.id,
                 user=profile.user.username,
                 address=profile.address,
                 first_name=profile.first_name,
                 last_name=profile.last_name,
+                email=profile.email,
                 phone_number=profile.phone_number,
                 image=profile.image.url if profile.image else None
             )
@@ -334,11 +336,12 @@ class Mutation:
         profile.save()
 
         return ProfileType(
-            id=profile.id,
+            id=profile.user.id,
             user=profile.user.username,
             address=profile.address,
             first_name=profile.first_name,
             last_name=profile.last_name,
+            email=profile.email,
             phone_number=profile.phone_number,
             image=profile.image.url if profile.image else None
         )
