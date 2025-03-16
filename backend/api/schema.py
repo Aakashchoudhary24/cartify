@@ -111,8 +111,39 @@ class Query:
 
     @strawberry.field
     def orders(self, user_id: int) -> List[OrderType]:
-        return Order.objects.filter(user__user__id=user_id)
-    
+        orders = Order.objects.filter(user__user__id=user_id)
+        return [
+            OrderType(
+                id=order.id,
+                user=order.user.user.username,
+                total_price=order.total_price,
+                status=order.status,
+                created_at=order.created_at,
+                order_items=[
+                    OrderItemType(
+                        id=item.id,
+                        product=ProductType(
+                            id=item.product.id,
+                            name=item.product.name,
+                            description=item.product.description,
+                            price=item.product.price,
+                            category=CategoryType(
+                                id=item.product.category.id,
+                                name=item.product.category.name,
+                                description=item.product.category.description
+                            ),
+                            image1=item.product.image1,
+                            image2=item.product.image2,
+                            gender=item.product.gender
+                        ),
+                        quantity=item.quantity,
+                        price=item.price
+                    )
+                    for item in order.order_items.all()  # ✅ Use correct related_name
+                ]
+            )
+            for order in orders
+        ]
 
 @strawberry.type
 class Mutation:
@@ -142,14 +173,34 @@ class Mutation:
             created_at=cart.created_at
         )
     @strawberry.mutation
-    def place_order(self, user_id: int, total_price: float) -> OrderType:
+    def place_order(self, user_id: int) -> OrderType:
         user = User.objects.get(id=user_id)
         profile = Profile.objects.filter(user=user).first()
 
         if not profile:
             raise Exception("Profile does not exist for this user.")
 
+        cart = Cart.objects.filter(user=user).first()
+        if not cart or not cart.items.exists():
+            raise Exception("Cart is empty. Add products before placing an order.")
+
+        total_price = sum(item.product.price * item.quantity for item in cart.items.all())
+
+        # ✅ Create the Order
         order = Order.objects.create(user=profile, total_price=total_price, status="Pending")
+
+        order_items = []
+        for cart_item in cart.items.all():
+            order_item = OrderItem.objects.create(
+                order=order,
+                product=cart_item.product,
+                quantity=cart_item.quantity,
+                price=cart_item.product.price
+            )
+            order_items.append(order_item)
+
+        # ✅ Clear the cart after placing the order
+        cart.items.all().delete()
 
         return OrderType(
             id=order.id,
@@ -157,7 +208,28 @@ class Mutation:
             total_price=order.total_price,
             status=order.status,
             created_at=order.created_at,
-            order_items=[]
+            order_items=[
+                OrderItemType(
+                    id=item.id,
+                    product=ProductType(
+                        id=item.product.id,
+                        name=item.product.name,
+                        description=item.product.description,
+                        price=item.product.price,
+                        category=CategoryType(
+                            id=item.product.category.id,
+                            name=item.product.category.name,
+                            description=item.product.category.description
+                        ),
+                        image1=item.product.image1,
+                        image2=item.product.image2,
+                        gender=item.product.gender
+                    ),
+                    quantity=item.quantity,
+                    price=item.price
+                )
+                for item in order_items
+            ]
         )
 
     @strawberry.mutation
