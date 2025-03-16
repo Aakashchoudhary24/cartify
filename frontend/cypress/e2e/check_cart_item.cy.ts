@@ -1,6 +1,6 @@
 const number_of_cart_items = 5;
-const user = "dilraj";
-const password = "dilraj";
+const user = "atma";
+const password = "atma";
 
 function getRandomNumber(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -11,9 +11,9 @@ describe("Check Cart Items", () => {
     cy.visit("localhost:3000/login");
     cy.login(user, password);
   });
-  // afterEach(() => {
-  //   cy.logout();
-  // });
+  afterEach(() => {
+    cy.logout();
+  });
   it("should display the correct number of items in the cart", () => {
     for (let i = 0; i < number_of_cart_items; i++) {
       cy.visit("localhost:3000/products");

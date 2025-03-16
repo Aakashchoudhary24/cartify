@@ -43,7 +43,7 @@ Cypress.Commands.add('login', (username,password) => {
   });
 Cypress.Commands.add('logout', () => {
     cy.contains('Logout').should('be.visible').click();
-    cy.contains('Where style speaks, trends resonate, fashion flourishes').should('exist');
+    cy.contains('Welcome Back').should('exist');
     });
 Cypress.Commands.add('waitGraphqlquery', () => {
     cy.intercept('POST', 'http://127.0.0.1:8000/graphql/').as('graphql');
