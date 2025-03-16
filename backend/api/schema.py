@@ -288,6 +288,52 @@ class Mutation:
             created_at=cart.created_at
         )
 
+    @strawberry.mutation
+    def delete_profile(self, user_id: int) -> DeleteOrderResponse:
+        profile = Profile.objects.filter(user__id=user_id).first()
+        user = User.objects.filter(id=user_id).first()
+
+        if not profile:
+            return DeleteOrderResponse(success=False, message="Profile not found.")
+
+        if not user:
+            return DeleteOrderResponse(success=False, message="User not found.")
+
+        # Delete the profile and the user
+        profile.delete()
+        user.delete()
+
+        return DeleteOrderResponse(success=True, message="Profile and user deleted successfully.")
+
+    @strawberry.mutation
+    def edit_profile(self, user_id: int, address: Optional[str] = None, first_name: Optional[str] = None, last_name: Optional[str] = None, phone_number: Optional[str] = None, image: Optional[str] = None) -> ProfileType:
+        profile = Profile.objects.filter(user__id=user_id).first()
+        if not profile:
+            raise Exception("Profile does not exist for this user.")
+
+        if address is not None:
+            profile.address = address
+        if first_name is not None:
+            profile.first_name = first_name
+        if last_name is not None:
+            profile.last_name = last_name
+        if phone_number is not None:
+            profile.phone_number = phone_number
+        if image is not None:
+            profile.image = image
+
+        profile.save()
+
+        return ProfileType(
+            id=profile.id,
+            user=profile.user.username,
+            address=profile.address,
+            first_name=profile.first_name,
+            last_name=profile.last_name,
+            phone_number=profile.phone_number,
+            image=profile.image.url if profile.image else None
+        )
+
 MergedQuery = merge_types("MergedQuery", (AuthQuery, Query))
 MergedMutation = merge_types("MergedMutation", (AuthMutation, Mutation))
 
