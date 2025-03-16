@@ -5,6 +5,7 @@ from chowkidar.extension import JWTAuthExtension
 from chowkidar.decorators import login_required
 from chowkidar.wrappers import issue_tokens_on_login, revoke_tokens_on_logout
 from chowkidar.utils.jwt import generate_token_from_claims # ✅ Import JWT utilities
+from api.models import Profile 
 
 from datetime import timedelta
 
@@ -65,6 +66,8 @@ class AuthMutation:
             raise Exception("Email already exists")
 
         user = User.objects.create_user(username=username.lower(), email=email, password=password)
+        Profile.objects.create(user=user,username=username.lower(),email=email)
+
         return UserType(id=user.id, username=user.username, email=user.email)
 
 @strawberry.type
