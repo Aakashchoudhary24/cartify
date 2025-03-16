@@ -306,10 +306,19 @@ class Mutation:
         return DeleteOrderResponse(success=True, message="Profile and user deleted successfully.")
 
     @strawberry.mutation
-    def edit_profile(self, user_id: int, address: Optional[str] = None, first_name: Optional[str] = None, last_name: Optional[str] = None, phone_number: Optional[str] = None, image: Optional[str] = None) -> ProfileType:
+    def edit_profile(self, user_id: int, username: Optional[str] = None, address: Optional[str] = None, first_name: Optional[str] = None, last_name: Optional[str] = None, phone_number: Optional[str] = None, image: Optional[str] = None) -> ProfileType:
         profile = Profile.objects.filter(user__id=user_id).first()
+        user = User.objects.filter(id=user_id).first()
+
         if not profile:
             raise Exception("Profile does not exist for this user.")
+
+        if not user:
+            raise Exception("User does not exist.")
+
+        if username is not None:
+            user.username = username
+            user.save()
 
         if address is not None:
             profile.address = address
