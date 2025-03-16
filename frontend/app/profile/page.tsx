@@ -63,8 +63,17 @@ const EDIT_PROFILE_MUTATION = gql`
   }
 `;
 
+const DELETE_PROFILE_MUTATION = gql`
+  mutation DeleteProfile($userId: Int!) {
+    deleteProfile(userId: $userId) {
+      success
+      message
+    }
+  }
+`;
+
 const ProfilePage = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   
   const [ordersData, setOrdersData] = useState(null);
   const [ordersLoading, setOrdersLoading] = useState(true);
@@ -87,6 +96,12 @@ const ProfilePage = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState(null);
+  
+  // Delete account states
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [confirmDeleteText, setConfirmDeleteText] = useState('');
 
   // Fetch profile data
   useEffect(() => {
@@ -262,6 +277,57 @@ const ProfilePage = () => {
     }
   };
 
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    if (!user || !user.id) {
+      setDeleteError(new Error("User not authenticated"));
+      return;
+    }
+
+    if (confirmDeleteText !== "DELETE") {
+      setDeleteError(new Error("Please type DELETE to confirm"));
+      return;
+    }
+
+    setDeleteLoading(true);
+    setDeleteError(null);
+
+    try {
+      const userId = parseInt(user.id);
+      if (isNaN(userId)) {
+        throw new Error("Invalid user ID");
+      }
+
+      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const headers = { 'X-CSRFToken': getCSRFToken() };
+
+      const result = await request(
+        endpoint,
+        DELETE_PROFILE_MUTATION,
+        { userId },
+        headers
+      );
+
+      console.log("Profile deleted:", result);
+
+      if (result.deleteProfile.success) {
+        // Logout the user after successful deletion
+        logout();
+        // Typically redirect here, but for now let's just show a message
+        alert("Your account has been deleted successfully.");
+        // You might want to redirect to home page
+        window.location.href = "/";
+      } else {
+        throw new Error(result.deleteProfile.message || "Failed to delete account");
+      }
+    } catch (err) {
+      console.error("Error deleting profile:", err);
+      setDeleteError(err);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   return (
     <div className="bg-[#ece2fd] min-h-screen">
       <Navbar />
@@ -351,7 +417,7 @@ const ProfilePage = () => {
             </div>
 
             {/* Main Content */}
-            <div className="w-full md:w-3/4 bg-[#d4cdf1] p-8">
+             <div className="w-full md:w-3/4 bg-[#d4cdf1] p-8">
               {/* Profile Section */}
               {activeSection === 'profile' && (
                 <div className="space-y-6">
@@ -584,11 +650,58 @@ const ProfilePage = () => {
                       </div>
                     </div>
                     
-                    <div className="border-t border-[#A6B1E1]/10 pt-6">
-                      <button className="px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                        Permanently Delete Account
-                      </button>
-                    </div>
+                    {deleteError && (
+                      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+                        <strong className="font-bold">Error! </strong>
+                        <span className="block sm:inline">{deleteError.message || "Failed to delete account"}</span>
+                      </div>
+                    )}
+                    
+                    {showDeleteConfirmation ? (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                        <h4 className="text-red-600 font-medium mb-3">Confirm Account Deletion</h4>
+                        <p className="text-[#424874] mb-4">
+                          To confirm deletion, please type "DELETE" in the field below:
+                        </p>
+                        <input
+                          type="text"
+                          value={confirmDeleteText}
+                          onChange={(e) => setConfirmDeleteText(e.target.value)}
+                          placeholder="Type DELETE to confirm"
+                           className="w-full px-4 py-2.5 rounded-lg border border-red-300 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent mb-4"
+                        />
+                        <div className="flex items-center justify-end space-x-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowDeleteConfirmation(false);
+                              setConfirmDeleteText('');
+                            }}
+                            className="px-4 py-2 text-[#424874] bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleDeleteAccount}
+                            disabled={deleteLoading}
+                            className="px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {deleteLoading ? 'Deleting...' : 'Delete My Account'}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => setShowDeleteConfirmation(true)}
+                          className="px-6 py-3 text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors"
+                        >
+                          Delete My Account
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
