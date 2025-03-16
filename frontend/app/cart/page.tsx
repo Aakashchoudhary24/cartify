@@ -30,6 +30,15 @@ interface CartData {
   };
 }
 
+interface OrderResponse {
+  placeOrder: {
+    id: string;
+    user: string;
+    totalPrice: number;
+    status: string;
+  };
+}
+
 const CART_QUERY = gql`
   query Cart($userId: Int!) {
     cart(userId: $userId) {
@@ -77,6 +86,17 @@ const UPDATE_CART_PRODUCT_MUTATION = gql`
   }
 `;
 
+const PLACE_ORDER_MUTATION = gql`
+  mutation PlaceOrder($userId: Int!) {
+    placeOrder(userId: $userId) {
+      id
+      user
+      totalPrice
+      status
+    }
+  }
+`;
+
 const CartPage = () => {
   const { user, loading: authLoading } = useAuth();
   const [userId, setUserId] = useState<number | null>(null);
@@ -89,6 +109,7 @@ const CartPage = () => {
   const [removeLoading, setRemoveLoading] = useState<number | null>(null);
   const [updateLoading, setUpdateLoading] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [orderLoading, setOrderLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [totals, setTotals] = useState({
@@ -283,6 +304,58 @@ const CartPage = () => {
     setDonation((prev) => prev + amount);
   };
 
+  // New function to handle placing an order
+  const placeOrder = async () => {
+    if (!userId) return;
+    
+    // Check if there are any selected items
+    const hasSelectedItems = selectedItems.some(selected => selected);
+    if (!hasSelectedItems) {
+      setNotification({
+        message: "Please select at least one item to place an order.",
+        type: "error"
+      });
+      return;
+    }
+    
+    setOrderLoading(true);
+    
+    try {
+      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const headers = { 'X-CSRFToken': getCSRFToken() };
+      
+      // Execute the place order mutation
+      const result = await request<OrderResponse>(
+        endpoint, 
+        PLACE_ORDER_MUTATION, 
+        { userId }, 
+        headers
+      );
+      
+      // If successful, show success message and refresh cart
+      if (result && result.placeOrder) {
+        setNotification({
+          message: `Order placed successfully! Order ID: ${result.placeOrder.id}`,
+          type: "success"
+        });
+        
+        // Clear cart or refresh data
+        await fetchCartData();
+        
+        // Optionally redirect to order confirmation page
+        // window.location.href = `/order-confirmation/${result.placeOrder.id}`;
+      }
+    } catch (error) {
+      console.error("Failed to place order:", error);
+      setNotification({
+        message: "Failed to place your order. Please try again.",
+        type: "error"
+      });
+    } finally {
+      setOrderLoading(false);
+    }
+  };
+
   // Wait for client-side rendering
   if (!isClientReady) {
     return (
@@ -346,6 +419,8 @@ const CartPage = () => {
       </>
     );
   }
+
+  const hasSelectedItems = selectedItems.some(selected => selected);
 
   return (
     <>
@@ -471,8 +546,12 @@ const CartPage = () => {
                 <span>Total:</span>
                 <span>₹{totals.total.toLocaleString("en-IN")}</span>
               </div>
-              <button className="place-order-btn" disabled={cartItems.length === 0}>
-                PLACE ORDER
+              <button 
+                className="place-order-btn" 
+                disabled={cartItems.length === 0 || !hasSelectedItems || orderLoading}
+                onClick={placeOrder}
+              >
+                {orderLoading ? 'PROCESSING...' : 'PLACE ORDER'}
               </button>
             </div>
           </div>

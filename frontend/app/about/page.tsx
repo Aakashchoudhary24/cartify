@@ -70,42 +70,6 @@ export default function AboutPage() {
                     </div>
                 </div>
             </section>
-
-            <section className={styles.hero}>
-                <div className={styles.heroContent}>
-                    <h1 className={styles.title}>Welcome to Cartify</h1>
-                    <p className={styles.subtitle}>
-                        Redefining fashion with comfort, style, and quality.
-                    </p>
-                    <button
-                        className={styles.ctaButton}
-                        onClick={() => setShowContact(!showContact)}
-                    >
-                        {showContact ? "Hide Contact Info" : "Contact Us"}
-                    </button>
-                </div>
-            </section>
-
-            {/* Contact Info */}
-            {showContact && (
-                <section className={styles.contactSection}>
-                    <h2 className={styles.sectionTitle}>Get in Touch</h2>
-                    <div className={styles.contactInfo}>
-                        <p>Email: <a href="mailto:cartify.professional@gmail.com">cartify.professional@gmail.com</a></p>
-                        <p>Phone: <a href="tel:+919448200330">+91 94482 00330</a></p>
-                        <p>GitHub: 
-                            <Link href="https://github.com/Aakashchoudhary24/cartify.git" target="_blank" rel="noopener noreferrer">
-                                github.com/Aakashchoudhary24/cartify
-                            </Link>
-                        </p>
-                        <p>LinkedIn: 
-                            <Link href="#" target="_blank" rel="noopener noreferrer">
-                                LinkedIn
-                            </Link>
-                        </p>
-                    </div>
-                </section>
-            )}
         </div>
         </>
     );
