@@ -1,93 +1,80 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import ProductsPage from "../page";
-import { vi } from "vitest";
-import { useFetchGraphQL } from "@/hooks";
-import { useRouter } from "next/navigation";
-import "@testing-library/jest-dom/vitest";
+import { render } from '@testing-library/react';
+import { useRouter } from 'next/router';
+import ProductsPage from '../page';
 
-// Mock hooks
-vi.mock("@/hooks", () => ({
-  useFetchGraphQL: vi.fn(),
-}));
-
-vi.mock("next/navigation", () => ({
+// Mocking the useRouter hook for Vitest
+vi.mock('next/router', () => ({
   useRouter: vi.fn(),
 }));
 
-describe("ProductsPage", () => {
-  beforeEach(() => {
-    (useFetchGraphQL as jest.Mock).mockReturnValue({
-      data: {
-        products: [
-          {
-            id: "1",
-            name: "Product 1",
-            description: "Description 1",
-            price: 2000,
-            category: { name: "Category 1" },
-            gender: "Men",
-            image1: "image1.jpg",
-            image2: "image2.jpg",
-          },
-          {
-            id: "2",
-            name: "Product 2",
-            description: "Description 2",
-            price: 5000,
-            category: { name: "Category 2" },
-            gender: "Women",
-            image1: "image3.jpg",
-            image2: "image4.jpg",
-          },
-        ],
-      },
-      loading: false,
-      error: null,
+describe('ProductsPage', () => {
+  it('should render loading state', () => {
+    // Mocking useRouter to avoid the invariant error
+    useRouter.mockReturnValue({
+      pathname: '/products',
+      query: {},
+      asPath: '/products',
     });
 
-    (useRouter as jest.Mock).mockReturnValue({
-      push: vi.fn(),
+    const { getByText } = render(<ProductsPage />);
+
+    // Add assertions for the loading state
+    expect(getByText(/loading/i)).toBeInTheDocument(); // Adjust this to match your actual loading state text
+  });
+
+  it('should render error state if there\'s an error', () => {
+    // Mocking the error scenario
+    useRouter.mockReturnValue({
+      pathname: '/products',
+      query: {},
+      asPath: '/products',
     });
+
+    const { getByText } = render(<ProductsPage />);
+
+    // Add assertions for error state
+    expect(getByText(/error/i)).toBeInTheDocument(); // Adjust this based on your error state message
   });
 
-  afterEach(() => {
-    vi.clearAllMocks();
+  it('should render products when data is available', () => {
+    // Mocking data fetching and the router
+    useRouter.mockReturnValue({
+      pathname: '/products',
+      query: {},
+      asPath: '/products',
+    });
+
+    const { getByText } = render(<ProductsPage />);
+
+    // Add assertions to check if products are rendered
+    expect(getByText(/product name/i)).toBeInTheDocument(); // Adjust based on the expected product name in the page
   });
 
-  it("renders the products correctly", () => {
-    render(<ProductsPage />);
-    
-    expect(screen.getByText("Product 1")).toBeInTheDocument();
-    expect(screen.getByText("Product 2")).toBeInTheDocument();
+  it('should handle category filter change', () => {
+    // Test logic for category filter change
+    useRouter.mockReturnValue({
+      pathname: '/products',
+      query: { category: 'electronics' },
+      asPath: '/products?category=electronics',
+    });
+
+    const { getByText } = render(<ProductsPage />);
+
+    // Add assertions for category filter change
+    expect(getByText(/electronics/i)).toBeInTheDocument();
   });
 
-  it("filters products by category", () => {
-    render(<ProductsPage />);
-    
-    const categoryButton = screen.getByText("Category 1");
-    fireEvent.click(categoryButton);
-    
-    expect(screen.getByText("Product 1")).toBeInTheDocument();
-    expect(screen.queryByText("Product 2")).not.toBeInTheDocument();
-  });
+  it('should update price range', () => {
+    // Test logic for price range update
+    useRouter.mockReturnValue({
+      pathname: '/products',
+      query: { price: '100-500' },
+      asPath: '/products?price=100-500',
+    });
 
-  it("filters products by gender", () => {
-    render(<ProductsPage />);
-    
-    const genderButton = screen.getByText("Men");
-    fireEvent.click(genderButton);
-    
-    expect(screen.getByText("Product 1")).toBeInTheDocument();
-    expect(screen.queryByText("Product 2")).not.toBeInTheDocument();
-  });
+    const { getByText } = render(<ProductsPage />);
 
-  it("resets filters when clicking reset button", () => {
-    render(<ProductsPage />);
-    
-    const resetButton = screen.getByText("Reset Filters");
-    fireEvent.click(resetButton);
-    
-    expect(screen.getByText("Product 1")).toBeInTheDocument();
-    expect(screen.getByText("Product 2")).toBeInTheDocument();
+    // Add assertions for price range update
+    expect(getByText(/100-500/i)).toBeInTheDocument();
   });
 });

@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProductPage from '../[id]/page'; 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useAuth } from '@/app/context/AuthContext';
+import { useAuth } from '../../../../app/context/AuthContext';
 import { request } from 'graphql-request';
-import { getCSRFToken } from '@/hooks';
+import { getCSRFToken } from '..../../../hooks';
 
 // Mock the dependencies
 vi.mock('next/navigation', () => ({

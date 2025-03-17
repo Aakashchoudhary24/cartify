@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import "../styles/carousel.css";
 import { gql } from "graphql-request";
-import { useFetchGraphQL } from "@/hooks";
+import { useFetchGraphQL } from "../../hooks";  
 
 
 const PRODUCTS_QUERY = gql`
@@ -106,7 +106,7 @@ const CarouselPage = () => {
         <div className="carousel-wrapper">
           <h2 className="text-dark text-2xl pl-10 fw-bold mb-3">Recommended for You</h2>
 
-          <button onClick={scrollLeft} className="carousel-btn left">
+          <button onClick={scrollLeft} className="carousel-btn left" aria-label="chevron-right">
             <ChevronLeft size={24} />
           </button>
 
@@ -138,7 +138,7 @@ const CarouselPage = () => {
             </div>
           </div>
 
-          <button onClick={scrollRight} className="carousel-btn right">
+          <button onClick={scrollRight} className="carousel-btn right" aria-label="chevron-left">
             <ChevronRight size={24} />
           </button>
         </div>

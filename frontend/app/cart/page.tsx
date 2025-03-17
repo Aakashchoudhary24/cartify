@@ -2,11 +2,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Carousel from "../carousel/page";
 import "../styles/cart.css";
-import { useFetchGraphQL } from "@/hooks";
+import { getCSRFToken } from "../../hooks";
 import { gql, request } from "graphql-request";
 import Navbar from "../components/Navbar";
-import { getCSRFToken } from "@/hooks";
-import { useAuth } from "@/app/context/AuthContext";
+import { useAuth } from "../../app/context/AuthContext";
 
 interface Product {
   id: number;
@@ -22,12 +21,6 @@ interface CartItem {
   product: Product;
   quantity: number;
   subtotal: number;
-}
-
-interface CartData {
-  cart: {
-    items: CartItem[];
-  };
 }
 
 interface OrderResponse {

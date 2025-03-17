@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ArrowLeft, Heart, Share2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import styles from "../../styles/productinfo.module.css";
 import Carousel from "../../carousel/page";
-import Navbar from "@/app/components/Navbar";
+import Navbar from "../../../app/components/Navbar";
 import { request, gql } from "graphql-request";
-import { getCSRFToken } from "@/hooks"; // Adjust import path as needed
-import { useAuth } from "@/app/context/AuthContext"; // Import useAuth from AuthContext
+import { getCSRFToken } from "../../../hooks"; // Adjust import path as needed
+import { useAuth } from "../../../app/context/AuthContext"; // Import useAuth from AuthContext
 
 // Add to Cart Mutation
 const ADD_TO_CART_MUTATION = gql`
@@ -32,7 +32,7 @@ export default function ProductPage() {
   const image1 = searchParams.get("image1") || "/default.jpg";
   const image2 = searchParams.get("image2") || null;
 
-  const [selectedSize, setSelectedSize] = useState("M");
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [fadeIn, setFadeIn] = useState(true);

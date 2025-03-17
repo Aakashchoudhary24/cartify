@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
@@ -14,19 +13,9 @@ const Navbar: React.FC = () => {
     const activeLinkColor = "text-white bg-[#A6B1E1] rounded-full";
 
     const { isAuthenticated, user, logout } = useAuth();
-    const [username, setUsername] = useState("");
-
-    useEffect(() => {
-        if (isAuthenticated && user) {
-            setUsername(user.username);
-        } else {
-            setUsername("");
-        }
-    }, [isAuthenticated, user]);
 
     const handleLogout = () => {
         logout();
-        setUsername("");
         router.push("/login");
     };
 
@@ -69,7 +58,6 @@ const Navbar: React.FC = () => {
                 <ul className="flex items-center gap-5 text-lg font-medium">
                     {isAuthenticated && user ? (
                         <>
-                            <span className="font-medium text-[#424874]">Welcome, {username}</span>
                             <li
                                 onClick={() => router.push("/cart")}
                                 className="cursor-pointer hover:text-[#A6B1E1] transition bg-[#A6B1E1] p-2 rounded-full"
@@ -89,6 +77,7 @@ const Navbar: React.FC = () => {
                                     />
                                 </svg>
                             </li>
+                            <>
                             <motion.li 
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.95 }}
@@ -97,6 +86,15 @@ const Navbar: React.FC = () => {
                             >
                                 Logout
                             </motion.li>
+                            <motion.li 
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="cursor-pointer hover:text-[#A6B1E1] transition"
+                                onClick={() => router.push('/profile')}
+                            >
+                                Profile
+                            </motion.li>
+                            </>
                         </>
                     ) : (
                         <>

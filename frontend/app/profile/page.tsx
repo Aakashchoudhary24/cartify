@@ -1,10 +1,10 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Navbar from "../components/Navbar";
-import { useAuth } from "@/app/context/AuthContext";
+import { useAuth } from "../../app/context/AuthContext";
 import { request } from 'graphql-request';
 import { gql } from "graphql-request";
-import { getCSRFToken } from '@/hooks'; // Import the getCSRFToken function from hooks.js
+import { getCSRFToken } from '../../hooks'; // Import the getCSRFToken function from hooks.js
 
 const ORDERS_QUERY = gql`
   query Orders($userId: Int!) {
