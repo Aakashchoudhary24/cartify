@@ -12,9 +12,9 @@ describe("Check Cart Items", () => {
     cy.login(username, user_password);
     cy.contains('Where style speaks, trends resonate, fashion flourishes').should('exist');
   });
-//   afterEach(() => {
-//     cy.logout();
-//   });
+  afterEach(() => {
+    cy.logout();
+  });
   it("should display the correct number of items in the cart", () => {
     for (let i = 0; i < number_of_cart_item; i++) {
       cy.visit("localhost:3000/products");
