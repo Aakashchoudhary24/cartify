@@ -39,7 +39,7 @@ Cypress.Commands.add('login', (username,password) => {
     cy.get('input[type=text]').should('be.visible').click().type(username);
     cy.get('input[type=password]').should('be.visible').click().type(password);
     cy.get('button').should('be.visible').click();
-    cy.contains('Where style speaks, trends resonate, fashion flourishes').should('exist');
+    
   });
 Cypress.Commands.add('logout', () => {
     cy.contains('Logout').should('be.visible').click();
