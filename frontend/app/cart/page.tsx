@@ -32,6 +32,20 @@ interface OrderResponse {
   };
 }
 
+const PROFILE_QUERY = gql`
+  query GetProfile($userId: Int!) {
+    profile(userId: $userId) {
+      user
+      address
+      firstName
+      lastName
+      phoneNumber
+      image
+      email
+    }
+  }
+`;
+
 const CART_QUERY = gql`
   query Cart($userId: Int!) {
     cart(userId: $userId) {
@@ -98,6 +112,7 @@ const CartPage = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<boolean[]>([]);
   const [donation, setDonation] = useState<number>(0);
+  const [activeDonation, setActiveDonation] = useState<number | null>(null);
   const [notification, setNotification] = useState({ message: "", type: "" });
   const [removeLoading, setRemoveLoading] = useState<number | null>(null);
   const [updateLoading, setUpdateLoading] = useState<number | null>(null);
@@ -111,6 +126,50 @@ const CartPage = () => {
     shipping: 0,
     total: 0,
   });
+
+  const [profile, setProfile] = useState({
+    address: "",
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    email: ""
+  });
+  const [profileLoading, setProfileLoading] = useState(false);
+
+  // Add a function to fetch profile data
+  const fetchProfileData = useCallback(async () => {
+    if (!userId) return;
+    
+    setProfileLoading(true);
+    
+    try {
+      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const headers = { 'X-CSRFToken': getCSRFToken() };
+      
+      const result = await request(endpoint, PROFILE_QUERY, { userId }, headers);
+      
+      if (result && result.profile) {
+        setProfile({
+          address: result.profile.address || "",
+          firstName: result.profile.firstName || "",
+          lastName: result.profile.lastName || "",
+          phoneNumber: result.profile.phoneNumber || "",
+          email: result.profile.email || ""
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch profile data:", error);
+    } finally {
+      setProfileLoading(false);
+    }
+  }, [userId]);
+
+  // Add a useEffect to fetch profile data when userId changes
+  useEffect(() => {
+    if (userId !== null) {
+      fetchProfileData();
+    }
+  }, [userId, fetchProfileData]);
 
   // Set client-side rendering flag
   useEffect(() => {
@@ -293,8 +352,17 @@ const CartPage = () => {
     });
   };
 
-  const addDonation = (amount: number) => {
-    setDonation((prev) => prev + amount);
+  // Modified function to toggle donations
+  const toggleDonation = (amount: number) => {
+    if (activeDonation === amount) {
+      // If the same donation button is clicked again, remove the donation
+      setDonation(0);
+      setActiveDonation(null);
+    } else {
+      // Otherwise, set the new donation amount
+      setDonation(amount);
+      setActiveDonation(amount);
+    }
   };
 
   // New function to handle placing an order
@@ -335,8 +403,6 @@ const CartPage = () => {
         // Clear cart or refresh data
         await fetchCartData();
         
-        // Optionally redirect to order confirmation page
-        // window.location.href = `/order-confirmation/${result.placeOrder.id}`;
       }
     } catch (error) {
       console.error("Failed to place order:", error);
@@ -438,10 +504,9 @@ const CartPage = () => {
           <div className="cart-left">
             <div className="delivery-address">
               <h2>
-                Deliver to: <span>Dattanand UD, 673004</span>
+                Deliver to: <span>{profile.firstName} {profile.lastName}, {profile.phoneNumber}</span>
               </h2>
-              <p>Flat C4, Devi Apartments, Puthiyara, Kozhikode</p>
-              <button>Change Address</button>
+              <p>{profile.address || "No address provided. Please update your profile."}</p>
             </div>
 
             <div className="offers-section">
@@ -519,7 +584,11 @@ const CartPage = () => {
               <h2>Donate and Make a Difference</h2>
               <div className="donation-buttons">
                 {[10, 20, 50, 100].map((amount) => (
-                  <button key={amount} onClick={() => addDonation(amount)}>
+                  <button 
+                    key={amount} 
+                    onClick={() => toggleDonation(amount)}
+                    className={activeDonation === amount ? "active-donation" : ""}
+                  >
                     ₹{amount}
                   </button>
                 ))}

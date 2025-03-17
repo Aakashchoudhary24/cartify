@@ -208,7 +208,6 @@ export default function ProductPage() {
               >
                 {loading ? 'Adding...' : 'Add to Cart'}
               </button>
-              <button className={styles.checkout}>Buy Now</button>
             </div>
           </div>
         </div>
