@@ -4,9 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 
 const CartifyHomepage: React.FC = () => {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-[#424874] text-white"> 
       <Navbar/>
@@ -47,6 +49,8 @@ const CartifyHomepage: React.FC = () => {
         <motion.button 
           className="bg-white text-[#424874] px-8 py-3 rounded-full inline-flex items-center hover:bg-[#A6B1E1] hover:text-white transition duration-300"
           initial={{ opacity: 0, y: 30 }}
+
+          onClick={() => router.push('/products')}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
           whileHover={{ scale: 1.05 }}

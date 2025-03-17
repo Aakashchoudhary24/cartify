@@ -22,7 +22,7 @@ export default function AboutPage() {
                 </p>
                 <div className={styles.aboutContent}>
                     <Image
-                        src="/images/about.jpg"
+                        src="/images/Aboutus.jpg"
                         alt="Our Team"
                         className={styles.image}
                         width={300} height={300}

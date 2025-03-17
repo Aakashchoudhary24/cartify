@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { gql } from "graphql-request";
 import { useFetchGraphQL } from "../../hooks";
 import styles from "../styles/products.module.css";
