@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 const Navbar: React.FC = () => {
     const router = useRouter();
@@ -78,14 +78,7 @@ const Navbar: React.FC = () => {
                                 </svg>
                             </li>
                             <>
-                            <motion.li 
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="cursor-pointer hover:text-[#A6B1E1] transition"
-                                onClick={handleLogout}
-                            >
-                                Logout
-                            </motion.li>
+                            
                             <motion.li 
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.95 }}
@@ -93,6 +86,14 @@ const Navbar: React.FC = () => {
                                 onClick={() => router.push('/profile')}
                             >
                                 Profile
+                            </motion.li>
+                            <motion.li 
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="cursor-pointer hover:text-[#A6B1E1] transition"
+                                onClick={handleLogout}
+                            >
+                                Logout
                             </motion.li>
                             </>
                         </>
