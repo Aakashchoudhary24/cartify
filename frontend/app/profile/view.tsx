@@ -5,6 +5,7 @@ import { useAuth } from "../../app/context/AuthContext";
 import { request } from 'graphql-request';
 import { gql } from "graphql-request";
 import { getCSRFToken } from '../../hooks'; // Import the getCSRFToken function from hooks.js
+import { useRouter } from 'next/navigation';
 
 const ORDERS_QUERY = gql`
   query Orders($userId: Int!) {
@@ -75,7 +76,7 @@ const DELETE_PROFILE_MUTATION = gql`
 
 const ProfilePage = () => {
   const { user, logout } = useAuth();
-  
+  const router = useRouter();
   const [ordersData, setOrdersData] = useState(null);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState(null);
@@ -656,7 +657,7 @@ const ProfilePage = () => {
                         </svg>
                         <p className="mt-6 text-[#424874] text-lg">No orders found</p>
                         <p className="mt-2 text-[#424874]/70">Your order history will appear here once you make a purchase</p>
-                        <button className="mt-6 px-6 py-3 bg-[#424874] text-white rounded-lg hover:bg-[#383d65] transition-colors">
+                        <button className="mt-6 px-6 py-3 bg-[#424874] text-white rounded-lg hover:bg-[#383d65] transition-colors" onClick={() => router.push('/products')}>
                           Browse Products
                         </button>
                       </div>

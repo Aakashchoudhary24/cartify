@@ -1,14 +1,30 @@
 "use client";
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Navbar from '../components/navbar/page';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import "../styles/Landing.css"
 
 
 const CartifyHomepage: React.FC = () => {
   const router = useRouter();
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Detect screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    handleResize(); // Check on initial load
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
   return (
     <div className="min-h-screen bg-[#424874] text-white"> 
       <Navbar/>
