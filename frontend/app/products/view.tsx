@@ -46,32 +46,68 @@ const PRODUCTS_QUERY = gql`
 const ProductsPage: React.FC = () => {
   const { data, loading, error } = useFetchGraphQL<ProductsResponse>(PRODUCTS_QUERY);
   const products: Product[] = data?.products || [];
-
+  const [top, setTop] = useState(100);
   const [processedProducts, setProcessedProducts] = useState<Product[]>([]);
   const [sortedProducts, setSortedProducts] = useState<Product[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([1000, 10000]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
 
   const minRangeRef = useRef<HTMLInputElement>(null);
   const maxRangeRef = useRef<HTMLInputElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const MIN_PRICE = 1000;
   const MAX_PRICE = 10000;
   const RANGE_GAP = 500;
 
-  const [top, setTop] = useState(100);
+  // Check if we're on mobile
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    if (products.length > 0) {
-      const enhancedProducts = products.map(product => ({
-        ...product,
-        hasValidImage: true
-      }));
-      setProcessedProducts(enhancedProducts);
+    // Set initial mobile state
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isMobileMenuOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
+
+  // Handle body scroll when menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
     }
-  }, [products]);
+    
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,6 +118,16 @@ const ProductsPage: React.FC = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (products.length > 0) {
+      const enhancedProducts = products.map(product => ({
+        ...product,
+        hasValidImage: true
+      }));
+      setProcessedProducts(enhancedProducts);
+    }
+  }, [products]);
 
   useEffect(() => {
     if (processedProducts.length > 0) {
@@ -170,12 +216,22 @@ const ProductsPage: React.FC = () => {
     setSelectedCategories((prev) =>
       prev.includes(category) ? prev.filter((cat) => cat !== category) : [...prev, category]
     );
+    
+    // Close menu on mobile after selection
+    if (isMobile) {
+      setIsMobileMenuOpen(false);
+    }
   };
 
   const handleGenderFilterChange = (gender: string) => {
     setSelectedGenders((prev) =>
       prev.includes(gender) ? prev.filter((g) => g !== gender) : [...prev, gender]
     );
+    
+    // Close menu on mobile after selection
+    if (isMobile) {
+      setIsMobileMenuOpen(false);
+    }
   };
 
   const handleResetFilters = () => {
@@ -185,6 +241,15 @@ const ProductsPage: React.FC = () => {
     
     if (minRangeRef.current) minRangeRef.current.value = MIN_PRICE.toString();
     if (maxRangeRef.current) maxRangeRef.current.value = MAX_PRICE.toString();
+    
+    // Close menu on mobile after reset
+    if (isMobile) {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const categories = [...new Set(products.map((p) => p.category.name))];
@@ -196,13 +261,33 @@ const ProductsPage: React.FC = () => {
   return (
     <>
       <Navbar />
+      
+      {/* Mobile Menu Toggle Button */}
+      <button 
+        className={styles.mobileMenuToggle}
+        onClick={toggleMobileMenu}
+        aria-label="Toggle Filter Menu"
+      >
+        {isMobileMenuOpen ? "×" : "Filters"}
+      </button>
+      
+      {/* Mobile Overlay */}
+      <div 
+        className={`${styles.sidebarOverlay} ${isMobileMenuOpen ? styles.open : ""}`} 
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+      
       <div className={styles.container}>
         <motion.div 
-          className={styles.sidebar} 
-          style={{ top: `${top}px`, transition: "top 0.1s ease-in-out" }}
-          initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
+            ref={sidebarRef}
+            className={`${styles.sidebar} ${isMobileMenuOpen ? styles.open : ""}`}
+            style={{ top: `${top}px`, transition: "top 0.1s ease-in-out" }}
+            initial={{ opacity: 0, x: -100 }}
+            animate={{ 
+              opacity: 1, 
+              x: 0,
+            }}
+            transition={{ duration: 0.5 }}
         >
           <div className={styles.sidebarHeader}>
             <h2 className={styles.sidebarLogo}>CARTIFY</h2>
@@ -326,49 +411,55 @@ const ProductsPage: React.FC = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <div className={styles.productGrid}>
-            {sortedProducts.map((product) => (
-              <motion.div
-                key={product.id}
-                className={styles.productCard}
-                onClick={() =>
-                  router.push(
-                    `/products/${product.id}?id=${encodeURIComponent(product.id)}&name=${encodeURIComponent(product.name
-                    )}&description=${encodeURIComponent(
-                      product.description
-                    )}&price=${product.price}&image1=${encodeURIComponent(
-                      product.image1
-                    )}&image2=${encodeURIComponent(product.image2)}`
-                  )
-                }
-                whileTap={{ scale: 0.95 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className={styles.cardInner}>
-                  <div className={styles.cardFront}>
-                    <img 
-                      src={product.image1} 
-                      alt={product.name} 
-                      className={styles.productImage}
-                      onError={() => handleImageError(product.id)}
-                    />
-                    <div className={styles.productInfo}>
-                      <h3 className={styles.productName}>{product.name}</h3>
+          {sortedProducts.length > 0 ? (
+            <div className={styles.productGrid}>
+              {sortedProducts.map((product) => (
+                <motion.div
+                  key={product.id}
+                  className={styles.productCard}
+                  onClick={() =>
+                    router.push(
+                      `/products/${product.id}?id=${encodeURIComponent(product.id)}&name=${encodeURIComponent(product.name
+                      )}&description=${encodeURIComponent(
+                        product.description
+                      )}&price=${product.price}&image1=${encodeURIComponent(
+                        product.image1
+                      )}&image2=${encodeURIComponent(product.image2)}`
+                    )
+                  }
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className={styles.cardInner}>
+                    <div className={styles.cardFront}>
+                      <img 
+                        src={product.image1} 
+                        alt={product.name} 
+                        className={styles.productImage}
+                        onError={() => handleImageError(product.id)}
+                        loading="lazy"
+                      />
+                      <div className={styles.productInfo}>
+                        <h3 className={styles.productName}>{product.name}</h3>
+                        <span className={styles.productPrice}>Rs. {product.price}</span>
+                      </div>
+                    </div>
+
+                    <div className={styles.cardBack}>
+                      <h3 className={styles.fullProductName}>{product.name}</h3>
+                      <p className={styles.productDescription}>{product.description}</p>
                       <span className={styles.productPrice}>Rs. {product.price}</span>
+                      <span className={styles.viewDetailsButton}>View Details</span>
                     </div>
                   </div>
-
-                  <div className={styles.cardBack}>
-                    <h3 className={styles.fullProductName}>{product.name}</h3>
-                    <p className={styles.productDescription}>{product.description}</p>
-                    <span className={styles.productPrice}>Rs. {product.price}</span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <p className={styles.noProducts}>No products match your filters. Try adjusting your selection.</p>
+          )}
         </motion.div>
       </div>
     </>
