@@ -6,6 +6,9 @@ User = get_user_model()
 from .models import Category, Product, Profile, Cart, CartItem, Order, OrderItem
 from strawberry.tools import merge_types
 from authentication.schema import AuthQuery, AuthMutation
+from strawberry.types import Info
+from api.models import Order
+from api.utils.email import send_notification_email
 
 @strawberry.type
 class CategoryType:
@@ -345,8 +348,38 @@ class Mutation:
             phone_number=profile.phone_number,
             image=profile.image.url if profile.image else None
         )
+    
+
+    @strawberry.mutation
+    def notify_order(self, info: Info, order_id: int) -> str:
+        try:
+            order = Order.objects.get(id=order_id)
+            user_profile = order.user  # Profile model
+            email = user_profile.email
+            name = user_profile.first_name
+
+            subject = f"Order #{order.id} Confirmation"
+            message = (
+                f"Hello {name},\n\n"
+                f"Thank you for your order!\n\n"
+                f"Order ID: {order.id}\n"
+                f"Total: ₹{order.total_price}\n"
+                f"Status: {order.status}\n"
+                f"Placed on: {order.created_at.strftime('%Y-%m-%d %H:%M')}\n\n"
+                f"We'll notify you when it's shipped!"
+            )
+
+            send_notification_email(subject, message, email)
+            return "Email sent successfully"
+        except Order.DoesNotExist:
+            return "Order not found"
+        except Exception as e:
+            return f"Error: {str(e)}"
 
 MergedQuery = merge_types("MergedQuery", (AuthQuery, Query))
 MergedMutation = merge_types("MergedMutation", (AuthMutation, Mutation))
 
 schema = strawberry.Schema(query=MergedQuery, mutation=MergedMutation)
+
+
+
