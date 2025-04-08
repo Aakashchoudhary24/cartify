@@ -6,6 +6,7 @@ import { request } from 'graphql-request';
 import { gql } from "graphql-request";
 import { getCSRFToken } from '../../hooks'; // Import the getCSRFToken function from hooks.js
 import { useRouter } from 'next/navigation';
+import "../styles/orders.css"
 
 const ORDERS_QUERY = gql`
   query Orders($userId: Int!) {
@@ -605,11 +606,11 @@ const ProfilePage = () => {
 
               {/* Orders Section */}
               {activeSection === 'orders' && (
-                <div className="bg-[#DCD6F7] rounded-xl overflow-hidden shadow-lg max-w-4xl w-full mx-auto">
-                  <div className="px-8 py-5 bg-[#424874] border-b border-[#A6B1E1]/20">
+                <div className="bg-[#DCD6F7] rounded-xl overflow-hidden shadow-lg max-w-4xl w-full mx-auto orders-container">
+                  <div className="px-6 py-4 bg-[#424874] border-b border-[#A6B1E1]/20">
                     <h3 className="text-xl font-semibold text-white">Orders</h3>
                   </div>
-                  <div className="p-8 flex items-center justify-center min-h-[400px]">
+                  <div className="p-4 flex items-center justify-center min-h-[400px]">
                     {ordersLoading ? (
                       <div className="flex items-center justify-center">
                         <div className="animate-spin rounded-full h-14 w-14 border-b-2 border-[#424874]"></div>
@@ -617,47 +618,51 @@ const ProfilePage = () => {
                     ) : ordersError ? (
                       <p className="text-red-500 text-center">Error fetching orders: {ordersError.message}</p>
                     ) : ordersData && ordersData.orders && ordersData.orders.length > 0 ? (
-                      <div className="space-y-6 w-full">
+                      <div className="space-y-4 w-full">
                         {ordersData.orders.map((order) => (
-                          <div key={order.id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                            <div className="flex justify-between items-center border-b border-gray-100 pb-3 mb-4">
-                              <h4 className="text-lg font-semibold text-[#424874]">Order #{order.id}</h4>
-                              <span className="text-sm bg-[#A6B1E1]/20 text-[#424874] px-3 py-1 rounded-full">
+                          <div key={order.id} className="order-card">
+                            <div className="order-header">
+                              <h4 className="order-id">Order #{order.id}</h4>
+                              <span className="order-date">
                                 {formatOrderDate(order.createdAt)}
                               </span>
                             </div>
-                            <ul className="mt-3 space-y-4">
+                            <div className="order-items">
                               {order.orderItems.map((item) => (
-                                <li key={item.id} className="flex items-center space-x-6 p-2 hover:bg-[#F8F7FD] rounded-lg transition-colors">
+                                <div key={item.id} className="order-item">
                                   <img 
                                     src={item.product.image1 || "/images/placeholder.jpg"} 
                                     alt={item.product.name} 
-                                    className="w-20 h-20 object-cover rounded-lg shadow-sm" 
+                                    className="product-image" 
                                   />
-                                  <div className="flex-1">
-                                    <p className="text-[#424874] font-medium text-lg">{item.product.name}</p>
-                                    <div className="flex justify-between mt-2">
-                                      <p className="text-[#424874]">Quantity: <span className="font-medium">{item.quantity}</span></p>
-                                      <p className="text-[#424874]">Price: <span className="font-medium">₹{item.product.price}</span></p>
+                                  <div className="product-details">
+                                    <p className="product-name">{item.product.name}</p>
+                                    <div className="product-meta">
+                                      <div>Quantity: <span className="font-medium">{item.quantity}</span></div>
+                                      <div>Price: <span className="font-medium">₹{item.product.price}</span></div>
                                     </div>
                                   </div>
-                                </li>
+                                </div>
                               ))}
-                            </ul>
-                            <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
-                              <p className="text-[#424874] font-medium">Total: ₹{order.orderItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)}</p>
+                            </div>
+                            <div className="order-total">
+                              <span>Total:</span>
+                              <span>₹{order.orderItems.reduce((sum, item) => 
+                                sum + (item.product.price * item.quantity), 0)}
+                              </span>
                             </div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center p-8 w-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 mx-auto text-[#424874]/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="empty-orders">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="empty-orders-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                         </svg>
-                        <p className="mt-6 text-[#424874] text-lg">No orders found</p>
-                        <p className="mt-2 text-[#424874]/70">Your order history will appear here once you make a purchase</p>
-                        <button className="mt-6 px-6 py-3 bg-[#424874] text-white rounded-lg hover:bg-[#383d65] transition-colors" onClick={() => router.push('/products')}>
+                        <p className="empty-message">No orders found</p>
+                        <p className="empty-submessage">Your order history will appear here once you make a purchase</p>
+                        <button className="mt-4 px-6 py-2 bg-[#424874] text-white rounded-lg hover:bg-[#383d65] transition-colors" 
+                          onClick={() => router.push('/products')}>
                           Browse Products
                         </button>
                       </div>

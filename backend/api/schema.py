@@ -144,7 +144,7 @@ class Query:
                         quantity=item.quantity,
                         price=item.price
                     )
-                    for item in order.order_items.all()  # ✅ Use correct related_name
+                    for item in order.order_items.all()  #  Use correct related_name
                 ]
             )
             for order in orders
@@ -191,7 +191,7 @@ class Mutation:
 
         total_price = sum(item.product.price * item.quantity for item in cart.items.all())
 
-        # ✅ Create the Order
+        # Create the Order
         order = Order.objects.create(user=profile, total_price=total_price, status="Pending")
 
         order_items = []
@@ -204,7 +204,7 @@ class Mutation:
             )
             order_items.append(order_item)
 
-        # ✅ Clear the cart after placing the order
+        # Clear the cart after placing the order
         cart.items.all().delete()
 
         return OrderType(

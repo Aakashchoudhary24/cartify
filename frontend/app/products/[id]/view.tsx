@@ -32,14 +32,13 @@ export default function ProductPage() {
   const image1 = searchParams.get("image1") || "/default.jpg";
   const image2 = searchParams.get("image2") || null;
 
-
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [fadeIn, setFadeIn] = useState(true);
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ message: "", type: "" });
 
-  const images = [image1, image2].filter((img): img is string => Boolean(img));
+  const images = [image1, image2].filter((img) => Boolean(img));
 
   useEffect(() => {
     if (images.length > 1) {
@@ -76,7 +75,7 @@ export default function ProductPage() {
     setQuantity(quantity + 1);
   };
 
-  const handleThumbnailClick = (index: number) => {
+  const handleThumbnailClick = (index) => {
     if (currentImageIndex !== index) {
       setFadeIn(false);
       setTimeout(() => {
@@ -128,8 +127,6 @@ export default function ProductPage() {
       setLoading(false);
     }
   };
-
-  console.log("Product ID:", id);
 
   return (
     <div className={styles.pageWrapper}>
