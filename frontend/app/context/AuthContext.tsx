@@ -2,8 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 
-// Define types for our auth state
 interface AuthUser {
   id: string;
   username: string;
@@ -13,18 +13,16 @@ interface AuthUser {
 interface AuthState {
   user: AuthUser | null;
   accessToken: string | null;
-  refreshToken: string | null;  
+  refreshToken: string | null;
   isAuthenticated: boolean;
 }
 
-// Define the context interface
 interface AuthContextType extends AuthState {
   login: (userData: AuthUser, accessToken: string, refreshToken: string) => void;
   logout: () => void;
   updateTokens: (accessToken: string, refreshToken: string) => void;
 }
 
-// Create the auth context with default values
 const AuthContext = createContext<AuthContextType>({
   user: null,
   accessToken: null,
@@ -35,7 +33,6 @@ const AuthContext = createContext<AuthContextType>({
   updateTokens: () => {},
 });
 
-// Create a provider component
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
@@ -43,13 +40,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     refreshToken: null,
     isAuthenticated: false,
   });
+
   const router = useRouter();
 
-  // Initialize auth state from localStorage on component mount
   useEffect(() => {
-    const storedAccessToken = localStorage.getItem('accessToken');
-    const storedRefreshToken = localStorage.getItem('refreshToken');
-    const storedUser = localStorage.getItem('user');
+    const storedAccessToken = Cookies.get('accessToken');
+    const storedRefreshToken = Cookies.get('refreshToken');
+    const storedUser = Cookies.get('user');
 
     if (storedAccessToken && storedRefreshToken && storedUser) {
       try {
@@ -61,17 +58,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           isAuthenticated: true,
         });
       } catch (error) {
-        // If parsing fails, clear localStorage
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
+        // Clear corrupted cookies
+        Cookies.remove('accessToken');
+        Cookies.remove('refreshToken');
+        Cookies.remove('user');
       }
     }
   }, []);
 
-  // Handle login
   const login = (userData: AuthUser, accessToken: string, refreshToken: string) => {
-    // Update state
     setAuthState({
       user: userData,
       accessToken,
@@ -79,15 +74,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isAuthenticated: true,
     });
 
-    // Store in localStorage
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-    localStorage.setItem('user', JSON.stringify(userData));
+    Cookies.set('accessToken', accessToken, { expires: 1 }); // 1 day
+    Cookies.set('refreshToken', refreshToken, { expires: 7 }); // 7 days
+    Cookies.set('user', JSON.stringify(userData), { expires: 7 });
   };
 
-  // Handle logout
   const logout = () => {
-    // Clear state
     setAuthState({
       user: null,
       accessToken: null,
@@ -95,16 +87,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isAuthenticated: false,
     });
 
-    // Clear localStorage
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user');
+    Cookies.remove('accessToken');
+    Cookies.remove('refreshToken');
+    Cookies.remove('user');
 
-    // Redirect to login
     router.push('/login');
   };
 
-  // Update tokens (useful for token refresh)
   const updateTokens = (accessToken: string, refreshToken: string) => {
     setAuthState(prev => ({
       ...prev,
@@ -112,8 +101,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       refreshToken,
     }));
 
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+    Cookies.set('accessToken', accessToken, { expires: 1 });
+    Cookies.set('refreshToken', refreshToken, { expires: 7 });
   };
 
   return (
@@ -130,5 +119,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Custom hook for using the auth context
 export const useAuth = () => useContext(AuthContext);
