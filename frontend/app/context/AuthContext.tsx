@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
 
 interface AuthUser {
   id: string;
@@ -33,6 +32,21 @@ const AuthContext = createContext<AuthContextType>({
   updateTokens: () => {},
 });
 
+const getCookie = (name: string) => {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+};
+
+const setCookie = (name: string, value: string, days: number) => {
+  const expires = new Date();
+  expires.setDate(expires.getDate() + days);
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; expires=${expires.toUTCString()}`;
+};
+
+const deleteCookie = (name: string) => {
+  document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
@@ -44,9 +58,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const storedAccessToken = Cookies.get('accessToken');
-    const storedRefreshToken = Cookies.get('refreshToken');
-    const storedUser = Cookies.get('user');
+    const storedAccessToken = getCookie('accessToken');
+    const storedRefreshToken = getCookie('refreshToken');
+    const storedUser = getCookie('user');
 
     if (storedAccessToken && storedRefreshToken && storedUser) {
       try {
@@ -58,10 +72,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           isAuthenticated: true,
         });
       } catch (error) {
-        // Clear corrupted cookies
-        Cookies.remove('accessToken');
-        Cookies.remove('refreshToken');
-        Cookies.remove('user');
+        deleteCookie('accessToken');
+        deleteCookie('refreshToken');
+        deleteCookie('user');
       }
     }
   }, []);
@@ -74,9 +87,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isAuthenticated: true,
     });
 
-    Cookies.set('accessToken', accessToken, { expires: 1 }); // 1 day
-    Cookies.set('refreshToken', refreshToken, { expires: 7 }); // 7 days
-    Cookies.set('user', JSON.stringify(userData), { expires: 7 });
+    setCookie('accessToken', accessToken, 1);
+    setCookie('refreshToken', refreshToken, 7);
+    setCookie('user', JSON.stringify(userData), 7);
   };
 
   const logout = () => {
@@ -87,9 +100,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isAuthenticated: false,
     });
 
-    Cookies.remove('accessToken');
-    Cookies.remove('refreshToken');
-    Cookies.remove('user');
+    deleteCookie('accessToken');
+    deleteCookie('refreshToken');
+    deleteCookie('user');
 
     router.push('/login');
   };
@@ -101,8 +114,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       refreshToken,
     }));
 
-    Cookies.set('accessToken', accessToken, { expires: 1 });
-    Cookies.set('refreshToken', refreshToken, { expires: 7 });
+    setCookie('accessToken', accessToken, 1);
+    setCookie('refreshToken', refreshToken, 7);
   };
 
   return (
