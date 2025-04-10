@@ -146,21 +146,7 @@ const ProfilePage = () => {
 
   // Fetch profile data
   useEffect(() => {
-<<<<<<< HEAD
   async function fetchProfile() {
-    if (!user || !user.id) {
-      setProfileLoading(false);
-      return;
-    }
-    
-    const userId = parseInt(user.id);
-    
-    if (isNaN(userId)) {
-      setProfileError(new Error("Invalid user ID"));
-      setProfileLoading(false);
-      return;
-=======
-    async function fetchProfile() {
       if (!user || !user.id) {
         setProfileLoading(false);
         return;
@@ -174,19 +160,19 @@ const ProfilePage = () => {
         return;
       }
 
-      setProfileLoading(true);
-      setProfileError(null);
+    setProfileLoading(true);
+    setProfileError(null);
 
-      try {
-        const endpoint = "http://127.0.0.1:8000/graphql/";
-        const headers = { 'X-CSRFToken': getCSRFToken() };
-        
-        const result = await request<ProfileResponse>(
-          endpoint, 
-          PROFILE_QUERY, 
-          { userId }, 
-          headers
-        );
+    try {
+      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const headers = { 'X-CSRFToken': getCSRFToken() };
+      
+      const result = await request(
+        endpoint, 
+        PROFILE_QUERY, 
+        { userId }, 
+        headers
+      );
       
       // Update profile state with fetched data
       if (result.profile) {
@@ -214,7 +200,7 @@ const ProfilePage = () => {
       } finally {
         setProfileLoading(false);
       }
->>>>>>> c0e39d5 (penultimate commit before deployment, an error yet to fix)
+
     }
 
     setProfileLoading(true);
@@ -256,10 +242,15 @@ const ProfilePage = () => {
       console.error("Error fetching profile:", err);
       setProfileError(err);
     } finally {
+      console.error("Error fetching profile:", err);
+      setProfileError(err);
+    } finally {
       setProfileLoading(false);
     }
   }
 
+  fetchProfile();
+}, [user]);
   fetchProfile();
 }, [user]);
 
@@ -356,6 +347,7 @@ const ProfilePage = () => {
       reader.onloadend = () => {
         // Store the base64 data which will be sent to the backend
         setProfileImage(reader.result);
+        setProfileImage(reader.result);
         
         // Optionally store the filename for reference
         setProfile(prev => ({
@@ -364,6 +356,18 @@ const ProfilePage = () => {
         }));
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const decodeImageUrl = (imageUrl) => {
+    if (!imageUrl) return null;
+    
+    try {
+      // Construct the full URL to the image
+      return `http://127.0.0.1:8000/${imageUrl}`;
+    } catch (error) {
+      console.error("Error creating image URL:", error);
+      return null;
     }
   };
 
@@ -611,7 +615,11 @@ const ProfilePage = () => {
                                   e.target.onerror = null; 
                                   e.target.style.display = 'none';
                                   
+                                  e.target.onerror = null; 
+                                  e.target.style.display = 'none';
+                                  
                                   // Show initials instead
+                                  const container = e.target.parentNode;
                                   const container = e.target.parentNode;
                                   const initials = document.createElement('span');
                                   initials.className = "text-3xl font-bold text-white";
