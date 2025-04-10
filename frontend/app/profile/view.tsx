@@ -145,7 +145,7 @@ const ProfilePage = () => {
 
   // Fetch profile data
   useEffect(() => {
-    async function fetchProfile() {
+  async function fetchProfile() {
       if (!user || !user.id) {
         setProfileLoading(false);
         return;
@@ -172,33 +172,42 @@ const ProfilePage = () => {
           { userId }, 
           headers
         );
+      
+      // Update profile state with fetched data
+      if (result.profile) {
+        setProfile({
+          firstName: result.profile.firstName || '',
+          lastName: result.profile.lastName || '',
+          email: result.profile.email || '',
+          phone: result.profile.phoneNumber || '',
+          username: result.profile.user || '',
+          address: result.profile.address || '',
+        });
         
-        // Update profile state with fetched data
-        if (result.profile) {
-          setProfile({
-            firstName: result.profile.firstName || '',
-            lastName: result.profile.lastName || '',
-            email: result.profile.email || '',
-            phone: result.profile.phoneNumber || '',
-            username: result.profile.user || '',
-            address: result.profile.address || '',
-          });
+        // Process the image
+        if (result.profile.image) {
+          // Construct the full URL to the profile image
+          const imageUrl = result.profile.image.startsWith('/') 
+            ? `http://127.0.0.1:8000/${result.profile.image.substring(1)}` 
+            : `http://127.0.0.1:8000/${result.profile.image}`;
           
-          // Set profile image if available
-          if (result.profile.image) {
-            setProfileImage(result.profile.image);
-          }
+          setProfileImage(imageUrl);
         }
-      } catch {
-        console.error("Error fetching profile:");
-        setProfileError("Error fetching profile:");
-      } finally {
-        setProfileLoading(false);
       }
+    } catch (err) {
+        console.error("Error fetching profile:", err);
+        if (err instanceof Error) {
+          setProfileError(err.message); 
+        } else {
+          setProfileError("An unexpected error occurred"); 
+        }
+      } finally {
+      setProfileLoading(false);
     }
+  }
 
-    fetchProfile();
-  }, [user]);
+  fetchProfile();
+}, [user]);
 
   // Fetch orders data
   useEffect(() => {
@@ -281,6 +290,37 @@ const ProfilePage = () => {
     }
   };
 
+  const handleImageUpload = (e:React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create a descriptive filename using username or user ID
+      const fileExt = file.name.split('.').pop();
+      if (!user) {
+        console.error("User not available");
+        return;
+      }
+      const filename = `profile_${profile.username || user.id}.${fileExt}`;
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Store the base64 data which will be sent to the backend
+        const result = reader.result;
+        if (typeof result === 'string') {
+          setProfileImage(result);
+        } else {
+          console.error("Failed to convert file to base64 string.");
+        }
+        
+        // Optionally store the filename for reference
+        setProfile(prev => ({
+          ...prev,
+          imageName: filename
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSaveProfile = async () => {
     if (!user || !user.id) {
       setUpdateError("User not authenticated");
@@ -311,6 +351,8 @@ const ProfilePage = () => {
         image: profileImage // This should be a URL or base64 string
       };
 
+      console.log("Sending image data:", profileImage ? "Image data present" : "No image data");
+
       const result = await request(
         endpoint,
         EDIT_PROFILE_MUTATION,
@@ -321,9 +363,9 @@ const ProfilePage = () => {
       console.log("Profile updated successfully:", result);
       setUpdateSuccess(true);
       setIsEditing(false);
-    } catch {
-      console.error("Error updating profile:");
-      setUpdateError("Error updating profile:");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setUpdateError(`Error updating profile: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setUpdateLoading(false);
     }
@@ -365,9 +407,7 @@ const ProfilePage = () => {
       if (result.deleteProfile.success) {
         // Logout the user after successful deletion
         logout();
-        // Typically redirect here, but for now let's just show a message
         alert("Your account has been deleted successfully.");
-        // You might want to redirect to home page
         window.location.href = "/";
       } else {
         throw new Error("Failed to delete account");
@@ -502,7 +542,25 @@ const ProfilePage = () => {
                         <div className="relative group">
                           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#A6B1E1] to-[#424874] flex items-center justify-center overflow-hidden">
                             {profileImage ? (
-                              <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                              <img 
+                                src={profileImage} 
+                                alt="Profile" 
+                                className="w-full h-full object-cover" 
+                                onError={(e) => {
+                                  const img = e.target as HTMLImageElement;
+                                  console.error("Error loading profile image:", profileImage);
+                                  img.onerror = null; 
+                                  img.style.display = 'none';
+
+                                  // Show initials instead
+                                  const container = img.parentNode as HTMLElement; 
+                                  const initials = document.createElement('span');
+                                  initials.className = "text-3xl font-bold text-white";
+                                  initials.textContent = profile.firstName && profile.lastName ? 
+                                    `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}` : "";
+                                  container.appendChild(initials);
+                                }}
+                              />
                             ) : (
                               <span className="text-3xl font-bold text-white">
                                 {profile.firstName && profile.lastName ? 
@@ -520,6 +578,7 @@ const ProfilePage = () => {
                                   type="file"
                                   accept="image/*"
                                   className="hidden"
+                                  onChange={handleImageUpload}
                                 />
                               </label>
                             </div>
