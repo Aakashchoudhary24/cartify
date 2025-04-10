@@ -2,9 +2,9 @@ import strawberry
 from typing import List, Optional
 from datetime import datetime
 import os
-import uuid  # Add this import
-import base64  # Add this import too for handling base64 images
-from django.conf import settings  # Make sure this is imported
+import uuid
+import base64
+from django.conf import settings
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from .models import Category, Product, Profile, Cart, CartItem, Order, OrderItem
@@ -319,6 +319,10 @@ class Mutation:
     def edit_profile(self, user_id: int, username: Optional[str] = None, address: Optional[str] = None, 
                     first_name: Optional[str] = None, last_name: Optional[str] = None, 
                     phone_number: Optional[str] = None, image: Optional[str] = None) -> ProfileType:
+    
+    def edit_profile(self, user_id: int, username: Optional[str] = None, address: Optional[str] = None, 
+                    first_name: Optional[str] = None, last_name: Optional[str] = None, 
+                    phone_number: Optional[str] = None, image: Optional[str] = None) -> ProfileType:
         profile = Profile.objects.filter(user__id=user_id).first()
         user = User.objects.filter(id=user_id).first()
 
@@ -350,9 +354,7 @@ class Mutation:
             # Generate a unique filename
             filename = f"{uuid.uuid4()}.{ext}"
             
-            # # Create the directory if it doesn't exist
-            # profile_images_dir = os.path.join(settings.MEDIA_ROOT, 'profileimage')
-            # os.makedirs(profile_images_dir, exist_ok=True)
+            profile_images_dir = os.path.join(settings.MEDIA_ROOT, 'profileimage')
             
             # Save the image file
             file_path = os.path.join(profile_images_dir, filename)
@@ -369,6 +371,11 @@ class Mutation:
         if profile.image:
             image_url = profile.image
 
+        # Get the full URL for the image
+        image_url = None
+        if profile.image:
+            image_url = profile.image
+
         return ProfileType(
             id=profile.user.id,
             user=profile.user.username,
@@ -377,6 +384,7 @@ class Mutation:
             last_name=profile.last_name,
             email=profile.email,
             phone_number=profile.phone_number,
+            image=image_url
             image=image_url
         )
     

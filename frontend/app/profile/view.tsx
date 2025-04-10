@@ -187,22 +187,26 @@ const ProfilePage = () => {
           { userId }, 
           headers
         );
+      
+      // Update profile state with fetched data
+      if (result.profile) {
+        setProfile({
+          firstName: result.profile.firstName || '',
+          lastName: result.profile.lastName || '',
+          email: result.profile.email || '',
+          phone: result.profile.phoneNumber || '',
+          username: result.profile.user || '',
+          address: result.profile.address || '',
+        });
         
-        // Update profile state with fetched data
-        if (result.profile) {
-          setProfile({
-            firstName: result.profile.firstName || '',
-            lastName: result.profile.lastName || '',
-            email: result.profile.email || '',
-            phone: result.profile.phoneNumber || '',
-            username: result.profile.user || '',
-            address: result.profile.address || '',
-          });
+        // Process the image
+        if (result.profile.image) {
+          // Construct the full URL to the profile image
+          const imageUrl = result.profile.image.startsWith('/') 
+            ? `http://127.0.0.1:8000/${result.profile.image.substring(1)}` 
+            : `http://127.0.0.1:8000/${result.profile.image}`;
           
-          // Set profile image if available
-          if (result.profile.image) {
-            setProfileImage(result.profile.image);
-          }
+          setProfileImage(imageUrl);
         }
       } catch {
         console.error("Error fetching profile:");
@@ -407,6 +411,8 @@ const ProfilePage = () => {
         image: profileImage // This should be a URL or base64 string
       };
 
+      console.log("Sending image data:", profileImage ? "Image data present" : "No image data");
+
       const result = await request(
         endpoint,
         EDIT_PROFILE_MUTATION,
@@ -417,9 +423,9 @@ const ProfilePage = () => {
       console.log("Profile updated successfully:", result);
       setUpdateSuccess(true);
       setIsEditing(false);
-    } catch {
-      console.error("Error updating profile:");
-      setUpdateError("Error updating profile:");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setUpdateError(`Error updating profile: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setUpdateLoading(false);
     }
@@ -461,9 +467,7 @@ const ProfilePage = () => {
       if (result.deleteProfile.success) {
         // Logout the user after successful deletion
         logout();
-        // Typically redirect here, but for now let's just show a message
         alert("Your account has been deleted successfully.");
-        // You might want to redirect to home page
         window.location.href = "/";
       } else {
         throw new Error("Failed to delete account");
@@ -633,6 +637,7 @@ const ProfilePage = () => {
                                   type="file"
                                   accept="image/*"
                                   className="hidden"
+                                  onChange={handleImageUpload}
                                 />
                               </label>
                             </div>
