@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Carousel from "../carousel/page";
 import "../styles/cart.css";
 import { getCSRFToken } from "../../hooks";
@@ -107,8 +107,6 @@ const PLACE_ORDER_MUTATION = gql`
 const CartPage = () => {
   const { user, loading: authLoading } = useAuth();
   const [userId, setUserId] = useState<number | null>(null);
-  const [isClientReady, setIsClientReady] = useState(false);
-  
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<boolean[]>([]);
   const [donation, setDonation] = useState<number>(0);
@@ -134,13 +132,10 @@ const CartPage = () => {
     phoneNumber: "",
     email: ""
   });
-  const [profileLoading, setProfileLoading] = useState(false);
 
   // Add a function to fetch profile data
   const fetchProfileData = useCallback(async () => {
     if (!userId) return;
-    
-    setProfileLoading(true);
     
     try {
       const endpoint = "http://127.0.0.1:8000/graphql/";
@@ -159,8 +154,6 @@ const CartPage = () => {
       }
     } catch (error) {
       console.error("Failed to fetch profile data:", error);
-    } finally {
-      setProfileLoading(false);
     }
   }, [userId]);
 
@@ -171,10 +164,6 @@ const CartPage = () => {
     }
   }, [userId, fetchProfileData]);
 
-  // Set client-side rendering flag
-  useEffect(() => {
-    setIsClientReady(true);
-  }, []);
 
   // Update userId when user changes
   useEffect(() => {
@@ -253,7 +242,6 @@ const CartPage = () => {
     
     const newQuantity = Math.max(1, cartItems[index].quantity + change);
     const productId = cartItems[index].product.id;
-    const productName = cartItems[index].product.name;
     
     if (newQuantity === cartItems[index].quantity) return;
     
@@ -269,17 +257,6 @@ const CartPage = () => {
         };
         return newItems;
       });
-      
-      const endpoint = "http://127.0.0.1:8000/graphql/";
-      const headers = { 'X-CSRFToken': getCSRFToken() };
-      
-      const variables = {
-        userId,
-        productId: productId,
-        quantity: newQuantity
-      };
-      
-      const result = await request(endpoint, UPDATE_CART_PRODUCT_MUTATION, variables, headers);
       
       await fetchCartData();
       
@@ -316,16 +293,6 @@ const CartPage = () => {
     setRemoveLoading(index);
     
     try {
-      const endpoint = "http://127.0.0.1:8000/graphql/";
-      const headers = { 'X-CSRFToken': getCSRFToken() };
-      
-      const variables = {
-        userId,
-        productId: productId
-      };
-      
-      const result = await request(endpoint, DELETE_PRODUCT_MUTATION, variables, headers);
-      
       setCartItems((prevItems) => prevItems.filter((_, i) => i !== index));
       setSelectedItems((prevSelected) => prevSelected.filter((_, i) => i !== index));
       
@@ -414,18 +381,6 @@ const CartPage = () => {
       setOrderLoading(false);
     }
   };
-
-  // Wait for client-side rendering
-  if (!isClientReady) {
-    return (
-      <>
-        <Navbar />
-        <div className="cart-container">
-          <p className="text-center text-gray-500">Loading...</p>
-        </div>
-      </>
-    );
-  }
 
   // Show loading state
   if (isLoading || authLoading) {
