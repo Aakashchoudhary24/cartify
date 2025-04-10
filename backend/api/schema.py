@@ -1,6 +1,10 @@
 import strawberry
 from typing import List, Optional
 from datetime import datetime
+import os
+import uuid  # Add this import
+import base64  # Add this import too for handling base64 images
+from django.conf import settings  # Make sure this is imported
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from .models import Category, Product, Profile, Cart, CartItem, Order, OrderItem
@@ -311,7 +315,10 @@ class Mutation:
         return DeleteOrderResponse(success=True, message="Profile and user deleted successfully.")
 
     @strawberry.mutation
-    def edit_profile(self, user_id: int, username: Optional[str] = None, address: Optional[str] = None, first_name: Optional[str] = None, last_name: Optional[str] = None, phone_number: Optional[str] = None, image: Optional[str] = None) -> ProfileType:
+    
+    def edit_profile(self, user_id: int, username: Optional[str] = None, address: Optional[str] = None, 
+                    first_name: Optional[str] = None, last_name: Optional[str] = None, 
+                    phone_number: Optional[str] = None, image: Optional[str] = None) -> ProfileType:
         profile = Profile.objects.filter(user__id=user_id).first()
         user = User.objects.filter(id=user_id).first()
 
@@ -333,10 +340,34 @@ class Mutation:
             profile.last_name = last_name
         if phone_number is not None:
             profile.phone_number = phone_number
-        if image is not None:
-            profile.image = image
+        
+        # Handle image upload
+        if image is not None and image.startswith('data:image'):
+            # Extract file format and base64 data
+            format, imgstr = image.split(';base64,')
+            ext = format.split('/')[-1]
+            
+            # Generate a unique filename
+            filename = f"{uuid.uuid4()}.{ext}"
+            
+            # # Create the directory if it doesn't exist
+            # profile_images_dir = os.path.join(settings.MEDIA_ROOT, 'profileimage')
+            # os.makedirs(profile_images_dir, exist_ok=True)
+            
+            # Save the image file
+            file_path = os.path.join(profile_images_dir, filename)
+            with open(file_path, 'wb') as f:
+                f.write(base64.b64decode(imgstr))
+            
+            # Save path relative to MEDIA_ROOT
+            profile.image = f'profileimage/{filename}'
 
         profile.save()
+
+        # Get the full URL for the image
+        image_url = None
+        if profile.image:
+            image_url = profile.image
 
         return ProfileType(
             id=profile.user.id,
@@ -346,7 +377,7 @@ class Mutation:
             last_name=profile.last_name,
             email=profile.email,
             phone_number=profile.phone_number,
-            image=profile.image.url if profile.image else None
+            image=image_url
         )
     
 

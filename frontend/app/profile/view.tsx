@@ -108,60 +108,65 @@ const ProfilePage = () => {
 
   // Fetch profile data
   useEffect(() => {
-    async function fetchProfile() {
-      if (!user || !user.id) {
-        setProfileLoading(false);
-        return;
-      }
-      
-      const userId = parseInt(user.id);
-      
-      if (isNaN(userId)) {
-        setProfileError(new Error("Invalid user ID"));
-        setProfileLoading(false);
-        return;
-      }
-
-      setProfileLoading(true);
-      setProfileError(null);
-
-      try {
-        const endpoint = "http://127.0.0.1:8000/graphql/";
-        const headers = { 'X-CSRFToken': getCSRFToken() };
-        
-        const result = await request(
-          endpoint, 
-          PROFILE_QUERY, 
-          { userId }, 
-          headers
-        );
-        
-        // Update profile state with fetched data
-        if (result.profile) {
-          setProfile({
-            firstName: result.profile.firstName || '',
-            lastName: result.profile.lastName || '',
-            email: result.profile.email || '',
-            phone: result.profile.phoneNumber || '',
-            username: result.profile.user || '',
-            address: result.profile.address || '',
-          });
-          
-          // Set profile image if available
-          if (result.profile.image) {
-            setProfileImage(result.profile.image);
-          }
-        }
-      } catch (err) {
-        console.error("Error fetching profile:", err);
-        setProfileError(err);
-      } finally {
-        setProfileLoading(false);
-      }
+  async function fetchProfile() {
+    if (!user || !user.id) {
+      setProfileLoading(false);
+      return;
+    }
+    
+    const userId = parseInt(user.id);
+    
+    if (isNaN(userId)) {
+      setProfileError(new Error("Invalid user ID"));
+      setProfileLoading(false);
+      return;
     }
 
-    fetchProfile();
-  }, [user]);
+    setProfileLoading(true);
+    setProfileError(null);
+
+    try {
+      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const headers = { 'X-CSRFToken': getCSRFToken() };
+      
+      const result = await request(
+        endpoint, 
+        PROFILE_QUERY, 
+        { userId }, 
+        headers
+      );
+      
+      // Update profile state with fetched data
+      if (result.profile) {
+        setProfile({
+          firstName: result.profile.firstName || '',
+          lastName: result.profile.lastName || '',
+          email: result.profile.email || '',
+          phone: result.profile.phoneNumber || '',
+          username: result.profile.user || '',
+          address: result.profile.address || '',
+        });
+        
+        // Process the image
+        if (result.profile.image) {
+          // Construct the full URL to the profile image
+          const imageUrl = result.profile.image.startsWith('/') 
+            ? `http://127.0.0.1:8000/${result.profile.image.substring(1)}` 
+            : `http://127.0.0.1:8000/${result.profile.image}`;
+          
+          setProfileImage(imageUrl);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+      setProfileError(err);
+    } finally {
+      setProfileLoading(false);
+    }
+  }
+
+  fetchProfile();
+}, [user]);
 
   // Fetch orders data
   useEffect(() => {
@@ -244,11 +249,34 @@ const ProfilePage = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Create a descriptive filename using username or user ID
+      const fileExt = file.name.split('.').pop();
+      const filename = `profile_${profile.username || user.id}.${fileExt}`;
+      
       const reader = new FileReader();
       reader.onloadend = () => {
+        // Store the base64 data which will be sent to the backend
         setProfileImage(reader.result);
+        
+        // Optionally store the filename for reference
+        setProfile(prev => ({
+          ...prev,
+          imageName: filename
+        }));
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const decodeImageUrl = (imageUrl) => {
+    if (!imageUrl) return null;
+    
+    try {
+      // Construct the full URL to the image
+      return `http://127.0.0.1:8000/${imageUrl}`;
+    } catch (error) {
+      console.error("Error creating image URL:", error);
+      return null;
     }
   };
 
@@ -473,7 +501,24 @@ const ProfilePage = () => {
                         <div className="relative group">
                           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#A6B1E1] to-[#424874] flex items-center justify-center overflow-hidden">
                             {profileImage ? (
-                              <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                              <img 
+                                src={profileImage} 
+                                alt="Profile" 
+                                className="w-full h-full object-cover" 
+                                onError={(e) => {
+                                  console.error("Error loading profile image:", profileImage);
+                                  e.target.onerror = null; 
+                                  e.target.style.display = 'none';
+                                  
+                                  // Show initials instead
+                                  const container = e.target.parentNode;
+                                  const initials = document.createElement('span');
+                                  initials.className = "text-3xl font-bold text-white";
+                                  initials.textContent = profile.firstName && profile.lastName ? 
+                                    `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}` : "";
+                                  container.appendChild(initials);
+                                }}
+                              />
                             ) : (
                               <span className="text-3xl font-bold text-white">
                                 {profile.firstName && profile.lastName ? 
