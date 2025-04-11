@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       accessToken,
       refreshToken,
       isAuthenticated: true,
-      loading: true,
+      loading: false,
     });
 
     setCookie('accessToken', accessToken, 1);
