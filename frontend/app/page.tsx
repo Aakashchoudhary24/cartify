@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Navbar from '../app/components/navbar/page';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import "../styles/Landing.css";
+import "../app/styles/Landing.css";
 
 export default function Home() {
   const router = useRouter();
