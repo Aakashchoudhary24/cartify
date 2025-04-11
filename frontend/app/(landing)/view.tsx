@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import "../styles/Landing.css";
 
-const CartifyHomepage: React.FC = () => {
+export default function CartifyHomepage() {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
 
@@ -119,5 +119,3 @@ const CartifyHomepage: React.FC = () => {
     </div>
   );
 };
-
-export default CartifyHomepage;
