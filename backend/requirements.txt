@@ -4,6 +4,7 @@ Django==5.1.6
 django-choices-field==2.3.0
 django-cors-headers==4.7.0
 graphql-core==3.2.6
+gunicorn==23.0.0
 iniconfig==2.0.0
 packaging==24.2
 pillow==11.1.0
