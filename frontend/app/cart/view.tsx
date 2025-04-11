@@ -32,6 +32,35 @@ interface OrderResponse {
   };
 }
 
+interface ProfileResponse {
+  profile: {
+    address: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    email: string;
+  };
+}
+
+interface CartResponse {
+  cart: {
+    items: {
+      product: {
+        id: number;
+        name: string;
+        price: number;
+        category: {
+          name: string;
+        };
+        image1: string;
+      };
+      quantity: number;
+      subtotal: number;
+    }[];
+  };
+}
+
+
 const PROFILE_QUERY = gql`
   query GetProfile($userId: Int!) {
     profile(userId: $userId) {
@@ -141,7 +170,7 @@ const CartPage = () => {
       const endpoint = "http://127.0.0.1:8000/graphql/";
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
-      const result = await request(endpoint, PROFILE_QUERY, { userId }, headers);
+      const result = await request<ProfileResponse>(endpoint, PROFILE_QUERY, { userId }, headers);
       
       if (result && result.profile) {
         setProfile({
@@ -188,7 +217,7 @@ const CartPage = () => {
       const endpoint = "http://127.0.0.1:8000/graphql/";
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
-      const result = await request(endpoint, CART_QUERY, { userId }, headers);
+      const result = await request<CartResponse>(endpoint, CART_QUERY, { userId }, headers);
       
       if (result && result.cart && result.cart.items) {
         setCartItems(result.cart.items);
@@ -258,6 +287,17 @@ const CartPage = () => {
         return newItems;
       });
       
+      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const headers = { 'X-CSRFToken': getCSRFToken() };
+      
+      const variables = {
+        userId,
+        productId: productId,
+        quantity: newQuantity
+      };
+      
+      await request(endpoint, UPDATE_CART_PRODUCT_MUTATION, variables, headers);
+      
       await fetchCartData();
       
     } 
@@ -293,6 +333,16 @@ const CartPage = () => {
     setRemoveLoading(index);
     
     try {
+      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const headers = { 'X-CSRFToken': getCSRFToken() };
+      
+      const variables = {
+        userId,
+        productId: productId
+      };
+      
+      await request(endpoint, DELETE_PRODUCT_MUTATION, variables, headers);
+      
       setCartItems((prevItems) => prevItems.filter((_, i) => i !== index));
       setSelectedItems((prevSelected) => prevSelected.filter((_, i) => i !== index));
       

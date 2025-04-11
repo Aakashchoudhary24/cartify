@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import styles from "../../styles/productinfo.module.css";
@@ -30,7 +30,7 @@ export default function ProductPage() {
   const description = searchParams.get("description") || "No description available.";
   const price = searchParams.get("price") || "0";
   const image1 = searchParams.get("image1") || "/default.jpg";
-  const image2 = searchParams.get("image2") || null;
+  const image2 = searchParams.get("image2") || undefined;
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -75,7 +75,7 @@ export default function ProductPage() {
     setQuantity(quantity + 1);
   };
 
-  const handleThumbnailClick = (index) => {
+  const handleThumbnailClick = (index: SetStateAction<number>) => {
     if (currentImageIndex !== index) {
       setFadeIn(false);
       setTimeout(() => {

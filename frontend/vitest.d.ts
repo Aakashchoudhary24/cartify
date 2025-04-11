@@ -9,3 +9,7 @@ declare global {
 
 // Re-export the TestingLibraryMatchers type
 export { TestingLibraryMatchers };
+
+interface ImportMeta {
+  vitest?: typeof import("vitest");
+}

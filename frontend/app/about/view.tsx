@@ -1,13 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import styles from "../styles/about.module.css";
 import Image from "next/image";
 import Navbar from '../components/navbar/page';
 
 export default function AboutPage() {
-    const [showContact, setShowContact] = useState(false);
 
     return (
         <>

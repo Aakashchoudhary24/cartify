@@ -1,6 +1,6 @@
 "use client";
 import Head from "next/head";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import "../styles/carousel.css";
@@ -38,7 +38,6 @@ const CarouselPage = () => {
   const router = useRouter();
   const { data, loading, error } = useFetchGraphQL<{ products: Product[] }>(PRODUCTS_QUERY);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-  const [processedProducts, setProcessedProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     if (data?.products && data.products.length > 0) {
