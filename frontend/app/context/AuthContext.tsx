@@ -14,6 +14,7 @@ interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
+  loading : boolean;
 }
 
 interface AuthContextType extends AuthState {
@@ -28,6 +29,7 @@ const AuthContext = createContext<AuthContextType>({
   accessToken: null,
   refreshToken: null,
   isAuthenticated: false,
+  loading: false,
   login: () => {},
   logout: () => {},
   updateTokens: () => {},
@@ -55,6 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     accessToken: null,
     refreshToken: null,
     isAuthenticated: false,
+    loading: false,
   });
 
   const [loading, setLoading] = useState(true);
@@ -74,8 +77,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           accessToken: storedAccessToken,
           refreshToken: storedRefreshToken,
           isAuthenticated: true,
+          loading: false,
         });
-      } catch (error) {
+      } catch {
         deleteCookie('accessToken');
         deleteCookie('refreshToken');
         deleteCookie('user');
@@ -90,6 +94,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       accessToken,
       refreshToken,
       isAuthenticated: true,
+      loading: true,
     });
 
     setCookie('accessToken', accessToken, 1);
@@ -103,6 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
+      loading: false,
     });
 
     deleteCookie('accessToken');

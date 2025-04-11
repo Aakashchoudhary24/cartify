@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from "../components/navbar/page";
 import { useAuth } from "../../app/context/AuthContext";
 import { request } from 'graphql-request';
@@ -7,6 +7,43 @@ import { gql } from "graphql-request";
 import { getCSRFToken } from '../../hooks'; // Import the getCSRFToken function from hooks.js
 import { useRouter } from 'next/navigation';
 import "../styles/orders.css"
+
+interface ProfileResponse {
+  profile: {
+      user: string;
+      address: string;
+      firstName: string;
+      lastName: string;
+      phoneNumber: string;
+      image?: string; // optional if image might be null
+      email: string;
+  };
+}
+export interface OrderResponse {
+  orders: {
+      id: number;
+      user: string;
+      createdAt: string;
+      orderItems: {
+          id: number;
+          quantity: number;
+          product: {
+              id: number;
+              name: string;
+              price: number;
+              image1: string;
+          };
+      }[];
+  }[];
+}
+
+export interface DeleteProfileResponse {
+  deleteProfile: {
+      success: boolean;
+      message: string;
+  };
+}
+
 
 const ORDERS_QUERY = gql`
   query Orders($userId: Int!) {
@@ -78,14 +115,14 @@ const DELETE_PROFILE_MUTATION = gql`
 const ProfilePage = () => {
   const { user, logout } = useAuth();
   const router = useRouter();
-  const [ordersData, setOrdersData] = useState(null);
+  const [ordersData, setOrdersData] = useState<OrderResponse | null>(null);
   const [ordersLoading, setOrdersLoading] = useState(true);
-  const [ordersError, setOrdersError] = useState(null);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
   
   const [activeSection, setActiveSection] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
-  const [updateError, setUpdateError] = useState(null);
+  const [updateError, setUpdateError] = useState<string | null>(null);
   const [updateSuccess, setUpdateSuccess] = useState(false);
   
   const [profile, setProfile] = useState({
@@ -96,19 +133,20 @@ const ProfilePage = () => {
     username: '',
     address: '',
   });
-  const [profileImage, setProfileImage] = useState(null);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
-  const [profileError, setProfileError] = useState(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
   
   // Delete account states
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [deleteError, setDeleteError] = useState(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [confirmDeleteText, setConfirmDeleteText] = useState('');
   const GRAPHQL_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/graphql/";
 
   // Fetch profile data
   useEffect(() => {
+<<<<<<< HEAD
   async function fetchProfile() {
     if (!user || !user.id) {
       setProfileLoading(false);
@@ -121,6 +159,58 @@ const ProfilePage = () => {
       setProfileError(new Error("Invalid user ID"));
       setProfileLoading(false);
       return;
+=======
+    async function fetchProfile() {
+      if (!user || !user.id) {
+        setProfileLoading(false);
+        return;
+      }
+      
+      const userId = parseInt(user.id);
+      
+      if (isNaN(userId)) {
+        setProfileError("Invalid user ID");
+        setProfileLoading(false);
+        return;
+      }
+
+      setProfileLoading(true);
+      setProfileError(null);
+
+      try {
+        const endpoint = "http://127.0.0.1:8000/graphql/";
+        const headers = { 'X-CSRFToken': getCSRFToken() };
+        
+        const result = await request<ProfileResponse>(
+          endpoint, 
+          PROFILE_QUERY, 
+          { userId }, 
+          headers
+        );
+        
+        // Update profile state with fetched data
+        if (result.profile) {
+          setProfile({
+            firstName: result.profile.firstName || '',
+            lastName: result.profile.lastName || '',
+            email: result.profile.email || '',
+            phone: result.profile.phoneNumber || '',
+            username: result.profile.user || '',
+            address: result.profile.address || '',
+          });
+          
+          // Set profile image if available
+          if (result.profile.image) {
+            setProfileImage(result.profile.image);
+          }
+        }
+      } catch {
+        console.error("Error fetching profile:");
+        setProfileError("Error fetching profile:");
+      } finally {
+        setProfileLoading(false);
+      }
+>>>>>>> c0e39d5 (penultimate commit before deployment, an error yet to fix)
     }
 
     setProfileLoading(true);
@@ -180,7 +270,7 @@ const ProfilePage = () => {
       const userId = parseInt(user.id);
       
       if (isNaN(userId)) {
-        setOrdersError(new Error("Invalid user ID"));
+        setOrdersError("Invalid user ID");
         setOrdersLoading(false);
         return;
       }
@@ -192,7 +282,7 @@ const ProfilePage = () => {
         const endpoint = GRAPHQL_URL;
         const headers = { 'X-CSRFToken': getCSRFToken() };
         
-        const result = await request(
+        const result = await request<OrderResponse>(
           endpoint, 
           ORDERS_QUERY, 
           { userId }, 
@@ -200,9 +290,9 @@ const ProfilePage = () => {
         );
         
         setOrdersData(result);
-      } catch (err) {
-        console.error("Error fetching orders:", err);
-        setOrdersError(err);
+      } catch {
+        console.error("Error fetching orders:");
+        setOrdersError("Error fetching orders:");
       } finally {
         setOrdersLoading(false);
       }
@@ -214,27 +304,30 @@ const ProfilePage = () => {
     }
   }, [user, activeSection]);
 
-  const formatOrderDate = (dateString) => {
-  if (!dateString) return 'Date not available';
+  const formatOrderDate = (dateString: string | number | Date): string => {
+    if (!dateString) return 'Date not available';
   
-  try {
-    const date = new Date(dateString);
-    if (!isNaN(date.getTime())) {
-      return date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      });
+    try {
+      const date = new Date(dateString);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        });
+      }
+      // fallback: stringify the original input
+      return String(dateString);
+    } catch (error) {
+      console.error("Error parsing date:", error);
+      return String(dateString);
     }
-    return dateString; // Just return it as-is if all else fails
-  } 
-  catch (e) {
-    console.error("Error parsing date:", e);
-    return dateString;
-  }
-};
+  };
+  
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
   
     if (name === "phone") {
@@ -247,6 +340,7 @@ const ProfilePage = () => {
     }
   };
 
+<<<<<<< HEAD
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -281,9 +375,11 @@ const ProfilePage = () => {
     }
   };
 
+=======
+>>>>>>> c0e39d5 (penultimate commit before deployment, an error yet to fix)
   const handleSaveProfile = async () => {
     if (!user || !user.id) {
-      setUpdateError(new Error("User not authenticated"));
+      setUpdateError("User not authenticated");
       return;
     }
 
@@ -321,9 +417,9 @@ const ProfilePage = () => {
       console.log("Profile updated successfully:", result);
       setUpdateSuccess(true);
       setIsEditing(false);
-    } catch (err) {
-      console.error("Error updating profile:", err);
-      setUpdateError(err);
+    } catch {
+      console.error("Error updating profile:");
+      setUpdateError("Error updating profile:");
     } finally {
       setUpdateLoading(false);
     }
@@ -332,12 +428,12 @@ const ProfilePage = () => {
   // Handle account deletion
   const handleDeleteAccount = async () => {
     if (!user || !user.id) {
-      setDeleteError(new Error("User not authenticated"));
+      setDeleteError("User not authenticated");
       return;
     }
 
     if (confirmDeleteText !== "DELETE") {
-      setDeleteError(new Error("Please type DELETE to confirm"));
+      setDeleteError("Please type DELETE to confirm");
       return;
     }
 
@@ -353,7 +449,7 @@ const ProfilePage = () => {
       const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
 
-      const result = await request(
+      const result = await request<DeleteProfileResponse>(
         endpoint,
         DELETE_PROFILE_MUTATION,
         { userId },
@@ -370,11 +466,11 @@ const ProfilePage = () => {
         // You might want to redirect to home page
         window.location.href = "/";
       } else {
-        throw new Error(result.deleteProfile.message || "Failed to delete account");
+        throw new Error("Failed to delete account");
       }
-    } catch (err) {
-      console.error("Error deleting profile:", err);
-      setDeleteError(err);
+    } catch {
+      console.error("Error deleting profile:");
+      setDeleteError("Error deleting profile:");
     } finally {
       setDeleteLoading(false);
     }
@@ -480,14 +576,14 @@ const ProfilePage = () => {
                   ) : profileError ? (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                       <strong className="font-bold">Error! </strong>
-                      <span className="block sm:inline">{profileError.message || "Failed to load profile"}</span>
+                      <span className="block sm:inline">{"Failed to load profile"}</span>
                     </div>
                   ) : (
                     <>
                       {updateError && (
                         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                           <strong className="font-bold">Error! </strong>
-                          <span className="block sm:inline">{updateError.message || "Failed to update profile"}</span>
+                          <span className="block sm:inline">{"Failed to update profile"}</span>
                         </div>
                       )}
                       
@@ -536,7 +632,6 @@ const ProfilePage = () => {
                                   id="profile-upload"
                                   type="file"
                                   accept="image/*"
-                                  onChange={handleImageUpload}
                                   className="hidden"
                                 />
                               </label>
@@ -636,7 +731,7 @@ const ProfilePage = () => {
                                   value={profile.address}
                                   onChange={handleInputChange}
                                   className="w-full px-4 py-2.5 rounded-lg bg-[#424874] border border-[#A6B1E1]/30 text-white focus:outline-none focus:ring-2 focus:ring-[#A6B1E1] focus:border-transparent"
-                                  rows="3"
+                                  rows={3}
                                 />
                               ) : (
                                 <p className="text-[#424874]">{profile.address}</p>
@@ -662,7 +757,7 @@ const ProfilePage = () => {
                         <div className="animate-spin rounded-full h-14 w-14 border-b-2 border-[#424874]"></div>
                       </div>
                     ) : ordersError ? (
-                      <p className="text-red-500 text-center">Error fetching orders: {ordersError.message}</p>
+                      <p className="text-red-500 text-center">Error fetching orders.</p>
                     ) : ordersData && ordersData.orders && ordersData.orders.length > 0 ? (
                       <div className="space-y-4 w-full">
                         {ordersData.orders.map((order) => (
@@ -741,7 +836,7 @@ const ProfilePage = () => {
                     {deleteError && (
                       <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
                         <strong className="font-bold">Error! </strong>
-                        <span className="block sm:inline">{deleteError.message || "Failed to delete account"}</span>
+                        <span className="block sm:inline">{"Failed to delete account"}</span>
                       </div>
                     )}
                     
@@ -749,7 +844,7 @@ const ProfilePage = () => {
                       <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
                         <h4 className="text-red-600 font-medium mb-3">Confirm Account Deletion</h4>
                         <p className="text-[#424874] mb-4">
-                          To confirm deletion, please type "DELETE" in the field below:
+                          To confirm deletion, please type &quot;DELETE&quot; in the field below:
                         </p>
                         <input
                           type="text"

@@ -1,10 +1,8 @@
+import {getRandomNumber} from '../support/utils';
+
 const number_of_cart_item = 5;
 const username = "atma";
 const user_password = "atma";
-
-function getRandomNumber(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 describe("Check Cart Items", () => {
   beforeEach(() => {

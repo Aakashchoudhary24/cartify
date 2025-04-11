@@ -33,6 +33,35 @@ interface OrderResponse {
   };
 }
 
+interface ProfileResponse {
+  profile: {
+    address: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    email: string;
+  };
+}
+
+interface CartResponse {
+  cart: {
+    items: {
+      product: {
+        id: number;
+        name: string;
+        price: number;
+        category: {
+          name: string;
+        };
+        image1: string;
+      };
+      quantity: number;
+      subtotal: number;
+    }[];
+  };
+}
+
+
 const PROFILE_QUERY = gql`
   query GetProfile($userId: Int!) {
     profile(userId: $userId) {
@@ -143,7 +172,7 @@ const CartPage = () => {
       const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
-      const result = await request(endpoint, PROFILE_QUERY, { userId }, headers);
+      const result = await request<ProfileResponse>(endpoint, PROFILE_QUERY, { userId }, headers);
       
       if (result && result.profile) {
         setProfile({
@@ -190,7 +219,7 @@ const CartPage = () => {
       const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
-      const result = await request(endpoint, CART_QUERY, { userId }, headers);
+      const result = await request<CartResponse>(endpoint, CART_QUERY, { userId }, headers);
       
       if (result && result.cart && result.cart.items) {
         setCartItems(result.cart.items);

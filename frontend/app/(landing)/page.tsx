@@ -1,11 +1,10 @@
+
 import View from "./view"
 
-function page() {
+export default function Landing() {
   return (
     <div>
       <View/>
     </div>
   )
 }
-
-export default page
