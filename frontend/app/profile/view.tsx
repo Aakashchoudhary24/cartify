@@ -164,7 +164,7 @@ const ProfilePage = () => {
     setProfileError(null);
 
     try {
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       const result = await request(
@@ -189,8 +189,8 @@ const ProfilePage = () => {
         if (result.profile.image) {
           // Construct the full URL to the profile image
           const imageUrl = result.profile.image.startsWith('/') 
-            ? `http://127.0.0.1:8000/${result.profile.image.substring(1)}` 
-            : `http://127.0.0.1:8000/${result.profile.image}`;
+            ? `${GRAPHQL_URL}/${result.profile.image.substring(1)}` 
+            : `${GRAPHQL_URL}/${result.profile.image}`;
           
           setProfileImage(imageUrl);
         }
@@ -364,7 +364,7 @@ const ProfilePage = () => {
     
     try {
       // Construct the full URL to the image
-      return `http://127.0.0.1:8000/${imageUrl}`;
+      return `${GRAPHQL_URL}/${imageUrl}`;
     } catch (error) {
       console.error("Error creating image URL:", error);
       return null;
