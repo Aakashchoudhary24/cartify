@@ -20,6 +20,7 @@ interface AuthContextType extends AuthState {
   login: (userData: AuthUser, accessToken: string, refreshToken: string) => void;
   logout: () => void;
   updateTokens: (accessToken: string, refreshToken: string) => void;
+  loading: boolean; // Added loading property
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -30,6 +31,7 @@ const AuthContext = createContext<AuthContextType>({
   login: () => {},
   logout: () => {},
   updateTokens: () => {},
+  loading: true,
 });
 
 const getCookie = (name: string) => {
@@ -55,6 +57,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isAuthenticated: false,
   });
 
+  const [loading, setLoading] = useState(true);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -77,6 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         deleteCookie('user');
       }
     }
+    setLoading(false); // Set loading to false after initialization
   }, []);
 
   const login = (userData: AuthUser, accessToken: string, refreshToken: string) => {
@@ -125,6 +130,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         logout,
         updateTokens,
+        loading, // Provide loading state in context
       }}
     >
       {children}

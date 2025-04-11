@@ -6,6 +6,7 @@ import { getCSRFToken } from "../../hooks";
 import { gql, request } from "graphql-request";
 import Navbar from '../components/navbar/page';
 import { useAuth } from "../../app/context/AuthContext";
+const GRAPHQL_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/graphql/";
 
 interface Product {
   id: number;
@@ -137,13 +138,14 @@ const CartPage = () => {
   const [profileLoading, setProfileLoading] = useState(false);
 
   // Add a function to fetch profile data
+
   const fetchProfileData = useCallback(async () => {
     if (!userId) return;
     
     setProfileLoading(true);
     
     try {
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       const result = await request(endpoint, PROFILE_QUERY, { userId }, headers);
@@ -196,7 +198,7 @@ const CartPage = () => {
     setError(null);
     
     try {
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       const result = await request(endpoint, CART_QUERY, { userId }, headers);
@@ -269,8 +271,9 @@ const CartPage = () => {
         };
         return newItems;
       });
+
       
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       const variables = {
@@ -316,7 +319,7 @@ const CartPage = () => {
     setRemoveLoading(index);
     
     try {
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       const variables = {
@@ -382,7 +385,7 @@ const CartPage = () => {
     setOrderLoading(true);
     
     try {
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       // Execute the place order mutation

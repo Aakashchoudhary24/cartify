@@ -12,6 +12,7 @@ export default function Register() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const GRAPHQL_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/graphql/";
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -19,7 +20,7 @@ export default function Register() {
         setSuccess('');
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/graphql/', {
+            const response = await fetch(GRAPHQL_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

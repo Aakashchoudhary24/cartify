@@ -9,6 +9,7 @@ import Navbar from "../../../app/components/navbar/page";
 import { request, gql } from "graphql-request";
 import { getCSRFToken } from "../../../hooks"; // Adjust import path as needed
 import { useAuth } from "../../../app/context/AuthContext"; // Import useAuth from AuthContext
+const GRAPHQL_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/graphql/";
 
 // Add to Cart Mutation
 const ADD_TO_CART_MUTATION = gql`
@@ -106,7 +107,7 @@ export default function ProductPage() {
       };
 
       // Use the same endpoint you're using for queries
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
 
       const result = await request(endpoint, ADD_TO_CART_MUTATION, variables, headers);
