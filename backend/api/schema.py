@@ -386,16 +386,24 @@ class Mutation:
             user_profile = order.user  # Profile model
             email = user_profile.email
             name = user_profile.first_name
+            address = user_profile.address
 
             subject = f"Order #{order.id} Confirmation"
             message = (
                 f"Hello {name},\n\n"
-                f"Thank you for your order!\n\n"
+                f"Thank you for your order! We’re excited to let you know that your {order} has been successfully received and is now being processed.\n\n"
+                f"Here are your Order Details\n\n"
+                f"----------------------------------------------------\n\n"
                 f"Order ID: {order.id}\n"
                 f"Total: ₹{order.total_price}\n"
                 f"Status: {order.status}\n"
                 f"Placed on: {order.created_at.strftime('%Y-%m-%d %H:%M')}\n\n"
-                f"We'll notify you when it's shipped!"
+                f"Shipping Address\n"
+                f"{address}\n\n"
+                f"----------------------------------------------------\n\n"
+                f"We'll notify you when it's shipped!\n\n"
+                f"Thank you for choosing Cartify!\n\n"
+                f"Warm regards, \nCARTIFY\n\n"
             )
 
             send_notification_email(subject, message, email)

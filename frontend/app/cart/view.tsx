@@ -6,6 +6,7 @@ import { getCSRFToken } from "../../hooks";
 import { gql, request } from "graphql-request";
 import Navbar from '../components/navbar/page';
 import { useAuth } from "../../app/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: number;
@@ -58,6 +59,10 @@ interface CartResponse {
       subtotal: number;
     }[];
   };
+}
+
+interface NotifyOrderResponse {
+  notifyOrder: boolean;
 }
 
 
@@ -133,11 +138,16 @@ const PLACE_ORDER_MUTATION = gql`
   }
 `;
 
+const NOTIFY_ORDER_MUTATION = gql`
+  mutation NotifyOrder($orderId: Int!) {
+    notifyOrder(orderId: $orderId)
+  }
+`;
+
 const CartPage = () => {
   const { user, loading: authLoading } = useAuth();
   const [userId, setUserId] = useState<number | null>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<boolean[]>([]);
   const [donation, setDonation] = useState<number>(0);
   const [activeDonation, setActiveDonation] = useState<number | null>(null);
   const [notification, setNotification] = useState({ message: "", type: "" });
@@ -146,7 +156,7 @@ const CartPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [orderLoading, setOrderLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const router = useRouter();
   const [totals, setTotals] = useState({
     totalMRP: 0,
     platformFee: 20,
@@ -221,7 +231,6 @@ const CartPage = () => {
       
       if (result && result.cart && result.cart.items) {
         setCartItems(result.cart.items);
-        setSelectedItems(new Array(result.cart.items.length).fill(true));
       }
       setIsLoading(false);
     } catch (error) {
@@ -242,7 +251,7 @@ const CartPage = () => {
 
   useEffect(() => {
     updateTotals();
-  }, [cartItems, selectedItems, donation]);
+  }, [cartItems, donation]);
 
   useEffect(() => {
     if (notification.message) {
@@ -254,8 +263,7 @@ const CartPage = () => {
   }, [notification]);
 
   const updateTotals = () => {
-    const selectedCartItems = cartItems.filter((_, index) => selectedItems[index]);
-    const totalMRP = selectedCartItems.reduce((sum, item) => sum + item.subtotal, 0);
+    const totalMRP = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
     const finalTotal = totalMRP + donation;
 
     setTotals({
@@ -344,7 +352,6 @@ const CartPage = () => {
       await request(endpoint, DELETE_PRODUCT_MUTATION, variables, headers);
       
       setCartItems((prevItems) => prevItems.filter((_, i) => i !== index));
-      setSelectedItems((prevSelected) => prevSelected.filter((_, i) => i !== index));
       
       setNotification({ 
         message: `Removed ${productName} from your cart!`, 
@@ -361,22 +368,12 @@ const CartPage = () => {
     }
   };
 
-  const toggleItemSelection = (index: number) => {
-    setSelectedItems((prevSelected) => {
-      const newSelected = [...prevSelected];
-      newSelected[index] = !newSelected[index];
-      return newSelected;
-    });
-  };
-
   // Modified function to toggle donations
   const toggleDonation = (amount: number) => {
     if (activeDonation === amount) {
-      // If the same donation button is clicked again, remove the donation
       setDonation(0);
       setActiveDonation(null);
     } else {
-      // Otherwise, set the new donation amount
       setDonation(amount);
       setActiveDonation(amount);
     }
@@ -386,11 +383,10 @@ const CartPage = () => {
   const placeOrder = async () => {
     if (!userId) return;
     
-    // Check if there are any selected items
-    const hasSelectedItems = selectedItems.some(selected => selected);
-    if (!hasSelectedItems) {
+    // Check if there are any items in the cart
+    if (cartItems.length === 0) {
       setNotification({
-        message: "Please select at least one item to place an order.",
+        message: "Your cart is empty. Please add items to place an order.",
         type: "error"
       });
       return;
@@ -412,14 +408,13 @@ const CartPage = () => {
       
       // If successful, show success message and refresh cart
       if (result && result.placeOrder) {
+        await sendOrderNotification(result.placeOrder.id);
         setNotification({
           message: `Order placed successfully! Order ID: ${result.placeOrder.id}`,
           type: "success"
         });
-        
-        // Clear cart or refresh data
+
         await fetchCartData();
-        
       }
     } catch (error) {
       console.error("Failed to place order:", error);
@@ -429,6 +424,30 @@ const CartPage = () => {
       });
     } finally {
       setOrderLoading(false);
+    }
+  };
+
+  const sendOrderNotification = async (orderId: string) => {
+    try {
+      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const headers = { 'X-CSRFToken': getCSRFToken() };
+      
+      const variables = {
+        orderId: orderId
+      };
+      
+      const notifyResult = await request<NotifyOrderResponse>(
+        endpoint, 
+        NOTIFY_ORDER_MUTATION, 
+        variables, 
+        headers
+      );
+      
+      console.log("Order notification sent:", notifyResult);
+      return notifyResult.notifyOrder;
+    } catch (error) {
+      console.error("Failed to send order notification:", error);
+      return false;
     }
   };
 
@@ -453,7 +472,7 @@ const CartPage = () => {
           <div className="empty-cart-message">
             <p>Please log in to view your cart.</p>
             <button 
-              onClick={() => window.location.href = '/login'}
+              onClick={() => router.push('/login')}
               className="place-order-btn" 
               style={{ maxWidth: '200px', margin: '20px auto' }}
             >
@@ -483,8 +502,6 @@ const CartPage = () => {
       </>
     );
   }
-
-  const hasSelectedItems = selectedItems.some(selected => selected);
 
   return (
     <>
@@ -566,12 +583,6 @@ const CartPage = () => {
                       {removeLoading === index ? 'Removing...' : 'Remove'}
                     </button>
                   </div>
-                  <input
-                    type="checkbox"
-                    checked={selectedItems[index]}
-                    onChange={() => toggleItemSelection(index)}
-                    className="cart-checkbox"
-                  />
                 </div>
               ))
             ) : (
@@ -615,7 +626,7 @@ const CartPage = () => {
               </div>
               <button 
                 className="place-order-btn" 
-                disabled={cartItems.length === 0 || !hasSelectedItems || orderLoading}
+                disabled={cartItems.length === 0 || orderLoading}
                 onClick={placeOrder}
               >
                 {orderLoading ? 'PROCESSING...' : 'PLACE ORDER'}

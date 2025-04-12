@@ -420,6 +420,27 @@ const ProfilePage = () => {
     }
   };
 
+  if (!user) {
+  return (
+      <>
+        <Navbar />
+        <div className="flex flex-col items-center p-4 bg-[#ebdfff] min-h-screen">
+          <div className="p-8 text-center text-[#5D5A8D] bg-[#F4EEFF] rounded-lg text-base">
+            <p>Please log in to view your Profile.</p>
+            <button 
+              onClick={() => router.push('/login')}
+              className="w-full max-w-[200px] bg-[#424874] text-white py-3 px-4 rounded-lg border-none 
+              cursor-pointer mt-3 text-sm font-semibold tracking-wider transition-all duration-300 
+              shadow-md hover:bg-[#383d65] mx-auto"
+            >
+              GO TO LOGIN
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <div className="bg-[#ece2fd] min-h-screen">
       <Navbar />
