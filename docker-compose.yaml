@@ -3,7 +3,8 @@ services:
     build: ./backend
     container_name: cartify_backend
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file:
       - backend/.env
     environment:
@@ -32,12 +33,17 @@ services:
       - backend/.env
     environment:
       - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_USER={DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   nginx:
     image: nginx:latest
