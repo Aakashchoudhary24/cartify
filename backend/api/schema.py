@@ -315,11 +315,6 @@ class Mutation:
         return DeleteOrderResponse(success=True, message="Profile and user deleted successfully.")
 
     @strawberry.mutation
-    
-    def edit_profile(self, user_id: int, username: Optional[str] = None, address: Optional[str] = None, 
-                    first_name: Optional[str] = None, last_name: Optional[str] = None, 
-                    phone_number: Optional[str] = None, image: Optional[str] = None) -> ProfileType:
-    
     def edit_profile(self, user_id: int, username: Optional[str] = None, address: Optional[str] = None, 
                     first_name: Optional[str] = None, last_name: Optional[str] = None, 
                     phone_number: Optional[str] = None, image: Optional[str] = None) -> ProfileType:
@@ -371,10 +366,6 @@ class Mutation:
         if profile.image:
             image_url = profile.image
 
-        # Get the full URL for the image
-        image_url = None
-        if profile.image:
-            image_url = profile.image
 
         return ProfileType(
             id=profile.user.id,
@@ -384,7 +375,6 @@ class Mutation:
             last_name=profile.last_name,
             email=profile.email,
             phone_number=profile.phone_number,
-            image=image_url
             image=image_url
         )
     
