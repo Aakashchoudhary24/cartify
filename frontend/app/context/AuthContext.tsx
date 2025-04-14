@@ -24,16 +24,16 @@ interface AuthContextType extends AuthState {
   loading: boolean; // Added loading property
 }
 
+// Removed duplicate 'loading' property from AuthContext object
 const AuthContext = createContext<AuthContextType>({
   user: null,
   accessToken: null,
   refreshToken: null,
   isAuthenticated: false,
-  loading: false,
+  loading: false, // Retained this 'loading' property
   login: () => {},
   logout: () => {},
   updateTokens: () => {},
-  loading: true,
 });
 
 const getCookie = (name: string) => {

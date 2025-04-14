@@ -146,113 +146,62 @@ const ProfilePage = () => {
 
   // Fetch profile data
   useEffect(() => {
-  async function fetchProfile() {
+    async function fetchProfile() {
       if (!user || !user.id) {
         setProfileLoading(false);
         return;
       }
-      
+
       const userId = parseInt(user.id);
-      
+
       if (isNaN(userId)) {
         setProfileError("Invalid user ID");
         setProfileLoading(false);
         return;
       }
 
-    setProfileLoading(true);
-    setProfileError(null);
+      setProfileLoading(true);
+      setProfileError(null);
 
-    try {
-      const endpoint = GRAPHQL_URL;
-      const headers = { 'X-CSRFToken': getCSRFToken() };
-      
-      const result = await request(
-        endpoint, 
-        PROFILE_QUERY, 
-        { userId }, 
-        headers
-      );
-      
-      // Update profile state with fetched data
-      if (result.profile) {
-        setProfile({
-          firstName: result.profile.firstName || '',
-          lastName: result.profile.lastName || '',
-          email: result.profile.email || '',
-          phone: result.profile.phoneNumber || '',
-          username: result.profile.user || '',
-          address: result.profile.address || '',
-        });
-        
-        // Process the image
-        if (result.profile.image) {
-          // Construct the full URL to the profile image
-          const imageUrl = result.profile.image.startsWith('/') 
-            ? `${GRAPHQL_URL}/${result.profile.image.substring(1)}` 
-            : `${GRAPHQL_URL}/${result.profile.image}`;
-          
-          setProfileImage(imageUrl);
+      try {
+        const endpoint = GRAPHQL_URL;
+        const headers = { 'X-CSRFToken': getCSRFToken() };
+
+        const result: ProfileResponse = await request(
+          endpoint,
+          PROFILE_QUERY,
+          { userId },
+          headers
+        );
+
+        if (result.profile) {
+          setProfile({
+            firstName: result.profile.firstName || '',
+            lastName: result.profile.lastName || '',
+            email: result.profile.email || '',
+            phone: result.profile.phoneNumber || '',
+            username: result.profile.user || '',
+            address: result.profile.address || '',
+          });
+
+          if (result.profile.image) {
+            const imageUrl = result.profile.image.startsWith('/')
+              ? `${GRAPHQL_URL}/${result.profile.image.substring(1)}`
+              : `${GRAPHQL_URL}/${result.profile.image}`;
+
+            setProfileImage(imageUrl);
+          }
         }
-      } catch {
-        console.error("Error fetching profile:");
-        setProfileError("Error fetching profile:");
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        setProfileError("Error fetching profile");
       } finally {
         setProfileLoading(false);
       }
-
     }
 
-    setProfileLoading(true);
-    setProfileError(null);
-
-    try {
-      const endpoint = GRAPHQL_URL;
-      const headers = { 'X-CSRFToken': getCSRFToken() };
-      
-      const result = await request(
-        endpoint, 
-        PROFILE_QUERY, 
-        { userId }, 
-        headers
-      );
-      
-      // Update profile state with fetched data
-      if (result.profile) {
-        setProfile({
-          firstName: result.profile.firstName || '',
-          lastName: result.profile.lastName || '',
-          email: result.profile.email || '',
-          phone: result.profile.phoneNumber || '',
-          username: result.profile.user || '',
-          address: result.profile.address || '',
-        });
-        
-        // Process the image
-        if (result.profile.image) {
-          // Construct the full URL to the profile image
-          const imageUrl = result.profile.image.startsWith('/') 
-            ? `${GRAPHQL_URL}/${result.profile.image.substring(1)}` 
-            : `${GRAPHQL_URL}/${result.profile.image}`;
-          
-          setProfileImage(imageUrl);
-        }
-      }
-    } catch (err) {
-      console.error("Error fetching profile:", err);
-      setProfileError(err);
-    } finally {
-      console.error("Error fetching profile:", err);
-      setProfileError(err);
-    } finally {
-      setProfileLoading(false);
-    }
-  }
-
-  fetchProfile();
-}, [user]);
-  fetchProfile();
-}, [user]);
+    fetchProfile();
+  }, [user]);
 
   // Fetch orders data
   useEffect(() => {
@@ -335,31 +284,37 @@ const ProfilePage = () => {
     }
   };
 
-<<<<<<< HEAD
-  const handleImageUpload = (e) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) {
+        console.error("No files selected");
+        return;
+    }
     const file = e.target.files[0];
     if (file) {
-      // Create a descriptive filename using username or user ID
-      const fileExt = file.name.split('.').pop();
-      const filename = `profile_${profile.username || user.id}.${fileExt}`;
-      
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // Store the base64 data which will be sent to the backend
-        setProfileImage(reader.result);
-        setProfileImage(reader.result);
+        // Create a descriptive filename using username or user ID
+        const fileExt = file.name.split('.').pop();
+        const filename = `profile_${profile.username || user?.id}.${fileExt}`;
         
-        // Optionally store the filename for reference
-        setProfile(prev => ({
-          ...prev,
-          imageName: filename
-        }));
-      };
-      reader.readAsDataURL(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            if (typeof reader.result === 'string') {
+                // Store the base64 data which will be sent to the backend
+                setProfileImage(reader.result);
+            } else {
+                console.error("Unexpected reader.result type");
+            }
+
+            // Optionally store the filename for reference
+            setProfile(prev => ({
+                ...prev,
+                imageName: filename
+            }));
+        };
+        reader.readAsDataURL(file);
     }
   };
 
-  const decodeImageUrl = (imageUrl) => {
+  const decodeImageUrl = (imageUrl: string | null): string | null => {
     if (!imageUrl) return null;
     
     try {
@@ -371,20 +326,6 @@ const ProfilePage = () => {
     }
   };
 
-  const decodeImageUrl = (imageUrl) => {
-    if (!imageUrl) return null;
-    
-    try {
-      // Construct the full URL to the image
-      return `${GRAPHQL_URL}/${imageUrl}`;
-    } catch (error) {
-      console.error("Error creating image URL:", error);
-      return null;
-    }
-  };
-
-=======
->>>>>>> c0e39d5 (penultimate commit before deployment, an error yet to fix)
   const handleSaveProfile = async () => {
     if (!user || !user.id) {
       setUpdateError("User not authenticated");
@@ -611,16 +552,13 @@ const ProfilePage = () => {
                                 alt="Profile" 
                                 className="w-full h-full object-cover" 
                                 onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
                                   console.error("Error loading profile image:", profileImage);
-                                  e.target.onerror = null; 
-                                  e.target.style.display = 'none';
-                                  
-                                  e.target.onerror = null; 
-                                  e.target.style.display = 'none';
+                                  target.onerror = null;
+                                  target.style.display = 'none';
                                   
                                   // Show initials instead
-                                  const container = e.target.parentNode;
-                                  const container = e.target.parentNode;
+                                  const container = target.parentNode as HTMLElement;
                                   const initials = document.createElement('span');
                                   initials.className = "text-3xl font-bold text-white";
                                   initials.textContent = profile.firstName && profile.lastName ? 
