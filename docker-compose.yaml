@@ -5,7 +5,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ./backend/.env
+      - backend/.env
     environment:
       - POSTGRES_NAME=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
@@ -14,6 +14,8 @@ services:
       - POSTGRES_PORT=${DB_PORT}
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend/staticfiles:/staticfiles
 
   frontend:
     build: ./frontend
@@ -27,7 +29,7 @@ services:
     image: postgres:15
     container_name: cartify_db
     env_file:
-      - ./backend/.env
+      - backend/.env
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
@@ -36,6 +38,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+
   nginx:
     image: nginx:latest
     container_name: cartify_nginx
@@ -46,6 +49,9 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./backend/static:/static:ro
+      - ./backend/staticfiles:/staticfiles:ro 
+
 volumes:
   pgdata:
+  staticvolume:
+  staticfiles:
