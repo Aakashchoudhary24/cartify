@@ -106,7 +106,6 @@ export default function ProductPage() {
         quantity: quantity
       };
 
-      // Use the same endpoint you're using for queries
       const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
 

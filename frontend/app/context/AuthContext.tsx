@@ -21,16 +21,14 @@ interface AuthContextType extends AuthState {
   login: (userData: AuthUser, accessToken: string, refreshToken: string) => void;
   logout: () => void;
   updateTokens: (accessToken: string, refreshToken: string) => void;
-  loading: boolean; // Added loading property
 }
 
-// Removed duplicate 'loading' property from AuthContext object
 const AuthContext = createContext<AuthContextType>({
   user: null,
   accessToken: null,
   refreshToken: null,
   isAuthenticated: false,
-  loading: false, // Retained this 'loading' property
+  loading: false,
   login: () => {},
   logout: () => {},
   updateTokens: () => {},
@@ -60,8 +58,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loading: false,
   });
 
-  const [loading, setLoading] = useState(true);
-
   const router = useRouter();
 
   useEffect(() => {
@@ -85,7 +81,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         deleteCookie('user');
       }
     }
-    setLoading(false); // Set loading to false after initialization
   }, []);
 
   const login = (userData: AuthUser, accessToken: string, refreshToken: string) => {
@@ -136,7 +131,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         logout,
         updateTokens,
-        loading, // Provide loading state in context
       }}
     >
       {children}

@@ -151,9 +151,8 @@ const ProfilePage = () => {
         setProfileLoading(false);
         return;
       }
-
+      
       const userId = parseInt(user.id);
-
       if (isNaN(userId)) {
         setProfileError("Invalid user ID");
         setProfileLoading(false);
@@ -186,8 +185,8 @@ const ProfilePage = () => {
 
           if (result.profile.image) {
             const imageUrl = result.profile.image.startsWith('/')
-              ? `${GRAPHQL_URL}/${result.profile.image.substring(1)}`
-              : `${GRAPHQL_URL}/${result.profile.image}`;
+            ? `http://127.0.0.1:8000/${result.profile.image.substring(1)}` 
+            : `http://127.0.0.1:8000/${result.profile.image}`;
 
             setProfileImage(imageUrl);
           }
@@ -284,47 +283,36 @@ const ProfilePage = () => {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) {
-        console.error("No files selected");
-        return;
-    }
-    const file = e.target.files[0];
-    if (file) {
+  const handleImageUpload = (e:React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
         // Create a descriptive filename using username or user ID
         const fileExt = file.name.split('.').pop();
-        const filename = `profile_${profile.username || user?.id}.${fileExt}`;
+        if (!user) {
+          console.error("User not available");
+          return;
+        }
+        const filename = `profile_${profile.username || user.id}.${fileExt}`;
         
         const reader = new FileReader();
         reader.onloadend = () => {
-            if (typeof reader.result === 'string') {
-                // Store the base64 data which will be sent to the backend
-                setProfileImage(reader.result);
-            } else {
-                console.error("Unexpected reader.result type");
-            }
-
-            // Optionally store the filename for reference
-            setProfile(prev => ({
-                ...prev,
-                imageName: filename
-            }));
+          // Store the base64 data which will be sent to the backend
+          const result = reader.result;
+          if (typeof result === 'string') {
+            setProfileImage(result);
+          } else {
+            console.error("Failed to convert file to base64 string.");
+          }
+          
+          // Optionally store the filename for reference
+          setProfile(prev => ({
+            ...prev,
+            imageName: filename
+          }));
         };
         reader.readAsDataURL(file);
-    }
-  };
-
-  const decodeImageUrl = (imageUrl: string | null): string | null => {
-    if (!imageUrl) return null;
-    
-    try {
-      // Construct the full URL to the image
-      return `${GRAPHQL_URL}/${imageUrl}`;
-    } catch (error) {
-      console.error("Error creating image URL:", error);
-      return null;
-    }
-  };
+      }
+    };
 
   const handleSaveProfile = async () => {
     if (!user || !user.id) {
@@ -424,6 +412,27 @@ const ProfilePage = () => {
       setDeleteLoading(false);
     }
   };
+
+  if (!user) {
+  return (
+      <>
+        <Navbar />
+        <div className="flex flex-col items-center p-4 bg-[#ebdfff] min-h-screen">
+          <div className="p-8 text-center text-[#5D5A8D] bg-[#F4EEFF] rounded-lg text-base">
+            <p>Please log in to view your Profile.</p>
+            <button 
+              onClick={() => router.push('/login')}
+              className="w-full max-w-[200px] bg-[#424874] text-white py-3 px-4 rounded-lg border-none 
+              cursor-pointer mt-3 text-sm font-semibold tracking-wider transition-all duration-300 
+              shadow-md hover:bg-[#383d65] mx-auto"
+            >
+              GO TO LOGIN
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="bg-[#ece2fd] min-h-screen">
@@ -552,13 +561,13 @@ const ProfilePage = () => {
                                 alt="Profile" 
                                 className="w-full h-full object-cover" 
                                 onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
+                                  const img = e.target as HTMLImageElement;
                                   console.error("Error loading profile image:", profileImage);
-                                  target.onerror = null;
-                                  target.style.display = 'none';
-                                  
+                                  img.onerror = null; 
+                                  img.style.display = 'none';
+
                                   // Show initials instead
-                                  const container = target.parentNode as HTMLElement;
+                                  const container = img.parentNode as HTMLElement; 
                                   const initials = document.createElement('span');
                                   initials.className = "text-3xl font-bold text-white";
                                   initials.textContent = profile.firstName && profile.lastName ? 

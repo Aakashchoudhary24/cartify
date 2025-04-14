@@ -20,7 +20,7 @@ export default function Register() {
         setSuccess('');
 
         try {
-            const response = await fetch(GRAPHQL_URL, {
+            const response = await fetch('http://127.0.0.1:8000/graphql/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
