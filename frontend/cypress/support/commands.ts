@@ -25,7 +25,7 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
-
+const GRAPHQL_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/graphql/";
 declare namespace Cypress {
     interface Chainable {
       login(username : string,password: string): Chainable<void>
@@ -46,6 +46,6 @@ Cypress.Commands.add('logout', () => {
     cy.contains('Welcome Back').should('exist');
     });
 Cypress.Commands.add('waitGraphqlquery', () => {
-    cy.intercept('POST', 'http://127.0.0.1:8000/graphql/').as('graphql');
+    cy.intercept('POST', GRAPHQL_URL).as('graphql');
     cy.wait('@graphql', { timeout: 5000 });
     });

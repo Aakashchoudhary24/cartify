@@ -12,6 +12,7 @@ export default function Register() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const GRAPHQL_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/graphql/";
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();

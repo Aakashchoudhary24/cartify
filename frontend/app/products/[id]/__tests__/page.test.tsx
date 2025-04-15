@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '../../../../app/context/AuthContext';
 import { request } from 'graphql-request';
 import { getCSRFToken } from '..../../../hooks';
+const GRAPHQL_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/graphql/";
 
 // Mock the dependencies
 vi.mock('next/navigation', () => ({
@@ -133,7 +134,7 @@ describe('ProductPage', () => {
     // Wait for the operation to complete
     await waitFor(() => {
       expect(request).toHaveBeenCalledWith(
-        'http://127.0.0.1:8000/graphql/',
+        GRAPHQL_URL,
         expect.anything(),
         {
           userId: 1,

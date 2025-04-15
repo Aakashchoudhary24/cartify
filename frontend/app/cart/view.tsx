@@ -6,6 +6,7 @@ import { getCSRFToken } from "../../hooks";
 import { gql, request } from "graphql-request";
 import Navbar from '../components/navbar/page';
 import { useAuth } from "../../app/context/AuthContext";
+const GRAPHQL_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/graphql/";
 import { useRouter } from "next/navigation";
 
 interface Product {
@@ -64,7 +65,6 @@ interface CartResponse {
 interface NotifyOrderResponse {
   notifyOrder: boolean;
 }
-
 
 const PROFILE_QUERY = gql`
   query GetProfile($userId: Int!) {
@@ -177,7 +177,7 @@ const CartPage = () => {
     if (!userId) return;
     
     try {
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       const result = await request<ProfileResponse>(endpoint, PROFILE_QUERY, { userId }, headers);
@@ -224,7 +224,7 @@ const CartPage = () => {
     setError(null);
     
     try {
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       const result = await request<CartResponse>(endpoint, CART_QUERY, { userId }, headers);
@@ -294,8 +294,8 @@ const CartPage = () => {
         };
         return newItems;
       });
-      
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       const variables = {
@@ -303,9 +303,8 @@ const CartPage = () => {
         productId: productId,
         quantity: newQuantity
       };
-      
+
       await request(endpoint, UPDATE_CART_PRODUCT_MUTATION, variables, headers);
-      
       await fetchCartData();
       
     } 
@@ -341,14 +340,13 @@ const CartPage = () => {
     setRemoveLoading(index);
     
     try {
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       const variables = {
         userId,
         productId: productId
       };
-      
       await request(endpoint, DELETE_PRODUCT_MUTATION, variables, headers);
       
       setCartItems((prevItems) => prevItems.filter((_, i) => i !== index));
@@ -382,7 +380,6 @@ const CartPage = () => {
   // New function to handle placing an order
   const placeOrder = async () => {
     if (!userId) return;
-    
     // Check if there are any items in the cart
     if (cartItems.length === 0) {
       setNotification({
@@ -395,7 +392,7 @@ const CartPage = () => {
     setOrderLoading(true);
     
     try {
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
       
       // Execute the place order mutation
@@ -413,7 +410,7 @@ const CartPage = () => {
           message: `Order placed successfully! Order ID: ${result.placeOrder.id}`,
           type: "success"
         });
-
+        // Clear cart or refresh data
         await fetchCartData();
       }
     } catch (error) {
@@ -450,7 +447,6 @@ const CartPage = () => {
       return false;
     }
   };
-
   // Show loading state
   if (isLoading || authLoading) {
     return (

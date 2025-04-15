@@ -142,17 +142,17 @@ const ProfilePage = () => {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [confirmDeleteText, setConfirmDeleteText] = useState('');
+  const GRAPHQL_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/graphql/";
 
   // Fetch profile data
   useEffect(() => {
-  async function fetchProfile() {
+    async function fetchProfile() {
       if (!user || !user.id) {
         setProfileLoading(false);
         return;
       }
       
       const userId = parseInt(user.id);
-      
       if (isNaN(userId)) {
         setProfileError("Invalid user ID");
         setProfileLoading(false);
@@ -163,51 +163,44 @@ const ProfilePage = () => {
       setProfileError(null);
 
       try {
-        const endpoint = "http://127.0.0.1:8000/graphql/";
+        const endpoint = GRAPHQL_URL;
         const headers = { 'X-CSRFToken': getCSRFToken() };
-        
-        const result = await request<ProfileResponse>(
-          endpoint, 
-          PROFILE_QUERY, 
-          { userId }, 
+
+        const result: ProfileResponse = await request(
+          endpoint,
+          PROFILE_QUERY,
+          { userId },
           headers
         );
-      
-      // Update profile state with fetched data
-      if (result.profile) {
-        setProfile({
-          firstName: result.profile.firstName || '',
-          lastName: result.profile.lastName || '',
-          email: result.profile.email || '',
-          phone: result.profile.phoneNumber || '',
-          username: result.profile.user || '',
-          address: result.profile.address || '',
-        });
-        
-        // Process the image
-        if (result.profile.image) {
-          // Construct the full URL to the profile image
-          const imageUrl = result.profile.image.startsWith('/') 
+
+        if (result.profile) {
+          setProfile({
+            firstName: result.profile.firstName || '',
+            lastName: result.profile.lastName || '',
+            email: result.profile.email || '',
+            phone: result.profile.phoneNumber || '',
+            username: result.profile.user || '',
+            address: result.profile.address || '',
+          });
+
+          if (result.profile.image) {
+            const imageUrl = result.profile.image.startsWith('/')
             ? `http://127.0.0.1:8000/${result.profile.image.substring(1)}` 
             : `http://127.0.0.1:8000/${result.profile.image}`;
-          
-          setProfileImage(imageUrl);
-        }
-      }
-    } catch (err) {
-        console.error("Error fetching profile:", err);
-        if (err instanceof Error) {
-          setProfileError(err.message); 
-        } else {
-          setProfileError("An unexpected error occurred"); 
-        }
-      } finally {
-      setProfileLoading(false);
-    }
-  }
 
-  fetchProfile();
-}, [user]);
+            setProfileImage(imageUrl);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        setProfileError("Error fetching profile");
+      } finally {
+        setProfileLoading(false);
+      }
+    }
+
+    fetchProfile();
+  }, [user]);
 
   // Fetch orders data
   useEffect(() => {
@@ -229,7 +222,7 @@ const ProfilePage = () => {
       setOrdersError(null);
 
       try {
-        const endpoint = "http://127.0.0.1:8000/graphql/";
+        const endpoint = GRAPHQL_URL;
         const headers = { 'X-CSRFToken': getCSRFToken() };
         
         const result = await request<OrderResponse>(
@@ -291,35 +284,35 @@ const ProfilePage = () => {
   };
 
   const handleImageUpload = (e:React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Create a descriptive filename using username or user ID
-      const fileExt = file.name.split('.').pop();
-      if (!user) {
-        console.error("User not available");
-        return;
-      }
-      const filename = `profile_${profile.username || user.id}.${fileExt}`;
-      
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // Store the base64 data which will be sent to the backend
-        const result = reader.result;
-        if (typeof result === 'string') {
-          setProfileImage(result);
-        } else {
-          console.error("Failed to convert file to base64 string.");
+      const file = e.target.files?.[0];
+      if (file) {
+        // Create a descriptive filename using username or user ID
+        const fileExt = file.name.split('.').pop();
+        if (!user) {
+          console.error("User not available");
+          return;
         }
+        const filename = `profile_${profile.username || user.id}.${fileExt}`;
         
-        // Optionally store the filename for reference
-        setProfile(prev => ({
-          ...prev,
-          imageName: filename
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          // Store the base64 data which will be sent to the backend
+          const result = reader.result;
+          if (typeof result === 'string') {
+            setProfileImage(result);
+          } else {
+            console.error("Failed to convert file to base64 string.");
+          }
+          
+          // Optionally store the filename for reference
+          setProfile(prev => ({
+            ...prev,
+            imageName: filename
+          }));
+        };
+        reader.readAsDataURL(file);
+      }
+    };
 
   const handleSaveProfile = async () => {
     if (!user || !user.id) {
@@ -337,7 +330,7 @@ const ProfilePage = () => {
         throw new Error("Invalid user ID");
       }
 
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
 
       // Prepare variables for the mutation
@@ -392,7 +385,7 @@ const ProfilePage = () => {
         throw new Error("Invalid user ID");
       }
 
-      const endpoint = "http://127.0.0.1:8000/graphql/";
+      const endpoint = GRAPHQL_URL;
       const headers = { 'X-CSRFToken': getCSRFToken() };
 
       const result = await request<DeleteProfileResponse>(

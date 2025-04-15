@@ -89,12 +89,14 @@ TEMPLATES = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:8000",
+    "http://localhost",
 ]
 CORS_ALLOW_ALL_ORIGINS = False  
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:8000",
+    "http://localhost",
 ]
 
 WSGI_APPLICATION = 'api.wsgi.application'
@@ -105,12 +107,12 @@ WSGI_APPLICATION = 'api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER':  os.getenv('DB_USER'),
-        'PASSWORD':  os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'), 
-        'PORT': os.getenv('DB_PORT'),
+        'ENGINE': 'django.db.backends.postgresql', 
+        'NAME': f"{os.getenv('DB_NAME')}",
+        'USER': f"{os.getenv('DB_USER')}",
+        'PASSWORD': f"{os.getenv('DB_PASSWORD')}",
+        'HOST': f"{os.getenv('DB_HOST')}",
+        'PORT': f"{os.getenv('DB_PORT')}",
     }
 }
 
@@ -158,9 +160,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
+    os.path.join(BASE_DIR, 'static'),
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles") 
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

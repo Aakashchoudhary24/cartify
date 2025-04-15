@@ -419,4 +419,3 @@ MergedMutation = merge_types("MergedMutation", (AuthMutation, Mutation))
 schema = strawberry.Schema(query=MergedQuery, mutation=MergedMutation)
 
 
-

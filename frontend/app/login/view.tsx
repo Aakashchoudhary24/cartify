@@ -13,6 +13,7 @@ export default function Login() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const { login, isAuthenticated } = useAuth();
+    const GRAPHQL_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/graphql/";
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();

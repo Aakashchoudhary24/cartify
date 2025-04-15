@@ -1,3 +1,4 @@
+const GRAPHQL_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/graphql/";
 import { useState, useEffect } from 'react';
 import { request } from 'graphql-request';
 
@@ -20,7 +21,7 @@ export function useFetchGraphQL<T>(query: string, variables: Record<string, any>
       setError(null);
 
       try {
-        const endpoint = "http://127.0.0.1:8000/graphql/";
+        const endpoint = GRAPHQL_URL;
         const headers = { 'X-CSRFToken': getCSRFToken() };
 
         const result = await request<T>(endpoint, query, variables, headers);
