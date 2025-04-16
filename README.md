@@ -58,3 +58,6 @@ CARTIFY is an online shopping platform that offers a seamless and interactive ex
 - **[@Dattaaanand](https://github.com/Dattaaanand)** – Dattanand U D  
 - **[@Aakashchoudhary24](https://github.com/Aakashchoudhary24)** – Aakash Choudhary  
 - **[@dilip27m](https://github.com/dilip27m)** – Mulakkayala Dilip Kumar Reddy
+
+## **Figma Design**
+- https://www.figma.com/design/wGKnFKSIlwE7WtythXWTxz/Cartify?node-id=30-3&t=DM2GhRwjlkQo9Pia-1
