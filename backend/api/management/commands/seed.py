@@ -40,19 +40,25 @@ class Command(BaseCommand):
                     category_objects.append(category)
                 
                 # Ensure the product does not already exist in the database
-                product, created = Product.objects.update_or_create(
-                    name=product_name,
-                    defaults={
-                        'price': price.strip('₹').replace(',', ''),
-                        'description': details,
-                        'image1': image1_keys[0],
-                        'image2': image2_keys[0],
-                        'category': category_objects[0],
-                        'gender': gender
-                    }
-                )
-
-                if created:
-                    self.stdout.write(self.style.SUCCESS(f'Product {product_name} created successfully'))
+                existing_products = Product.objects.filter(name=product_name)
+                if existing_products.exists():
+                    product = existing_products.first()
+                    product.price = price.strip('₹').replace(',', '')
+                    product.description = details
+                    product.image1 = image1_keys[0]
+                    product.image2 = image2_keys[0]
+                    product.category = category_objects[0]
+                    product.gender = gender
+                    product.save()
+                    self.stdout.write(self.style.WARNING(f'Product {product_name} updated'))
                 else:
-                    self.stdout.write(self.style.WARNING(f'Product {product_name} already exists'))
+                    product = Product.objects.create(
+                        name=product_name,
+                        price=price.strip('₹').replace(',', ''),
+                        description=details,
+                        image1=image1_keys[0],
+                        image2=image2_keys[0],
+                        category=category_objects[0],
+                        gender=gender
+                    )
+                    self.stdout.write(self.style.SUCCESS(f'Product {product_name} created successfully'))
