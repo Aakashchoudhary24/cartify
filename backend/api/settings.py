@@ -93,6 +93,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_ALL_ORIGINS = False  
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:8000,http://localhost').split(',')
+if not DEBUG:
+    CSRF_TRUSTED_ORIGINS.append("https://cartify-o294.onrender.com")
 
 WSGI_APPLICATION = 'api.wsgi.application'
 
