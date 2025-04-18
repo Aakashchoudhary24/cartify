@@ -1,5 +1,6 @@
 asgiref==3.8.1
 chowkidar-strawberry==0.3.2
+dj-database-url==2.3.0
 Django==5.1.6
 django-choices-field==2.3.0
 django-cors-headers==4.7.0
