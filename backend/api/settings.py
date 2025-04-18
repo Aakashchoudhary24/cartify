@@ -92,12 +92,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost",
 ]
 CORS_ALLOW_ALL_ORIGINS = False  
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:8000",
-    "http://localhost",
-]
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:8000,http://localhost').split(',')
 
 WSGI_APPLICATION = 'api.wsgi.application'
 
@@ -187,3 +182,8 @@ SECURE_HSTS_PRELOAD = True
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+if DEBUG:
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
