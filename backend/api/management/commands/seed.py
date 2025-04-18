@@ -40,7 +40,7 @@ class Command(BaseCommand):
                     category_objects.append(category)
                 
                 # Ensure the product does not already exist in the database
-                product, created = Product.objects.get_or_create(
+                product, created = Product.objects.update_or_create(
                     name=product_name,
                     defaults={
                         'price': price.strip('₹').replace(',', ''),
